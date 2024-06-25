@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+<script>
+
+$(document).ready(function() {
+	ConfirmDialog('Hello Dave');
+});
+
+function ConfirmDialog(message) {
+  $('<div></div>').appendTo('body')
+    .html('<div><h6>' + message + '?</h6></div>')
+    .dialog({
+      modal: true,
+      title: 'Delete message',
+      zIndex: 10000,
+      autoOpen: true,
+      width: 'auto',
+      resizable: false,
+      buttons: {
+        Yes: function() {
+          // $(obj).removeAttr('onclick');                                
+          // $(obj).parents('.Parent').remove();
+
+          $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
+
+          $(this).dialog("close");
+        },
+        No: function() {
+          $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
+
+          $(this).dialog("close");
+        }
+      },
+      close: function(event, ui) {
+        $(this).remove();
+      }
+    });
+};
+
+</script>
+</head>
+<body>
+	<button id="say_it">Say "Hello!"</button>
+</body>
+</html>

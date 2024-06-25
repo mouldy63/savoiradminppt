@@ -1,0 +1,15 @@
+hr {
+  background-size: 1px;
+  border-top: 1px solid #000;
+  border-color: #000000;
+}
+label {padding-right: 6px;
+padding-left:2px;}
+.radiospace {margin-right: 2px !important;
+padding-left:2px !important;}
+.nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+   margin-bottom:10px !important;
+}
+.rowindent {margin-left:8px;}

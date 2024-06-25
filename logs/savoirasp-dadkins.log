@@ -1,0 +1,183 @@
+11/10/2023 08:11:55    /Index.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:11:56    /Index.asp    d.adkins    Exit
+11/10/2023 08:12:05    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:12:05    /edit-purchase.asp    d.adkins    Enter: order=88823
+11/10/2023 08:12:07    /edit-purchase.asp    d.adkins    Exit
+11/10/2023 08:12:09    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:12:09    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:12:13    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:13:29    /update-productioninfo.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:13:31    /orderdetails.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:13:31    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:13:31    /orderdetails.asp    d.adkins    Enter: msg=Details updated
+11/10/2023 08:13:34    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:13:40    login.asp    d.adkins    d.adkins successfully logged on
+11/10/2023 08:15:32    /update-productioninfo.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:15:34    /orderdetails.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:15:34    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:15:34    /orderdetails.asp    d.adkins    Enter: msg=Details updated
+11/10/2023 08:15:37    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:15:56    login.asp    d.adkins    d.adkins successfully logged on
+11/10/2023 08:24:38    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:24:38    /edit-purchase.asp    d.adkins    Enter: order=89752
+11/10/2023 08:24:38    /edit-purchase.asp    d.adkins    Exit
+11/10/2023 08:24:40    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:24:40    /orderdetails.asp    d.adkins    Enter: pn=89752
+11/10/2023 08:24:43    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:32:47    /Index.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:32:48    /Index.asp    d.adkins    Exit
+11/10/2023 08:32:53    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:32:53    /edit-purchase.asp    d.adkins    Enter: order=88823
+11/10/2023 08:32:54    /edit-purchase.asp    d.adkins    Exit
+11/10/2023 08:32:58    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:32:58    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:33:01    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:33:05    /edit-purchase.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:33:05    /edit-purchase.asp    d.adkins    Enter: prod=y
+11/10/2023 08:33:05    /edit-purchase.asp    d.adkins    Enter: order=88823
+11/10/2023 08:33:06    /edit-purchase.asp    d.adkins    Exit
+11/10/2023 08:33:23    /edit-purchase.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:33:23    /edit-purchase.asp    d.adkins    Enter: prod=y
+11/10/2023 08:33:23    /edit-purchase.asp    d.adkins    Enter: order=88823
+11/10/2023 08:33:23    /edit-purchase.asp    d.adkins    deletePackagingDataForComponent: delete from packagingdata where Purchase_no=88823 and componentID=5
+11/10/2023 08:33:23    /edit-purchase.asp    d.adkins    deletePackagingDataForComponent: update packagingdata set packedwith=null where packedwith='5' and Purchase_no=88823
+11/10/2023 08:33:24    /edit-purchase.asp    d.adkins    retrieveUserLocation=1
+11/10/2023 08:33:24    /edit-purchase.asp    d.adkins    paymentEmailCC=dmildenhall@salmon.com
+11/10/2023 08:33:24    /edit-purchase.asp    d.adkins    defunct: request(additionalpayment)=
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: No. of query params=9
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: mattreq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: basereq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: prod=y
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: topperreq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: valreq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: hbreq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: accreq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: legsreq=n
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Enter: val=88823
+11/10/2023 08:33:24    /ordercomplete.asp    d.adkins    Exit
+11/10/2023 08:33:26    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+11/10/2023 08:33:26    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:33:30    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:33:50    /update-productioninfo.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:33:51    /orderdetails.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:33:51    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:33:51    /orderdetails.asp    d.adkins    Enter: msg=Details updated
+11/10/2023 08:33:55    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:34:32    /update-productioninfo.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:34:34    /orderdetails.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:34:34    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:34:34    /orderdetails.asp    d.adkins    Enter: msg=Details updated
+11/10/2023 08:34:37    /orderdetails.asp    d.adkins    Exit
+11/10/2023 08:35:57    /update-productioninfo.asp    d.adkins    Enter: No. of query params=0
+11/10/2023 08:35:58    /orderdetails.asp    d.adkins    Enter: No. of query params=2
+11/10/2023 08:35:58    /orderdetails.asp    d.adkins    Enter: pn=88823
+11/10/2023 08:35:58    /orderdetails.asp    d.adkins    Enter: msg=Details updated
+11/10/2023 08:36:03    /orderdetails.asp    d.adkins    Exit
+18/10/2023 12:52:58    login.asp    d.adkins    d.adkins successfully logged on
+18/10/2023 12:53:16    /Index.asp    d.adkins    Enter: No. of query params=0
+18/10/2023 12:53:17    /Index.asp    d.adkins    Exit
+18/10/2023 12:53:22    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+18/10/2023 12:53:22    /edit-purchase.asp    d.adkins    Enter: order=88823
+18/10/2023 12:53:25    /edit-purchase.asp    d.adkins    Exit
+18/10/2023 12:53:40    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+18/10/2023 12:53:40    /orderdetails.asp    d.adkins    Enter: pn=88823
+18/10/2023 12:53:45    /orderdetails.asp    d.adkins    Exit
+19/10/2023 13:38:38    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+19/10/2023 13:38:38    /orderdetails.asp    d.adkins    Enter: pn=89754
+19/10/2023 13:38:41    /orderdetails.asp    d.adkins    Exit
+13/11/2023 13:41:14    /current-orders.asp    d.adkins    Enter: No. of query params=0
+13/11/2023 13:42:46    /current-orders.asp    d.adkins    Exit
+14/11/2023 12:34:13    /editcust.asp    d.adkins    Enter: No. of query params=1
+14/11/2023 12:34:13    /editcust.asp    d.adkins    Enter: val=319256
+14/11/2023 12:34:14    /editcust.asp    d.adkins    Exit
+14/11/2023 12:34:20    /editcust.asp    d.adkins    Enter: No. of query params=0
+14/11/2023 12:34:20    /add-order.asp    d.adkins    Enter: No. of query params=4
+14/11/2023 12:34:20    /add-order.asp    d.adkins    Enter: contact_no=319256
+14/11/2023 12:34:20    /add-order.asp    d.adkins    Enter: e1=y
+14/11/2023 12:34:20    /add-order.asp    d.adkins    Enter: quote=n
+14/11/2023 12:34:20    /add-order.asp    d.adkins    Enter: ordersource=Test
+14/11/2023 12:34:20    /add-order.asp    d.adkins    Exit
+14/11/2023 12:36:48    /editcust.asp    d.adkins    Enter: No. of query params=1
+14/11/2023 12:36:48    /editcust.asp    d.adkins    Enter: val=319256
+14/11/2023 12:36:49    /editcust.asp    d.adkins    Exit
+14/11/2023 12:36:52    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+14/11/2023 12:36:52    /edit-purchase.asp    d.adkins    Enter: order=89712
+14/11/2023 12:36:53    /edit-purchase.asp    d.adkins    Exit
+14/11/2023 12:36:58    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+14/11/2023 12:36:58    /orderdetails.asp    d.adkins    Enter: pn=89712
+14/11/2023 12:37:00    /orderdetails.asp    d.adkins    Exit
+20/11/2023 11:28:20    /editcust.asp    d.adkins    Enter: No. of query params=1
+20/11/2023 11:28:20    /editcust.asp    d.adkins    Enter: val=319256
+20/11/2023 11:28:21    /editcust.asp    d.adkins    Exit
+20/11/2023 11:28:27    /editcust.asp    d.adkins    Enter: No. of query params=0
+20/11/2023 11:28:27    /add-order.asp    d.adkins    Enter: No. of query params=4
+20/11/2023 11:28:27    /add-order.asp    d.adkins    Enter: contact_no=319256
+20/11/2023 11:28:27    /add-order.asp    d.adkins    Enter: e1=y
+20/11/2023 11:28:27    /add-order.asp    d.adkins    Enter: quote=n
+20/11/2023 11:28:27    /add-order.asp    d.adkins    Enter: ordersource=Test
+20/11/2023 11:28:27    /add-order.asp    d.adkins    Exit
+24/11/2023 13:49:09    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+24/11/2023 13:49:09    /edit-purchase.asp    d.adkins    Enter: order=89804
+24/11/2023 13:49:10    /edit-purchase.asp    d.adkins    Exit
+24/11/2023 13:49:40    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+24/11/2023 13:49:40    /orderdetails.asp    d.adkins    Enter: pn=89804
+24/11/2023 13:49:43    /orderdetails.asp    d.adkins    Exit
+24/11/2023 13:51:06    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+24/11/2023 13:51:06    /edit-purchase.asp    d.adkins    Enter: order=89804
+24/11/2023 13:51:07    /edit-purchase.asp    d.adkins    Exit
+24/11/2023 13:51:15    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+24/11/2023 13:51:15    /orderdetails.asp    d.adkins    Enter: pn=89804
+24/11/2023 13:51:18    /orderdetails.asp    d.adkins    Exit
+24/11/2023 13:54:35    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+24/11/2023 13:54:35    /edit-purchase.asp    d.adkins    Enter: order=89804
+24/11/2023 13:54:36    /edit-purchase.asp    d.adkins    Exit
+24/11/2023 13:58:29    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+24/11/2023 13:58:29    /orderdetails.asp    d.adkins    Enter: pn=89804
+24/11/2023 13:58:32    /orderdetails.asp    d.adkins    Exit
+24/11/2023 13:58:53    /update-productioninfo.asp    d.adkins    Enter: No. of query params=0
+24/11/2023 13:58:55    /orderdetails.asp    d.adkins    Enter: No. of query params=2
+24/11/2023 13:58:55    /orderdetails.asp    d.adkins    Enter: pn=89804
+24/11/2023 13:58:55    /orderdetails.asp    d.adkins    Enter: msg=Details updated
+24/11/2023 13:58:59    /orderdetails.asp    d.adkins    Exit
+13/03/2024 15:27:15    /editcust.asp    d.adkins    Enter: No. of query params=1
+13/03/2024 15:27:15    /editcust.asp    d.adkins    Enter: val=319256
+13/03/2024 15:27:17    /editcust.asp    d.adkins    Exit
+13/03/2024 15:27:30    /editcust.asp    d.adkins    Enter: No. of query params=1
+13/03/2024 15:27:30    /editcust.asp    d.adkins    Enter: val=319256
+13/03/2024 15:27:31    /editcust.asp    d.adkins    Exit
+13/03/2024 15:27:41    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+13/03/2024 15:27:41    /edit-purchase.asp    d.adkins    Enter: order=89712
+13/03/2024 15:27:42    /edit-purchase.asp    d.adkins    Exit
+13/03/2024 15:27:44    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+13/03/2024 15:27:44    /orderdetails.asp    d.adkins    Enter: pn=89712
+13/03/2024 15:27:46    /orderdetails.asp    d.adkins    Exit
+13/03/2024 15:28:21    /editcust.asp    d.adkins    Enter: No. of query params=2
+13/03/2024 15:28:21    /editcust.asp    d.adkins    Enter: val=319256
+13/03/2024 15:28:21    /editcust.asp    d.adkins    Enter: tab=2
+13/03/2024 15:28:22    /editcust.asp    d.adkins    Exit
+13/03/2024 15:29:11    /editcust.asp    d.adkins    Enter: No. of query params=1
+13/03/2024 15:29:11    /editcust.asp    d.adkins    Enter: val=319256
+13/03/2024 15:29:12    /editcust.asp    d.adkins    Exit
+05/04/2024 11:03:55    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+05/04/2024 11:03:55    /edit-purchase.asp    d.adkins    Enter: order=89833
+05/04/2024 11:03:56    /edit-purchase.asp    d.adkins    Exit
+05/04/2024 11:03:58    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+05/04/2024 11:03:58    /orderdetails.asp    d.adkins    Enter: pn=89833
+05/04/2024 11:04:02    /orderdetails.asp    d.adkins    Exit
+05/04/2024 11:08:32    /editcust.asp    d.adkins    Enter: No. of query params=2
+05/04/2024 11:08:32    /editcust.asp    d.adkins    Enter: val=334993
+05/04/2024 11:08:32    /editcust.asp    d.adkins    Enter: tab=2
+05/04/2024 11:08:33    /editcust.asp    d.adkins    Exit
+05/04/2024 13:19:22    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+05/04/2024 13:19:22    /orderdetails.asp    d.adkins    Enter: pn=89833
+05/04/2024 13:19:24    /orderdetails.asp    d.adkins    Exit
+08/04/2024 09:33:43    /edit-purchase.asp    d.adkins    Enter: No. of query params=1
+08/04/2024 09:33:43    /edit-purchase.asp    d.adkins    Enter: order=89833
+08/04/2024 09:33:43    /edit-purchase.asp    d.adkins    Exit
+08/04/2024 09:33:46    /orderdetails.asp    d.adkins    Enter: No. of query params=1
+08/04/2024 09:33:46    /orderdetails.asp    d.adkins    Enter: pn=89833
+08/04/2024 09:33:48    /orderdetails.asp    d.adkins    Exit
+08/04/2024 09:34:21    /editcust.asp    d.adkins    Enter: No. of query params=2
+08/04/2024 09:34:21    /editcust.asp    d.adkins    Enter: val=334993
+08/04/2024 09:34:21    /editcust.asp    d.adkins    Enter: tab=2
+08/04/2024 09:34:23    /editcust.asp    d.adkins    Exit

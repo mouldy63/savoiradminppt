@@ -1,0 +1,77 @@
+.button {
+    background-color: #D3D3D3;
+    border: none;
+    color: black;
+    padding: 8px 8px;
+    text-align: center;
+    text-decoration: none;
+    /*display: inline-block;*/
+    font-size: 16px;
+    margin: 2px 1px;
+    cursor: pointer;
+}
+
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#articleInputCenter{
+    text-align: center
+}
+#newArticleForm{
+    display: none;
+}
+
+#showEditRows{
+    display: none;
+}
+
+.centertext{
+    text-align: center;
+}
+
+td a {
+    display:block;
+    width:100%;
+}
+
+span.inline {
+    float:left;}
+
+.clearBoth{
+    clear:both;
+}
+
+.content-hidden{
+    display: none;
+}
+
+#PostAddForm #ArticleHeader{
+    width: 700px;
+}
+
+#PostAddForm #ArticleLink{
+    width: 700px;
+}
+
+#EditRows td input{
+    width: 700px;
+}
+
+#PostEditForm div input{
+    width: 700px;
+}
+
+#MarketingArticleAddForm #ArticleHeader{
+    width: 700px;
+}
+
+#MarketingArticleAddForm #ArticleLink{
+    width: 700px;
+}
+
+
+#MarketingArticleEditForm div input{
+    width: 700px;
+}

@@ -1,0 +1,35 @@
+
+Amount__c:
+0
+Appeasement_note__c:
+null
+attributes:
+[object Object]
+type:
+Transaction__c
+url:
+/services/data/v47.0/sobjects/Transaction__c/a002600000CLCsoAAH
+Case_number__c:
+00005724
+caseid__c:
+5002600000TiuNjAAJ
+Confirmed_Fraud_Order__c:
+false
+CreatedDate:
+2023-03-02T15:43:47.000+0000
+Description__c:
+null
+Handled_Date_time__c:
+2023-03-02T15:43:49.000+0000
+Id:
+a002600000CLCsoAAH
+Refund_Notes__c:
+Automatically approved, no action required
+Refund_Reason__c:
+Shorted
+Refund_type__c:
+null
+SFCC_Customer_Number__c:
+null
+SFCC_Order_number__c:
+30096949

@@ -1,0 +1,57 @@
+#table-area,#control-area,#revenue-header{
+	width:1000px;
+	margin-left:auto;
+	margin-right:auto;
+}
+.month-select,#control-area{
+	display:none;
+}
+input[disabled]{
+	background-color:lightgrey;
+}
+option {
+    font-size: 100%;
+    padding: 0 9px;
+}
+#table-area{
+	/*height:500px;*/
+	overflow-x: auto;
+}
+#table-area tbody{
+	overflow-x:hidden;
+}
+#control-area{
+	margin-top:50px;
+}
+.path {
+    padding: 5px 10px;
+    margin-top: 5px;
+    margin-left: 30px;
+    margin-right: 30px;
+    border: 1px solid black;
+    float: left;
+}
+.path:hover{
+	cursor:pointer;
+	background-color:#666;
+	color:black;
+}
+.path a {
+    font-size: 15px;
+    color:black;
+}
+.select-month,.select-year,.date-type-select,.showroom-select{
+	font-size:12px;
+}
+.location-select-area,.time-select-area{
+	width:40%;
+	float:left;
+	height:100px;
+}
+.action-area{
+	width:80%;
+	margin-top: 40px;
+}
+.clear{
+	clear:both;
+}

@@ -1,0 +1,217 @@
+body{
+	font-family: "Trebuchet MS",Arial,Verdana,San serif;
+	background-color:white;
+}
+label {
+    display: initial;
+    margin-bottom: 3px;
+}
+ul, li{
+	margin:0 0;
+}
+a{
+	font-weight:normal;
+}
+label{
+	font-size: 12px;
+}
+select,input{
+    background-color: white;
+    -webkit-rtl-ordering: logical;
+    user-select: text;
+    cursor: auto;
+    padding: 1px 0px;
+    border-width: 1px;
+    border-style: inset;
+    border-color: #bbb;
+    border-image: initial;
+    text-rendering: auto;
+    color: initial;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    font: 13.3333px Arial;
+    width:initial;
+    margin: 0em 0em 0em 0em;
+}
+input[type="button"],input[type="submit"]{
+	-webkit-appearance: push-button;
+	padding: 1px 6px;
+	-webkit-appearance: push-button;
+    user-select: none;
+    white-space: pre;
+	align-items: flex-start;
+    text-align: center;
+    cursor: default;
+    color: buttontext;
+    background-color: buttonface;
+    box-sizing: border-box;
+    border-width: 2px;
+    border-style: solid;
+    border-color: buttonface;
+    border-image: initial;
+    text-shadow:none;
+    border: 1px solid grey;
+    border-radius: 1px;
+}
+input[type="submit" i]:hover{
+	border: 1px solid black;
+}
+#adminhdr2 form{
+	width:100%
+}
+#header{
+	border: 1px solid #ebebeb;
+    margin: 2em auto;
+    padding: 0 0 3em 0;
+    width: 1020px;
+}
+#header a{
+	color: #767371;
+}
+#header a:hover{
+	color:black;
+}
+#header p a{
+	color:grey;
+}
+#header p a:hover {
+    color: #000;
+}
+h3{
+	color:black;
+}
+a{
+	color:black;
+	text-decoration:none;
+}
+table{
+	margin-top:30px;
+	margin-bottom:50px;
+	width:90%;
+}
+th.tablecell{
+	word-wrap: normal;
+}
+.tablecell p{
+	margin-left:0;
+	margin-right:0;
+}
+td,th{
+	text-align:center;
+}
+#navbuttom{
+
+	float: right;
+	margin-bottom: 20px;
+	margin-right:2%;
+}
+#navbuttom:after{
+	clear:both;
+}
+.tablecell{
+	max-width:90px;
+	min-width:90px;
+	padding:6px;
+	/*word-wrap: break-word;*/
+}
+.eight-tablecell{
+	max-width:816px;
+	min-width:816px;
+	padding: 6px;
+}
+.inner-table{
+	margin-bottom:0;
+	margin-top:0;
+}
+.inner-table tr:nth-child(even){
+	background:none !important;
+}
+.inner-table tbody{
+	height: initial;
+}
+thead{
+	display: table-header-group;
+    vertical-align: middle;
+}
+thead tr{
+    position: relative;
+	display:block;
+}
+tbody {
+    display: block;
+    height: 500px;
+    overflow: auto;
+    width: 100%;
+}
+.filter-selected{
+	opacity: 0.3;
+}
+.fabricStatusCell{
+	position:relative;
+	
+}
+.fabricStatusCellMoreInfo{
+	position:absolute;
+	display:none;
+	z-index:100;
+	background-color: rgba(255,255,255,0.9);
+	width:150px;
+	border:1px solid grey;
+	border-radius: 3px;
+	padding:10px;
+}
+.emptycell{
+	height:50px;
+}
+.topcell{
+	border-top:2px solid black;
+}
+.leftcell{
+	border-left:2px solid black;
+}
+.rightcell{
+	border-right:2px solid black;
+}
+.bottomcell{
+	border-bottom:2px solid black;
+}
+.nobottomcell{
+	border-bottom:none;
+}
+.greencell{
+	background-color:green;
+}
+.transparentcell{
+	background-color:transparent;
+}
+.yellowcell{
+	background-color:yellow;
+}
+.redcell{
+	background-color:red;
+}
+.centertext{
+	text-align:center;
+}
+.colorzone{
+	height:5px;
+	width:100%;
+	margin-bottom:10px;
+}
+.cellContainedColorZone{
+	padding-left:0;
+	padding-right:0;
+	padding-top:0;
+}
+.colorzoneWords{
+	padding-left:6px;
+	padding-right:6px;
+}
+.ui-datepicker-calendar tbody{
+	height: auto!important;
+}

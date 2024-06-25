@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/cakereact/reactassets/static/css/main.2a273284.css",
+    "main.js": "/cakereact/reactassets/static/js/main.8d54e803.js",
+    "static/js/787.b701888c.chunk.js": "/cakereact/reactassets/static/js/787.b701888c.chunk.js",
+    "static/media/logo.svg": "/cakereact/reactassets/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/cakereact/reactassets/index.html",
+    "main.2a273284.css.map": "/cakereact/reactassets/static/css/main.2a273284.css.map",
+    "main.8d54e803.js.map": "/cakereact/reactassets/static/js/main.8d54e803.js.map",
+    "787.b701888c.chunk.js.map": "/cakereact/reactassets/static/js/787.b701888c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2a273284.css",
+    "static/js/main.8d54e803.js"
+  ]
+}

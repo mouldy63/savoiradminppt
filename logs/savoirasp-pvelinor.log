@@ -1,0 +1,86 @@
+24/11/2023 10:02:11    /editcust.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 10:02:11    /editcust.asp    p.velinor    Enter: val=328219
+24/11/2023 10:02:16    /editcust.asp    p.velinor    Exit
+24/11/2023 10:02:52    /editcust.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 10:02:52    /editcust.asp    p.velinor    Enter: val=328219
+24/11/2023 10:02:57    /editcust.asp    p.velinor    Exit
+24/11/2023 10:03:26    /editcust.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 10:03:26    /add-order.asp    p.velinor    Enter: No. of query params=4
+24/11/2023 10:03:26    /add-order.asp    p.velinor    Enter: contact_no=328219
+24/11/2023 10:03:26    /add-order.asp    p.velinor    Enter: e1=y
+24/11/2023 10:03:26    /add-order.asp    p.velinor    Enter: quote=n
+24/11/2023 10:03:26    /add-order.asp    p.velinor    Enter: ordersource=Floorstock
+24/11/2023 10:03:27    /add-order.asp    p.velinor    Exit
+24/11/2023 10:03:54    /editcust.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Enter: No. of query params=5
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Enter: contact_no=328219
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Enter: overseas=y
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Enter: e1=y
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Enter: quote=n
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Enter: ordersource=Client Retail
+24/11/2023 10:03:54    /add-order.asp    p.velinor    Exit
+24/11/2023 11:39:23    /order-added.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 11:39:23    /order-added.asp    p.velinor    Exit
+24/11/2023 11:39:54    /order-added.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 11:40:27    /ordercomplete.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 11:40:27    /ordercomplete.asp    p.velinor    Enter: val=89804
+24/11/2023 11:40:27    /ordercomplete.asp    p.velinor    Exit
+24/11/2023 11:40:30    /editcust.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 11:40:34    /editcust.asp    p.velinor    Exit
+24/11/2023 11:40:40    /edit-purchase.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 11:40:40    /edit-purchase.asp    p.velinor    Enter: order=89804
+24/11/2023 11:40:41    /edit-purchase.asp    p.velinor    Exit
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    Enter: order=89804
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    deletePackagingDataForComponent: delete from packagingdata where Purchase_no=89804 and componentID=8
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    deletePackagingDataForComponent: update packagingdata set packedwith=null where packedwith='8' and Purchase_no=89804
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    retrieveUserLocation=1
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    paymentEmailCC=dmildenhall@salmon.com
+24/11/2023 11:48:04    /edit-purchase.asp    p.velinor    defunct: request(additionalpayment)=
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: No. of query params=9
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: mattreq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: basereq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: prod=
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: topperreq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: valreq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: hbreq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: accreq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: legsreq=n
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Enter: val=89804
+24/11/2023 11:48:05    /ordercomplete.asp    p.velinor    Exit
+24/11/2023 11:48:06    /editcust.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 11:48:09    /editcust.asp    p.velinor    Exit
+24/11/2023 11:48:09    /editcust.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 11:48:11    /editcust.asp    p.velinor    Exit
+24/11/2023 11:48:15    /edit-purchase.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 11:48:15    /edit-purchase.asp    p.velinor    Enter: order=89804
+24/11/2023 11:48:16    /edit-purchase.asp    p.velinor    Exit
+24/11/2023 12:14:13    /edit-purchase.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 12:14:13    /edit-purchase.asp    p.velinor    Enter: order=89804
+24/11/2023 12:14:14    /edit-purchase.asp    p.velinor    Exit
+24/11/2023 12:14:17    /orderdetails.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 12:14:17    /orderdetails.asp    p.velinor    Enter: pn=89804
+24/11/2023 12:14:21    /orderdetails.asp    p.velinor    Exit
+24/11/2023 12:15:17    /update-productioninfo.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 12:15:20    /orderdetails.asp    p.velinor    Enter: No. of query params=2
+24/11/2023 12:15:20    /orderdetails.asp    p.velinor    Enter: pn=89804
+24/11/2023 12:15:20    /orderdetails.asp    p.velinor    Enter: msg=Details updated
+24/11/2023 12:15:24    /orderdetails.asp    p.velinor    Exit
+24/11/2023 12:29:20    /update-productioninfo.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 12:29:24    /orderdetails.asp    p.velinor    Enter: No. of query params=2
+24/11/2023 12:29:24    /orderdetails.asp    p.velinor    Enter: pn=89804
+24/11/2023 12:29:24    /orderdetails.asp    p.velinor    Enter: msg=Details updated
+24/11/2023 12:29:28    /orderdetails.asp    p.velinor    Exit
+24/11/2023 12:31:53    /update-productioninfo.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 12:31:56    /orderdetails.asp    p.velinor    Enter: No. of query params=2
+24/11/2023 12:31:56    /orderdetails.asp    p.velinor    Enter: pn=89804
+24/11/2023 12:31:56    /orderdetails.asp    p.velinor    Enter: msg=Details updated
+24/11/2023 12:31:59    /orderdetails.asp    p.velinor    Exit
+24/11/2023 13:18:09    /orderdetails.asp    p.velinor    Enter: No. of query params=1
+24/11/2023 13:18:09    /orderdetails.asp    p.velinor    Enter: pn=89804
+24/11/2023 13:18:14    /orderdetails.asp    p.velinor    Exit
+24/11/2023 13:18:38    /update-productioninfo.asp    p.velinor    Enter: No. of query params=0
+24/11/2023 13:18:40    /orderdetails.asp    p.velinor    Enter: No. of query params=2
+24/11/2023 13:18:40    /orderdetails.asp    p.velinor    Enter: pn=89804
+24/11/2023 13:18:40    /orderdetails.asp    p.velinor    Enter: msg=Details updated
+24/11/2023 13:18:44    /orderdetails.asp    p.velinor    Exit

@@ -1,0 +1,311 @@
+<%Option Explicit%>
+<%
+dim ALLOWED_ROLES
+ALLOWED_ROLES = "ADMINISTRATOR"
+%>
+<!-- #include file="access/funcs.asp" -->
+<!-- #include file="access/login.inc" -->
+<!-- #include file="common/logger-in.inc" -->
+<!-- #include file="common/mysqldbfuncs.asp" -->
+<!-- #include file="common/adovbs2.inc" -->
+<!-- #include file="generalfuncs.asp" -->
+<!-- #include file="orderfuncs.asp" -->
+<!-- #include file="clientAccessFuncs.asp" -->
+<%
+Dim Con
+Set Con = getMysqlConnection()
+if not isClientAllowedAccess(Con, "deliveries booked", false) then
+	Response.Status = "403 Forbidden"
+	response.end
+end if
+Dim postcode, postcodefull, rs, recordfound, id, rspostcode, submit, count, sql, msg, customerasc, orderasc, showr,  companyasc, bookeddate, productiondate, previousOrderNumber, acknowDateWarning, rs2, compstatus
+dim matt_madeat, base_madeat, topper_madeat, headboard_madeat, legs_madeat, factory, bold
+dim diff, factories, datenow, twoweeksdate, custname, madeat, hasLondonItems, compmadeat1, compmadeat3, compmadeat5, compmadeat8, compmadeat7, hasCardiffItems, dofweek,startweek,newweek, pnewweek, weekno, pweekno, weeknoadd, pweeknoadd, weekstarted, pweekstarted, data, pweekno2, weekno2, finishedComp1, finishedComp3, finishedComp5, finishedComp8, finishedComp7, ItemNotFinished, strdate, enddate, ItemsFinished, ProductionFloorNoDays, realproductiondate, weekNoToDisplay, realProdStartDate, realProdEndDate
+Server.ScriptTimeout=1200
+
+weekstarted=1
+pweekstarted=1
+pweekno=DatePart("ww", Now(), 2, 2)
+
+
+madeat=CInt(request("madeat"))
+if madeat=2 then
+Response.Redirect "/php/deliveriesbooked?madeat=2"
+else
+Response.Redirect "/php/deliveriesbooked?madeat=1"
+end if
+
+sql="Select ProductionFloorNoItems from manufacturedat where ManufacturedAtId=" & madeat
+Set rs = getMysqlQueryRecordSet(sql, con)
+ProductionFloorNoDays=rs("ProductionFloorNoItems")
+rs.close
+set rs=nothing
+
+datenow=DateAdd ("d", 0, Date())
+'dofweek=Weekday(datenow,0)
+'startweek=7-dofweek
+'newweek=DateAdd ("d", startweek, datenow)
+
+twoweeksdate= DateAdd ("d", +14, Date())
+datenow=toDbDate(datenow)
+twoweeksdate=toDbDate(twoweeksdate)
+showr=request("showr")
+realproductiondate=request("productiondate")
+bookeddate=request("bookeddate")
+companyasc=request("companyasc")
+customerasc=request("customerasc")
+orderasc=request("orderasc")
+matt_madeat=request("matt_madeat")
+base_madeat=request("base_madeat")
+topper_madeat=request("topper_madeat")
+headboard_madeat=request("headboard_madeat")
+legs_madeat=request("legs_madeat")
+factory=request("factory")
+if factory = "" then factory=-1
+factory = cint(factory)
+msg=""
+msg=Request("msg")
+count=0
+submit=Request("submit") 
+
+postcodefull=Request("postcode")
+postcode=Replace(postcodefull, " ", "")
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head><title>Administration.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta HTTP-EQUIV="ROBOTS" content="NOINDEX,NOFOLLOW" />
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="-1">
+<meta http-equiv="refresh" content="600">
+<link href="Styles/screen.css" rel="Stylesheet" type="text/css" />
+<link href="Styles/extra.css" rel="Stylesheet" type="text/css" />
+<link href="Styles/screenP.css" rel="Stylesheet" type="text/css" />
+<link href="Styles/print.css" rel="Stylesheet" type="text/css" media="print" />
+<script   
+   src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
+    </script>
+<style>
+.moveleft10 {
+	position:relative;
+	left: -10px;}
+.lheight {
+	clear:both;
+	margin-top:20px;}
+#bespoke {font-size:11px;}
+#bespoke2 {font-size:10px;}
+</style>
+
+
+
+</head>
+<body>
+
+<div class="containerwide">
+
+  <div class="one-col head-col">
+
+<!--<form name="form1" method="post" action="">-->	
+<br><h1 class="moveleft10">&nbsp;</h1><br><br>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" id="bespoke">
+<%
+
+Set Con = getMysqlConnection()
+
+
+%>
+
+<tr><td height="35" colspan="10" bgcolor="#999999">&nbsp;<br>  <strong>Production Date</strong><br>&nbsp;</td></tr>
+<tr><td colspan="10"><hr></td></tr>
+<%
+if madeat=2 then
+sql = "select * from address A, contact C, Purchase P, Location L Where P.code=A.code AND C.contact_no=P.contact_no AND P.completedorders='n' AND P.quote='n' and P.orderonhold<>'y' and (P.cancelled is Null or P.cancelled='n') AND P.productiondate<>'' AND P.londonproductiondate<>'' AND P.source_site='SB' and P.idlocation=L.idlocation order by P.londonproductiondate asc "
+end if 
+if madeat=1 then
+sql = "select * from address A, contact C, Purchase P, Location L Where P.code=A.code AND C.contact_no=P.contact_no AND P.completedorders='n' AND P.quote='n' and P.orderonhold<>'y' and (P.cancelled is Null or P.cancelled='n') AND P.productiondate<>'' AND P.cardiffproductiondate<>'' AND P.source_site='SB' and P.idlocation=L.idlocation order by P.cardiffproductiondate asc "
+end if 
+
+Set rs = getMysqlQueryRecordSet(sql, con)
+Do until rs.eof
+custname=""
+if rs("title")<>"" then custname=custname & rs("title") & " "
+if rs("first")<>"" then custname=custname & rs("first") & " "
+if rs("surname")<>"" then custname=custname & rs("surname")
+
+ItemsFinished="n"
+
+compmadeat1=getComponentCurrentMadeAt(con, rs("purchase_no"), 1)
+finishedcomp1=isCompFinished(con, rs("purchase_no"), 1)
+compmadeat3=getComponentCurrentMadeAt(con, rs("purchase_no"), 3)
+finishedcomp3=isCompFinished(con, rs("purchase_no"), 3)
+compmadeat5=getComponentCurrentMadeAt(con, rs("purchase_no"), 5)
+finishedcomp5=isCompFinished(con, rs("purchase_no"), 5)
+compmadeat8=getComponentCurrentMadeAt(con, rs("purchase_no"), 8)
+finishedcomp8=isCompFinished(con, rs("purchase_no"), 8)
+compmadeat7=getComponentCurrentMadeAt(con, rs("purchase_no"), 7)
+finishedcomp7=isCompFinished(con, rs("purchase_no"), 7)
+
+hasLondonItems = false
+hasCardiffItems = false
+if (compmadeat1=1 and finishedcomp1="n") or (compmadeat3=1 and finishedcomp3="n") or (compmadeat5=1 and finishedcomp5="n") or (compmadeat8=1 and finishedcomp8="n") or (compmadeat7=1 and finishedcomp7="n") then
+	hasCardiffItems = true
+end if
+if (compmadeat1=2 and finishedcomp1="n") or (compmadeat3=2 and finishedcomp3="n") or (compmadeat5=2 and finishedcomp5="n") or (compmadeat8=2 and finishedcomp8="n") or (compmadeat7=2 and finishedcomp7="n") then
+	hasLondonItems = true
+end if
+ItemNotFinished=False
+if finishedcomp1="n" or finishedcomp3="n" or finishedcomp5="n" or finishedcomp8="n" or finishedcomp7="n" then
+	ItemNotFinished = true
+end if
+
+if (hasCardiffItems and madeat=1) or (hasLondonItems and madeat=2) then
+
+realproductiondate=rs("productiondate")
+if madeat=2 then productiondate=rs("londonproductiondate")
+if madeat=1 then productiondate=rs("cardiffproductiondate")
+
+productiondate=(DateAdd("d",-ProductionFloorNoDays,productiondate))
+
+dofweek=Weekday(realproductiondate,0)
+
+startweek=7-dofweek
+pnewweek=DateAdd ("d", startweek, realproductiondate)
+
+pweekno=DatePart("ww", productiondate, 2, 2)
+weekNoToDisplay=DatePart("ww", productiondate, 2, 2)
+strdate=FirstDayOfNextWeekN(pweekno2, productiondate)
+
+strdate=Year(strdate) & "/" & month(strdate) & "/" & day(strdate)
+realProdStartDate=FirstDayOfNextWeekN(pweekno2, realproductiondate)
+realProdStartDate=Year(strdate) & "/" & month(strdate) & "/" & day(strdate)
+enddate=FirstDayOfNextWeekN(pweekno, productiondate)
+enddate=Year(enddate) & "/" & month(enddate) & "/" & day(enddate)
+realProdEndDate=FirstDayOfNextWeekN(pweekno, realproductiondate)
+realProdEndDate=Year(enddate) & "/" & month(enddate) & "/" & day(enddate)
+'response.write("productiondate=" & productiondate)
+'response.write("<br>realproductiondate=" & realproductiondate)
+'response.write("<br>strdate=" & strdate)
+'response.write("<br>dofweek=" & dofweek)
+'response.write("<br>pnewweek=" & pnewweek)
+'response.write("<br>startweek=" & startweek)
+'response.write("<br>enddate=" & enddate)
+'response.write("<br>realproductiondate=" & realproductiondate)
+'response.write("<br>realProdStartDate=" & realProdStartDate)
+'response.write("<br>realProdEndDate=" & realProdEndDate)
+
+'response.end
+
+
+
+
+
+if pweekno<>pweekno2 then
+
+
+response.Write("<tr><td height=""17"" colspan=""2"" bgcolor=""#999999"">Week No. " & weekNoToDisplay & "</td><td colspan=""6"" bgcolor=""#999999"" align=""center"">" &getcomponentNoTobefinishedNew(con, ProductionFloorNoDays, realProdStartDate, realProdEndDate, madeat) & " items to finish</td><td height=""17"" colspan=""2"" bgcolor=""#999999"">Production&nbsp;Date </td></tr>")
+
+else
+		response.Write("<tr><td colspan=10><hr style=""height:1px;border:none;color:#999999;background-color:#999999;""></td></tr>")
+end if
+'pnewweek=DateAdd ("d", 7, pnewweek)
+pweekno2=pweekno	
+
+if madeat=1 then%>
+<!-- #include file="cardiff-tvscreen.asp" -->
+<%else%>
+<!-- #include file="london-tvscreen.asp" -->   
+
+<%end if
+end if
+rs.movenext
+loop
+rs.close
+set rs=nothing
+%>
+
+<%
+Con.Close
+Set Con = Nothing%>
+  </table>
+<p>&nbsp; </p>
+
+<!--</form>-->
+<div id="topright">
+  <img src="images/logo.gif" width="255" height="66" alt="Savoir Beds"></div>
+</div>
+</div>
+<div>
+
+   
+</body>
+<HEAD>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="-1">
+</HEAD>   
+</html>
+
+<%
+
+function getLockColourForStatus(aStatus)
+
+	if aStatus = 20 then
+		getLockColourForStatus = "red" 'In Production
+	elseif aStatus = 30 then
+		getLockColourForStatus = "orange" ' Order on Stock, Waiting QC
+	elseif aStatus = 40 then
+		getLockColourForStatus = "green" ' QC Checked
+	elseif aStatus = 50 then
+		getLockColourForStatus = "green" ' In Bay
+	elseif aStatus = 60 then
+		getLockColourForStatus = "green" ' Order Picked
+	elseif aStatus = 70 then
+		getLockColourForStatus = "grey" ' Delivered
+	else
+		getLockColourForStatus = "white"
+	end if
+
+end function
+
+function getComponentCellStatusClass(byref acon, aPurchaseNo, aCompId)
+	dim aStatus
+	aStatus = getComponentStatusLatest(acon, aPurchaseNo, aCompId)
+	getComponentCellStatusClass = ""
+	if aStatus < 20 then getComponentCellStatusClass = "redcell"
+end function
+
+function parseMadeat(byref aval)
+	parseMadeat = -1
+
+	on error resume next
+		parseMadeat = cint(cstr(aval))
+	if err.number <> 0 then
+		parseMadeat = -1
+	end if
+	on error goto 0
+	'response.write("<br>aval = " & cstr(aval))
+	'response.write("<br>parseMadeat = " & parseMadeat)
+	'response.end
+	
+end function
+
+Function FirstDayOfWeekN( weekN, ProdDate )
+	Dim FirstDayOfYear, FirstDayOfFirstWeek
+    FirstDayOfYear = DateSerial( Year(ProdDate), 1, 1 )
+    FirstDayOfFirstWeek = FirstDayOfYear - Weekday( FirstDayOfYear ) + 1
+    FirstDayOfWeekN = DateAdd( "ww", weekN-1, FirstDayOfFirstWeek )
+End Function
+
+Function FirstDayOfNextWeekN( weekN, ProdDate )
+	Dim FirstDayOfYear, FirstDayOfFirstWeek
+    FirstDayOfYear = DateSerial( Year(ProdDate), 1, 1 )
+    FirstDayOfFirstWeek = FirstDayOfYear - Weekday( FirstDayOfYear ) + 1
+    FirstDayOfNextWeekN = DateAdd( "ww", weekN, FirstDayOfFirstWeek )
+End Function
+%>
+<!-- #include file="common/logger-out.inc" -->
+
+ 
+   

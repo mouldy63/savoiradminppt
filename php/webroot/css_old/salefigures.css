@@ -1,0 +1,228 @@
+select{
+	font-size: 11px;
+	width:90%;
+	margin-bottom: 3px;
+    margin-top: 3px;
+}
+#tableArea input{
+	width: 90%;
+	font: 10px Arial;
+	text-align: right;
+	background-color: transparent;
+}
+#tableArea table{
+	font-size:11px;
+	margin-left: auto;
+    margin-right: auto;
+	
+}
+#tableArea table tbody{
+	height:initial;
+	font-size:10px;
+	
+}
+
+#tableArea table #datatable{
+	/*height:400px;*/
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#tableArea table #datatable tr td{
+	text-align:right;
+}
+table{
+	border-collapse:collapse;
+}
+
+td,th{
+	border:none;
+}
+#content{
+	overflow: initial;
+}
+#tableControllPanel,#salefigureMenu{
+	margin: 2em auto;
+    width: 1020px;
+    background-color: #f3f3f3;
+    margin-top:0px;
+    height: 40px;
+}
+#salefigureMenu {
+	margin-bottom:0px;
+}
+#tableControllPanel{
+	padding-top:5px;
+	font-size:12px;
+	height: 45px;
+	background-color: #ccc;
+}
+#tableControllPanel button{
+	padding:6px;
+	margin: 3px 20px;
+}
+.salefigureMenuTile a{
+	color:black;
+}
+#salefigureMenu ul{
+	list-style-type: none;
+}
+#salefigureMenu ul:after{
+	clear:both;
+}
+li.salefigureMenuTile:hover{
+	background-color: #666;
+}
+#salefigureMenu ul li .salefigure_submenu a{
+	color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+#tableControllPanel div,#salefigureMenu ul li{
+	float:left;
+	padding-left:50px;
+	padding-right:50px;
+	display: inline-block;
+}
+#tableControllPanel div{
+	padding:5px 10px;
+	margin-top: 5px;
+	margin-left:30px;
+	margin-right:30px;
+	border: 1px solid black;
+}
+#tableControllPanel div:hover{
+	cursor:pointer;
+	background-color:#666;
+}
+#tableControllPanel div a{
+	font-size:15px;
+}
+#salefigureMenu ul .salefigureBigTile{
+	margin-left:0px;
+}
+.salefigure_submenu{
+	position:absolute;
+	left:0px;
+	display:none;
+	background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 999;
+    margin-top:10px;
+}
+.salefigureMenuTile{
+	padding-top:10px;
+	padding-bottom:10px;
+	position:relative;
+}
+.salefigureBigTile h3{
+	margin-top: 5px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+}
+.salefigure_submenu a:hover{
+	background-color: lightgrey;
+	cursor:pointer;
+}
+.salefigureMenuTile a:hover{
+	cursor:pointer;
+}
+
+.tablecell{
+	max-width:50px;
+	min-width:50px;
+	padding:3px;
+	/*word-wrap: break-word;*/
+}
+.twotablecell{
+	max-width:107px; /*two tablecell, two padding, 1 border*/
+	min-width:107px;
+	padding:3px;
+}
+.fourtablecell{
+	max-width:221px; /*two twotablecell, two padding, 1 border*/
+	min-width:221px;
+	padding:3px;
+}
+.sixtablecell{
+	max-width:335px; /*three twotablecell, four padding, 2 border*/
+	min-width:335px;
+	padding:3px;	
+}
+.eighttablecell{
+	max-width:449px; /*two 4tablecell, two padding, 1 border*/
+	min-width:449px;
+	padding:3px;	
+}
+
+.tentablecell{
+	max-width:563px; /*five twotablecell, eight padding, 4 border*/
+	min-width:563px;
+	padding:3px;	
+}
+.onesixtablecell{
+	max-width:905px; /*two 8tablecell, two padding, 1 border*/
+	min-width:905px;
+	padding:3px;	
+}
+.threetwotablecell{
+	max-width:1817px; /*two 16tablecell, two padding, 1 border*/
+	min-width:1817px;
+	padding:3px;	
+}
+.emptycell{
+	height:20px;
+}
+.topcell{
+	border-top:1px solid black;
+}
+.leftcell{
+	border-left:1px solid black;
+}
+.rightcell{
+	border-right:1px solid black;
+}
+.bottomcell{
+	border-bottom:1px solid black;
+}
+.bordercell{
+	border:1px solid black;
+}
+.topbottomcell{
+	border-bottom:1px solid black;
+	border-top:1px solid black;
+}
+.nobottomcell{
+	border-bottom:none;
+}
+.noleftcell{
+	border-left:none;
+}
+.norightcell{
+	border-right:none;
+}
+.orangecell{
+	background-color:orange;
+}
+.lightgreencell{
+	background-color:lightgreen;
+}
+.disablebg{
+	border:none;
+}
+.changed{
+	background-color:yellow !important;
+}
+#testTable{
+	margin-left: auto;
+    margin-right: auto;
+    width: initial;
+}
+#tableControllPanel .inputcell:hover{
+	background-color:transparent;
+}
+button:hover{
+	cursor:pointer !important;
+}
