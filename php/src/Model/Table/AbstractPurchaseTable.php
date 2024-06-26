@@ -133,7 +133,7 @@ class AbstractPurchaseTable extends Table {
 		$summary = "";
 		foreach ($names as $key => $value) {
 			$adaptedValue = $this->adaptComponentValue($key, $row[$key], $componentId, $pn);
-			$summary .= $value.": ".$adaptedValue."<br/>";
+			$summary .=$adaptedValue." ";
 		}
 		return $summary;
 	}

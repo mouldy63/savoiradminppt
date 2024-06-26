@@ -62,13 +62,17 @@ class CommunicationTable extends Table {
 		$rs = $myconn->execute($sql, ['code' => $code]);
 		$notes = [];
 		foreach ($rs as $row) {
-			$note['commDate'] = $this->_getSafeValueFromRs($row, 'date');
-			$note['commType'] = $this->_getSafeValueFromRs($row, 'type');
+			$note['communicationid'] = $this->_getSafeValueFromRs($row, 'Communication');
+			$note['commDate'] = $this->_getSafeValueFromRs($row, 'Date');
+			$note['commType'] = $this->_getSafeValueFromRs($row, 'Type');
 			$note['person'] = $this->_getSafeValueFromRs($row, 'person');
+			$note['commstatus'] = $this->_getSafeValueFromRs($row, 'commstatus');
 			$note['notes'] = $this->_getSafeValueFromRs($row, 'notes');
-			$note['actionnext'] = $this->_getSafeValueFromRs($row, 'next');
-			$note['actionresponse'] = $this->_getSafeValueFromRs($row, 'response');
+			$note['actionnext'] = $this->_getSafeValueFromRs($row, 'Next');
+			$note['actionresponse'] = $this->_getSafeValueFromRs($row, 'Response');
 			$note['staff'] = $this->_getSafeValueFromRs($row, 'staff');
+			$note['completeddate'] = $this->_getSafeValueFromRs($row, 'completedDate');
+			$note['completedby'] = $this->_getSafeValueFromRs($row, 'commCompletedBy');
 			array_push($notes, $note);
 		}
 		return $notes;	

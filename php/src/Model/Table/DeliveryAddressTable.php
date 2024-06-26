@@ -12,6 +12,13 @@ class DeliveryAddressTable extends Table {
         $this->setTable('delivery_address');
         $this->setPrimaryKey('DELIVERY_ADDRESS_ID');
     }
+
+    public function getDeliveryAddresses($contactno) {
+    	$sql = "Select * from delivery_address WHERE CONTACT_NO=".$contactno." order by ISDEFAULT desc, retire asc";
+		$myconn = ConnectionManager::get('default');
+		return $myconn->execute($sql)->fetchAll('assoc');
+		
+    }
 	
 	
 }

@@ -897,7 +897,7 @@ accessoriesrequired=rs("accessoriesrequired")
 if productiondate<>"" then rs("productiondate")=productiondate else rs("productiondate")=null
 
 if orderstatus=90 then rs("orderonhold")="y"
-if orderstatus=80 then rs("cancelled")="y"
+'if orderstatus=80 then rs("cancelled")="y"
 legsrequired = rs("legsrequired")
 if isnull(rs("legstyle")) then legsrequired="n"
 if accountcode<>"" then rs("accountcode")=accountcode else rs("accountcode")=null

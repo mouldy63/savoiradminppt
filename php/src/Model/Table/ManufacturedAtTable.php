@@ -655,10 +655,10 @@ public function getProdTopper($datefrom, $dateto, $madeat) {
     	$sql = "Select P.purchase_no, P.headboardwidth as w, P.headboardheight as l, P.order_number, P.headboardstyle as n, P.specialinstructionsheadboard as x, P.headboardfabric, P.headboardfabricchoice, P.headboardfabricdesc, L.adminheading";
     	$sql .= " from qc_history_latest Q, purchase P, Location L WHERE (P.cancelled is Null or P.cancelled='n') and  P.purchase_no=Q.purchase_no and P.idlocation=L.idlocation and Q.componentID=8 and Q.madeat=". $madeat ." and P.code<>15919 ";
     	if (!empty($datefrom)) {
-			$sql .= " and p.production_completion_date >= '" . $this->convertDateToMysql($datefrom) . "' ";
+			$sql .= " and Q.finished >= '" . $this->convertDateToMysql($datefrom) . "' ";
 		}
 		if (!empty($dateto)) {
-			$sql .= " and p.production_completion_date < DATE_ADD('" . $this->convertDateToMysql($dateto) . "', INTERVAL 1 DAY)";
+			$sql .= " and Q.finished < DATE_ADD('" . $this->convertDateToMysql($dateto) . "', INTERVAL 1 DAY)";
 		}
 		$sql .= " order by P.order_number";
 		$myconn = ConnectionManager::get('default');

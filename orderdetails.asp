@@ -1667,7 +1667,7 @@ call getPhoneNumber(con, order, 3, delphonetype3, delphone3)
   &nbsp;</td>
     <td valign="top"><strong>Order Status:</strong></td>
     <td valign="top"><%Set rs3 = getMysqlUpdateRecordSet("Select * from OrderStatus", con)%>
-           <%Set rs3 = getMysqlUpdateRecordSet("Select * from QC_status where  retiredCoreProducts='n'", con)%>
+           <%Set rs3 = getMysqlUpdateRecordSet("Select * from QC_status where  retiredCoreProducts='n' and QC_statusID<>80", con)%>
           <select name="orderstatus" id="orderstatus">
      
              <%do until rs3.eof

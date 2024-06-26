@@ -202,7 +202,7 @@ class MyFormHelper extends Helper {
 		return number_format($val, 2, '.', $sep);
 	}
 
-	function formatMoneyWithSymbol($val, $currencyCode) {
+	function formatMoneyWithSymbol($val, $currencyCode, $separate=false) {
 		$currencySymbol = "";
 		if ($currencyCode == "GBP") {
 			$currencySymbol = "&pound;";
@@ -211,8 +211,11 @@ class MyFormHelper extends Helper {
 		} else if ($currencyCode == "EUR") {
 			$currencySymbol = "&euro;";
 		}
-		
-		$formattedVal = $this->formatMoney($val);
+		if ($separate) {
+			$formattedVal = $this->formatMoney($val,',');
+		} else {
+			$formattedVal = $this->formatMoney($val);
+		}
 		return $currencySymbol . $formattedVal;
 	}
 }

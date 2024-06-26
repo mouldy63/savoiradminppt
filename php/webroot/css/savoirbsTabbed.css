@@ -10,6 +10,7 @@ body {font-size: 75%;}
 label {
     display: initial;
     margin-bottom: 3px;
+	font-weight:600;
 }
 ul, li{
 	margin:0 0;
@@ -19,6 +20,8 @@ a{
 }
 label{
 	font-size: 12px;
+	margin-top:20px;
+	padding-top:20px;
 }
 
 .message {
@@ -195,22 +198,24 @@ p#logo {
 	width: 255px;
 }
 
+
+
 ul.nav {
 	border-top: 1px solid #ebebeb;
-	margin: 10px auto 0px auto;
+	margin-left: 5px;
 	padding: 10px 0;
 	width: 910px;
 }
 
 ul.nav li {
 	display: inline;
-	margin: 5px 33px 5px 0;
-	list-style:none;
-	font-family: Arial, Verdana, San serif; 
+	text-decoration: none;
+	list-style:none;	
 }
 
 ul.nav li.active {
 	font-weight: bold;
+	text-decoration: none;
 }
        
 .main {
@@ -601,6 +606,38 @@ padding:8px;}
     padding: 14px 16px;
     text-decoration: none;
 }
+.jconfirm .jconfirm-box div.jconfirm-title-c {
+    display: block;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+
+.jconfirm .jconfirm-box-container.jconfirm-no-transition {
+    -webkit-transition: none !important;
+    transition: none !important;
+    min-width: 80%;
+}
+
+.jconfirm.jconfirm-white .jconfirm-box, .jconfirm.jconfirm-light .jconfirm-box {
+	font-family:"Trebuchet MS",Arial,Verdana,San serif !important;
+	margin-right:40% !important;
+	}
+.jconfirm.jconfirm-white .jconfirm-box .jconfirm-buttons button.btn-default, .jconfirm.jconfirm-light .jconfirm-box .jconfirm-buttons button.btn-default {
+  font-size:14px !important;}
+.jconfirm.jconfirm-white .jconfirm-box .jconfirm-buttons, .jconfirm.jconfirm-light .jconfirm-box .jconfirm-buttons {
+  float:none !important;
+  text-align:center !important;
+  font-size:12px !important;
+  font-style:normal !important;}
+.jconfirm .jconfirm-box .jconfirm-buttons button {
+  font-size:12px !important;}
+
+
+
+input[type="checkbox"][readonly] {
+pointer-events: none;
+}
 
 #adminhdr li a:hover, .dropdown:hover .dropbtn {
     background-color: #666;
@@ -706,7 +743,45 @@ textarea.form-control {
 .form-control {
 	font-size: 0.75rem !important;
 	color: #000 !important;
+
+	margin-bottom:10px;
 }
+
+
+.nav-tabs {
+    margin: 0;
+    padding: 0;
+    border: 0;    
+}
+.nav-tabs > li > a {
+	padding:13px;
+	border-top-left-radius: 5px;
+	border-top-right-radius:5px;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	background-color: #dddddd;
+	text-decoration: none;
+    box-shadow: inset 0 -8px 7px -9px rgba(0,0,0,.4),-2px -2px 5px -2px rgba(0,0,0,.4);
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover {
+    background: #f3f2f2;
+	text-decoration: none;
+    box-shadow: inset 0 0 0 0 rgba(0,0,0,.4),-2px -3px 5px -2px rgba(0,0,0,.4) !important;
+}
+
+/* Tab Content */
+.tab-pane {
+    background: #f3f2f2;
+    border-radius: 0;
+    text-align: left;
+    padding: 10px;
+}
+.keepright{
+	float:right; 
+	clear: right;
+ }
+
 @media (max-width: 767.98px) {
 	/*By default, containers are only full-width on xs screens. 
 	This makes them full-width om sm screens as well*/
