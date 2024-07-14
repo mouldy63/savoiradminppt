@@ -200,6 +200,7 @@ class OrderController extends SecureAppController {
         $this->set('customerreference', $customerreference);
         $this->set('contactdetails', $contactdetails[0]);
         $this->set('priceMatrixEnabled', $this->isPriceMatrixEnabled() ? 'y' : 'n');
+        $this->set('isTrade', $this->TempOrder->isTradeCustomer($contact_no) ? 'y' : 'n');
         $this->set('wholesaledata', $wholesaledata);
         $this->set('phoneNumbers', $phoneNumbers);
 
@@ -238,6 +239,7 @@ class OrderController extends SecureAppController {
         $userId=$this->getCurrentUsersId();
 		$formData = $this->request->getData();
         $contact_no = $formData['contact_no'];
+        $isTrade = $this->TempOrder->isTradeCustomer($contact_no);
 
         $pn = null;
         if (isset($formData['pn'])) {
@@ -305,7 +307,7 @@ class OrderController extends SecureAppController {
         $purchaserow->vatrate = $formData['vatrates'];
         $purchaserow->contact_no = trim($formData['contact_no']);
         $purchaserow->ordercurrency = trim($formData['currency']);
-        $purchaserow->istrade = $this->TempOrder->isTradeCustomer($purchaserow->contact_no) ? 'y' : 'n';
+        $purchaserow->istrade = $isTrade ? 'y' : 'n';
         if (isset($formData['productiondate']) && !empty($formData['productiondate'])) {
             $purchaserow->productiondate = FrozenDate::createFromFormat('d/m/Y', $formData['productiondate']);
         }
@@ -317,7 +319,6 @@ class OrderController extends SecureAppController {
         $purchaserow->customerreference = trim($formData['customerref']);
 
         $this->TempPurchase->save($purchaserow);
-
         $pn=$purchaserow->PURCHASE_No;
         $quote=$purchaserow->quote;
         $this->TempPhoneNumber->deleteNumbersForPurchase($pn);

@@ -384,7 +384,9 @@ class EditCustomerController extends SecureAppController
 			}
 			$this->DeliveryAddress->save($row);
 		}
-	
+		if (isset($formData['submitbrochure'])) {
+			$contactdetails->BrochureRequestSent = 'n';
+		}
 
 		$contactdetails->title = trim($formData['title']);
 		$contactdetails->first = trim($formData['first']);
@@ -449,20 +451,15 @@ class EditCustomerController extends SecureAppController
 		} else {
 			$addressdetails->PRICE_LIST = null;
 		}
-		if (isset($formData['initialcontactdate'])) {
+		if (!empty($formData['initialcontactdate'])) {
 			$addressdetails->FIRST_CONTACT_DATE = FrozenDate::createFromFormat('d/m/Y', $formData['initialcontactdate']);
-		} else {
-			$addressdetails->FIRST_CONTACT_DATE = null;
 		}
-		if (isset($formData['visitdate'])) {
+		
+		if (!empty($formData['visitdate'])) {
 			$addressdetails->VISIT_DATE = FrozenDate::createFromFormat('d/m/Y', $formData['visitdate']);
-		} else {
-			$addressdetails->VISIT_DATE = null;
 		}
-		if (isset($formData['lastcontactdate'])) {
+		if (!empty($formData['lastcontactdate'])) {
 			$addressdetails->last_contact_date = FrozenDate::createFromFormat('d/m/Y', $formData['lastcontactdate']);
-		} else {
-			$addressdetails->last_contact_date = null;
 		}
 		if ($formData['inintialcontact'] != 'n') {
 			$addressdetails->INITIAL_CONTACT = $formData['inintialcontact'];
@@ -517,11 +514,57 @@ class EditCustomerController extends SecureAppController
 			}
 
 		}
-
 		$this->Flash->success("Contact amended successfully");
-		$this->redirect(['action' => 'index', '?' => ['val' => $contactno]]);
+
+		if (!empty($formData['nextpage'])) {
+			$this->redirect($formData['nextpage']);
+		} else {
+			$this->redirect(['action' => 'index', '?' => ['val' => $contactno]]);
+		}
+
+		
+		
     }
 
+	public function export() {
+		$params = $this->request->getParam('?');		
+		if (isset($params['val'])) {
+            $contactno = $params['val'];
+		}
+		$contactTable = TableRegistry::get('Contact');
+		$contact = $contactTable->get($contactno);
+		$address=$this->Address->get($contact['CODE']);
+			$data = [];
+				$title = $contact['title'];
+				$first = $contact['first'];
+				$surname = $contact['surname'];
+				$company = $address['company'];
+				$position = $contact['position'];
+				$street1 = $address['street1'];
+				$street2 = $address['street2'];
+				$street3 = $address['street3'];
+				$town = $address['town'];
+				$county = $address['county'];
+				$postcode = $address['postcode'];
+				$country = $address['country'];
+				$tel = $address['tel'];
+				$fax = $address['fax'];
+				$email = $address['EMAIL_ADDRESS'];
+
+				$a = [$title, $first, $surname, $company, $position, $street1, $street2, $street3, $town, $county, $postcode, $country, $tel, $fax, $email];
+				array_push($data, $a);
+			
+			$header = ['Title', 'First Name', 'Surname', 'Company', 'Position', 'Street1', 'Street2', 'Street3', 'Town', 'County', 'Postcode', 'Country', 'Tel', 'Fax', 'Email'];
+	
+			$this->setResponse($this->getResponse()->withDownload('customerrecord.csv'));
+			$this->set(compact('data'));
+			$this->viewBuilder()
+			->setClassName('CsvView.Csv')
+			->setOptions([
+				'serialize' => 'data',
+				'header' => $header
+			]);
+	}
 	public function reopenorder()
     {
     	
@@ -538,6 +581,45 @@ class EditCustomerController extends SecureAppController
 		$this->Purchase->save($purchaserow);
 		$this->Flash->success("Order has been reopened");
 		$this->redirect(['action' => 'index', '?' => ['val' => $contactno]]);
+	}
+
+	public function print() {
+		
+		$this->viewBuilder()->setLayout('print');
+    	
+    	//debug($this->request->getData());
+		$corresid='';
+		$params = $this->request->getParam('?');		
+		if (isset($params['val'])) {
+            $contactno = $params['val'];
+			$env = $params['env'];
+		}
+		if (isset($params['corresid'])) {
+			$corresid=$params['corresid'];
+		}
+		$contactTable = TableRegistry::get('Contact');
+		$correspondenceTable = TableRegistry::get('Correspondence');
+		$contact = $contactTable->get($contactno);
+		$address=$this->Address->get($contact['CODE']);
+		$greeting='';
+		$correspondence='';
+		if ($corresid != '') {
+			$corresQuery = $this->Correspondence->find()->where(['correspondenceid =' => $corresid])->toArray();
+			if (count($corresQuery) > 0 && $corresid !='') {
+				$corresid = $corresQuery[0]['correspondenceid'];
+				$greeting = $corresQuery[0]['greeting'];
+				$correspondence = $corresQuery[0]['correspondence'];
+				
+			}
+		}
+			
+		
+		$this->set('greeting', $greeting);
+		$this->set('env', $env);
+		$this->set('contact', $contact);
+		$this->set('address', $address);
+		$this->set('correspondence', $correspondence);
+				
 	}
 	
 	protected function _getAllowedRoles()

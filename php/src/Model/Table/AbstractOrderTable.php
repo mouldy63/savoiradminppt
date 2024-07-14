@@ -79,11 +79,18 @@ class AbstractOrderTable extends Table {
 		return $conn->execute($sql)->fetchAll('assoc');
     }
 
-    public function orderhasexportsNoInvoices($pn) {
+    public function orderHasExportsNoInvoices($pn) {
     	$conn = ConnectionManager::get('default');
         $sql = "Select distinct(E.CollectionDate),E.exportcollectionsID from exportcollections E, exportLinks L, exportCollShowrooms S where (L.invoiceNo IS NULL or L.invoiceNo='') and L.purchase_no=".$pn." and L.linksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=E.exportCollectionsID";
 		return $conn->execute($sql)->fetchAll('assoc');
     }
+
+    public function invoiceNumbersExistForOrder($pn) {
+    	$conn = ConnectionManager::get('default');
+        $sql = "Select distinct(E.CollectionDate),E.exportcollectionsID from exportcollections E, exportLinks L, exportCollShowrooms S where (L.invoiceNo IS NOT NULL and L.invoiceNo<>'') and L.purchase_no=".$pn." and L.linksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=E.exportCollectionsID";
+		return count($conn->execute($sql)->fetchAll('assoc')) > 0;
+    }
+    
 
     public function copyRealPurchaseToTempTables($pn) {
         $conn = ConnectionManager::get('default');

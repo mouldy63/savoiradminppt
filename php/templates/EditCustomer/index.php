@@ -38,29 +38,40 @@ changeYear: true,
 dateFormat: 'dd/mm/yy'
 });
 $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
-
+<?php foreach ($communications as $commsrow): ?>
+$( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker({
+changeMonth: true,
+yearRange: year + ":+2",
+changeYear: true,
+dateFormat: 'dd/mm/yy'
 });
-
-
+$( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
+<?php endforeach; ?>
+});
 
 </script>
 <div id="brochureform" class="brochure">
-<form name="form1" class = "form-horizontal" role = "form" method="post" action="/php/EditCustomer/edit">
+
+<form name="form1" class = "form-horizontal" id="form1" role = "form" method="post" action="/php/EditCustomer/edit">
 <div class="whitebox">
 
 	<?=$custdetails ?>
   <div class="row">
-    <div class="col-md-6">
-        <p>Edit all customer details here using the tabs below and finally clicking on the Update Customer Record Button at the bottom of the page:</p>
-        <p> <a href="/print2.asp?val=<?=$addressdetails['CODE']?>"><strong>Print Label</strong></a><strong> |  <label>Print Letter:</label></strong><br>
+    <div class="col-md-8">
+        <p>Edit customer details here using the tabs below and finally clicking on the Save Changes button.<br><a href="/php/EditCustomer/export/?val=<?=$customer['CONTACT_NO']?>"><strong>Download Customer Record CSV</strong></a></p>
+        <p> <a href="/php/EditCustomer/print?env=y&val=<?=$customer['CONTACT_NO']?>"><strong>Print Label</strong></a><strong> |  <label>Print Letter:</label></strong><br>
+
         <select onChange="window.open(this.options[this.selectedIndex].value,'_parent')" name="corresid" id="corresid">
           <option value="n">None</option>
           <?php foreach ($correspondenceList as $row): ?>
-            <option value="/print2a.asp?val2=<?=$addressdetails['CODE']?>&corresid=<?=$row['correspondenceid']?>"><?=$row['correspondencename']?></option>
+            <option value="/php/EditCustomer/print?env=n&val=<?=$customer['CONTACT_NO']?>&corresid=<?=$row['correspondenceid']?>"><?=$row['correspondencename']?></option>
           <?php endforeach; ?>
-        </select></p>
+        </select>
+
+
+       </p>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="keepright">
             <input type="submit" name="submitbrochure" value="Brochure Request"  id="submitbrochure" class="button" />
         </div> 
@@ -72,19 +83,19 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
 		      <select name="orderquote" id="orderquote" style="margin-right:13px;" onChange="return orderQuoteChangeHandler2();">
 		      <option value="0">Please select</option>
            <?php if ($userRegion == 1) { ?>
-		      <option value="/php/order/index?contact_no=<%=val%>&e1=y&quote=n">New Order</option>
+		      <option value="/Order/?contact_no=<?=$customer['CONTACT_NO']?>&e1=y&quote=n">New Order</option>
             <?php } else { ?>
-               <option value="php/order/index?contact_no=<%=val%>&e1=y&quote=n&overseas=y">New  Order</option>
+               <option value="/Order/?contact_no=<?=$customer['CONTACT_NO']?>&e1=y&quote=n&overseas=y">New  Order</option>
          <?php } 
          } 
        if ($userLocation==1) {
        ?>
-             <option value="php/order/index?contact_no=<%=val%>&e1=y&quote=n&overseas=y">New Overseas Order</option>
+             <option value="/Order/?contact_no=<?=$customer['CONTACT_NO']?>&e1=y&quote=n&overseas=y">New Overseas Order</option>
        <?php }
        if ($allowedquote=='y') { ?>
-              <option value="php/order/index?contact_no=<%=val%>&e1=y&quote=y">New Quote</option>
+              <option value="/Order/?contact_no=<?=$customer['CONTACT_NO']?>&e1=y&quote=y">New Quote</option>
        <?php } ?>
-              <option value="cusrecord-csv.asp?val=<%=val%>">Download CSV</option>
+             
 	       </select>
        </div>     
 	  
@@ -120,12 +131,15 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
 </ul>
 
 <input type="hidden" name="nextpage" id="nextpage" value="" />
-<input name="contactno" type="hidden" id="val" value="<?=$customer['CONTACT_NO']?>">
+<input name="contactno" type="hidden" id="contactno" value="<?=$customer['CONTACT_NO']?>">
+<input name="code" type="hidden" id="code" value="<?=$customer['CODE']?>">
+<input name="owningregion" type="hidden" id="owningregion" value="<?=$customer['OWNING_REGION']?>">
 <!-- Tab panes -->
 <div class="tab-content responsive">
   <div class="tab-pane active" id="details">
     <div class="form-row">
         <div class="form-group col-md-6">
+        
           <div>
           <label class="control-label" for="title">Title</label>
           <input type="text" class="form-control form-control-sm" name="title" id="title" placeholder="Title" value="<?=$customer['title']?>">
@@ -448,7 +462,9 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
       <th>Product Purchased</th>
       <th>Notes</th>
       <th>Order Total ex VAT</th>
+      <?php if ($this->Security->isSuperuser() || $this->Security->userHasRoleInList('ORDER_REOPENER')) { ?>
       <th>Order Complete</th>
+      <?php } ?>
     </tr>
   </thead>
   <tbody>
@@ -462,25 +478,29 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
       $productspurchased='';
       if ($allorder['mattressrequired']=='y') {
         $productspurchased.='<b>Mattress:</b> ';
-        $productspurchased.=$this->OrderFuncs->getOrderComponentSummary($allorder['PURCHASE_No'], 1);
+        $productspurchased.=$this->OrderFuncs->getOrderComponentSummary($allorder['PURCHASE_No'], 1).'<br>';
       }
       if ($allorder['baserequired']=='y') {
         $productspurchased.='<b>Base:</b> ';
+        $productspurchased.=$this->OrderFuncs->getOrderComponentSummary($allorder['PURCHASE_No'], 3).'<br>';
       }
       if ($allorder['topperrequired']=='y') {
         $productspurchased.='<b>Topper:</b> ';
+        $productspurchased.=$this->OrderFuncs->getOrderComponentSummary($allorder['PURCHASE_No'], 5).'<br>';
       }
       if ($allorder['legsrequired']=='y') {
         $productspurchased.='<b>Legs:</b> ';
+        $productspurchased.=$this->OrderFuncs->getOrderComponentSummary($allorder['PURCHASE_No'], 7).'<br>';
       }
       if ($allorder['valancerequired']=='y') {
-        $productspurchased.='<b>Valance:</b> Yes ';
+        $productspurchased.='<b>Valance:</b> Yes<br>';
       }
       if ($allorder['headboardrequired']=='y') {
         $productspurchased.='<b>Headboard:</b> ';
+        $productspurchased.=$this->OrderFuncs->getOrderComponentSummary($allorder['PURCHASE_No'], 8).'<br>';
       }
       if ($allorder['accessoriesrequired']=='y') {
-        $productspurchased.='<b>Accessories:</b> ';
+        $productspurchased.='<b>Accessories</b> ';
       }
       ?>
       
@@ -511,21 +531,24 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
       <td><?=$allorder['BED']?> <?=$productspurchased?></td>
       <td><?=$allorder['NOTES']?></td>
       <td><?php if (!$this->Security->userHasRoleInList('NOPRICEUSER')) { 
-       echo $allorder['totalexvat'];
+       echo $this->MyForm->formatMoneyWithSymbol($allorder['totalexvat'], $allorder['ordercurrency'],true);
       }
        ?></td>
-      <td>
-      <?php if (($this->Security->isSuperuser() || $this->Security->userHasRoleInList('ORDER_REOPENER')) && $allorder['completedorders']=='y') {  ?>
-    	<a href="/orderincomplete.asp?val=<?=$allorder['PURCHASE_No']?>">Re-open order</a>
+       <?php if ($this->Security->isSuperuser() || $this->Security->userHasRoleInList('ORDER_REOPENER')) {  ?>
+          <td>
+            <?php if ($allorder['completedorders']=='y') { ?>
+              <a href="EditCustomer/reopenorder?val=<?=$allorder['PURCHASE_No']?>&contactno=<?=$customer['CONTACT_NO']?>">Re-open order</a>
+            <?php } ?>
+          </td> 
       <?php } ?>
-      </td>
     </tr>
     <?php endforeach; ?>    
     
   </tbody>
 </table>
-  
-  
+    <?php if ($allordercount > 25) { ?>
+    <p><a href="#top" class="addorderbox">&gt;&gt; Back to Top</a></p>
+    <?php } ?> 
   
   
   
@@ -535,12 +558,496 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
 </div>
 
 
+<div class="tab-pane" id="delivery">
+  <?php if (count($deliveryaddresses)==0) {
+    echo '<p>No delivery addresses available</p>';
+    } else { 
+      foreach ($deliveryaddresses as $deliveryaddress):
+      
+        $deladdress='';
+        if ($deliveryaddress['DELIVERY_NAME'] != '') {
+          $deladdress.=$deliveryaddress['DELIVERY_NAME'].', ';
+        }
+        if ($deliveryaddress['ADD1'] != '') {
+          $deladdress.=$deliveryaddress['ADD1'].', ';
+        }
+        if ($deliveryaddress['ADD2'] != '') {
+          $deladdress.=$deliveryaddress['ADD2'].', ';
+        }
+        if ($deliveryaddress['ADD3'] != '') {
+          $deladdress.=$deliveryaddress['ADD3'].', ';
+        }
+        if ($deliveryaddress['TOWN'] != '') {
+          $deladdress.=$deliveryaddress['TOWN'].', ';
+        }
+        if ($deliveryaddress['COUNTYSTATE'] != '') {
+          $deladdress.=$deliveryaddress['COUNTYSTATE'].', ';
+        }
+        if ($deliveryaddress['COUNTRY'] != '') {
+          $deladdress.=$deliveryaddress['COUNTRY'].', ';
+        }
+        if ($deliveryaddress['CONTACT'] != '') {
+          $deladdress.=$deliveryaddress['CONTACT'];
+        }
+        $retire='';
+        if ($deliveryaddress['retire']=='y') {
+          $retire='<span style="color:red">Retired </span>';
+        }
+
+      if ($deliveryaddress['ISDEFAULT']=='y') {    ?>
+      <div class="form-row" style="background-color: #C8E6F1">
+          <div class="form-group col-md-10">
+          <span class="delfloatleft" style="margin-top:15px;"><input name="maindeliveryaddress" type="radio" checked id="maindeliveryaddress_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" onClick="alert('You are changing the default delivery address')" value="<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>"></span>
+          <br><?=$retire?><b>Default Address: </b><?=$deladdress?>
+          </div>
+          <div class="form-group col-md-2"><br>
+          <p class="delfloatright" data-toggle="collapse" data-target="#ZZ<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>"><b>Edit</b></p>
+          </div>
+      </div>
+      <?php } 
+      if ($deliveryaddress['ISDEFAULT']=='n') { ?>
+      <div class="form-row" style="background-color: #fff">
+          <div class="form-group col-md-10">
+            <span class="delfloatleft" style="margin-top:15px;"><input name="maindeliveryaddress" type="radio" id="maindeliveryaddress_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" onClick="alert('You are changing the default delivery address')" value="<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>"></span><br><?=$retire?><?=$deladdress?>
+            </div>
+            <div class="form-group col-md-2">
+            <p class="delfloatright" style="margin-top:15px;" data-toggle="collapse" data-target="#ZZ<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>"><b>Edit</b></p>
+            </div>
+      </div>
+              <?php } ?>
+      <div id="ZZ<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" class="collapse">
+          <div class="form-row">
+              <div class="form-group col-md-6">
+                <div>
+                <label class="control-label" for="deliveryname_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Delivery Name:</label>
+                <input type="text" class="form-control form-control-sm" name="deliveryname_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliveryname_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['DELIVERY_NAME']?>">
+                </div>
+                <div>
+                <label class="control-label" for="deliveryadd1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Delivery Address 1:</label>
+                <input type="text" class="form-control form-control-sm" name="deliveryadd1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliveryadd1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['ADD1']?>">
+                </div>
+                <div>
+                <label class="control-label" for="deliveryadd2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Delivery Address 2:</label>
+                <input type="text" class="form-control form-control-sm" name="deliveryadd2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliveryadd2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['ADD2']?>">
+                </div>
+                <div>
+                <label class="control-label" for="deliveryadd3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Delivery Address 3:</label>
+                <input type="text" class="form-control form-control-sm" name="deliveryadd3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliveryadd3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['ADD3']?>">
+                </div>
+                
+                <div>
+                <label class="control-label" for="deliverytown_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Town:</label>
+                <input type="text" class="form-control form-control-sm" name="deliverytown_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverytown_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['TOWN']?>">
+                </div>
+              
+                <div>
+                <label class="control-label" for="deliverycounty_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">County:</label>
+                <input type="text" class="form-control form-control-sm" name="deliverycounty_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycounty_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['COUNTYSTATE']?>">
+                </div>
+
+                <div>
+                <label class="control-label" for="deliverypostcode_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Postcode:</label>
+                <input type="text" class="form-control form-control-sm" name="deliverypostcode_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverypostcode_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['POSTCODE']?>">
+                </div>
+
+                <div>
+                <label class="control-label" for="deliverycountry_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Country:</label>
+                <input type="text" class="form-control form-control-sm" name="deliverycountry_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycountry_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['COUNTRY']?>">
+                </div>
 
 
+              </div>
+              <div class="form-group col-md-6">
+                <div class="row">
+                    <div class="col-md-8">
+                      <label class="control-label" for="deliverycontact1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Contact 1 Name:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverycontact1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycontact1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['CONTACT']?>">
 
-  <div class="tab-pane" id="delivery">...settings</div>
-  <div class="tab-pane" id="notes">...settings</div>
-  <div class="tab-pane" id="additional">...settings</div>
+                      <label class="control-label" for="deliverytel1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Tel 1:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverytel1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycontact1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['PHONE']?>">
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="control-label" for="deliveryphonetype1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Select Phone Type:</label>
+                      <select class="form-control" name="deliveryphonetype1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliveryphonetype1_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">
+                      <?php 
+                      foreach ($phonenotypes as $phonenotype):
+                      $selected='';
+                      if (isset($deliveryaddress['CONTACTTYPE1']) && $deliveryaddress['CONTACTTYPE1']==$phonenotype['typename']) {
+                        $selected='selected';
+                      } ?>
+                      <option value="<?php echo $phonenotype['typename'] ?>" <?= $selected ?>><?php echo $phonenotype['typename']?> </option>
+                      <?php endforeach; ?>          
+                      </select> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                      <label class="control-label" for="deliverycontact2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Contact 2 Name:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverycontact2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycontact2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['CONTACT2']?>">
+
+                      <label class="control-label" for="deliverytel2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Tel 2:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverytel2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycontact2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['PHONE2']?>">
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="control-label" for="deliveryphonetype2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Select Phone Type:</label>
+                      <select class="form-control" name="deliveryphonetype2_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="visitlocation">
+                      <?php 
+                      foreach ($phonenotypes as $phonenotype):
+                      $selected='';
+                      if (isset($deliveryaddress['CONTACTTYPE2']) && $deliveryaddress['CONTACTTYPE2']==$phonenotype['typename']) {
+                        $selected='selected';
+                      } ?>
+                      <option value="<?php echo $phonenotype['typename'] ?>" <?= $selected ?>><?php echo $phonenotype['typename']?> </option>
+                      <?php endforeach; ?>          
+                      </select> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                      <label class="control-label" for="deliverycontact3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Contact 3 Name:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverycontact3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycontact3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['CONTACT3']?>">
+
+                      <label class="control-label" for="deliverytel3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Tel 3:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverytel3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="deliverycontact3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" placeholder="" value="<?=$deliveryaddress['PHONE3']?>">
+                      <p><b>Tick to Retire this address:</b> 
+                      <?php if ($deliveryaddress['retire']=='n') { ?>
+                      <input name="deliveryretire_<?= $deliveryaddress['DELIVERY_ADDRESS_ID'] ?>" id="deliveryretire_<?php $deliveryaddress['DELIVERY_ADDRESS_ID'] ?>" type="checkbox" value="y">
+                      <?php } else { ?>
+                      <input name="deliveryretire_<?= $deliveryaddress['DELIVERY_ADDRESS_ID'] ?>" id="deliveryretire_<?php $deliveryaddress['DELIVERY_ADDRESS_ID'] ?>" type="checkbox" value="y" checked>
+                      <?php } ?>
+                      </p>   
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="control-label" for="deliveryphonetype3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>">Select Phone Type:</label>
+                      <select class="form-control" name="deliveryphonetype3_<?=$deliveryaddress['DELIVERY_ADDRESS_ID']?>" id="visitlocation">
+                      <?php 
+                      foreach ($phonenotypes as $phonenotype):
+                      $selected='';
+                      if (isset($deliveryaddress['CONTACTTYPE3']) && $deliveryaddress['CONTACTTYPE3']==$phonenotype['typename']) {
+                        $selected='selected';
+                      } ?>
+                      <option value="<?php echo $phonenotype['typename'] ?>" <?= $selected ?>><?php echo $phonenotype['typename']?> </option>
+                      <?php endforeach; ?>          
+                      </select> 
+                    </div>
+                </div>
+            </div>
+          </div>
+    
+   </div>
+   <div><hr></div>
+<?php endforeach; ?>   
+
+<?php } ?>  
+
+        <p data-toggle="collapse" data-target="#newadd"><b>ADD NEW DELIVERY ADDRESS</b></p>
+          <div id="newadd" class="collapse">
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <div>
+              <label class="control-label" for="deliveryname">Delivery Name:</label>
+              <input type="text" class="form-control form-control-sm" name="deliveryname" id="deliveryname" placeholder="" value="">
+              </div>
+              <div>
+              <label class="control-label" for="deliveryadd1">Delivery Address 1:</label>
+              <input type="text" class="form-control form-control-sm" name="deliveryadd1" id="deliveryadd1" placeholder="" value="">
+              </div>
+              <div>
+              <label class="control-label" for="deliveryadd2">Delivery Address 2:</label>
+              <input type="text" class="form-control form-control-sm" name="deliveryadd2" id="deliveryadd2" placeholder="" value="">
+              </div>
+              <div>
+              <label class="control-label" for="deliveryadd3">Delivery Address 3:</label>
+              <input type="text" class="form-control form-control-sm" name="deliveryadd3" id="deliveryadd3" placeholder="" value="">
+              </div>
+              
+              <div>
+              <label class="control-label" for="deliverytown">Town:</label>
+              <input type="text" class="form-control form-control-sm" name="deliverytown" id="deliverytown" placeholder="" value="">
+              </div>
+              
+              <div>
+              <label class="control-label" for="deliverycounty">County:</label>
+              <input type="text" class="form-control form-control-sm" name="deliverycounty" id="deliverycounty" placeholder="" value="">
+              </div>
+
+              <div>
+              <label class="control-label" for="deliverypostcode">Postcode:</label>
+              <input type="text" class="form-control form-control-sm" name="deliverypostcode" id="deliverypostcode" placeholder="" value="">
+              </div>
+
+              <div>
+              <label class="control-label" for="deliverycountry">Country:</label>
+              <input type="text" class="form-control form-control-sm" name="deliverycountry" id="deliverycountry" placeholder="" value="">
+              </div>
+
+
+            </div>
+            <div class="form-group col-md-6">
+               <div class="row">
+                    <div class="col-md-8">
+                      <label class="control-label" for="deliverycontact1">Contact 1 Name:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverycontact1" id="deliverycontact1" placeholder="" value="">
+
+                      <label class="control-label" for="deliverytel1">Tel 1:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverytel1" id="deliverytel1" placeholder="" value="">
+                    
+                    
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="control-label" for="deliveryphonetype1">Select Phone Type:</label>
+                      <select class="form-control" name="deliveryphonetype1" id="deliveryphonetype1">
+                  
+                      <?php 
+                    
+                  foreach ($phonenotypes as $phonenotype):
+                    ?>
+                      <option value="<?php echo $phonenotype['typename'] ?>" <?= $selected ?>><?php echo $phonenotype['typename']?> </option>
+                  <?php endforeach; ?>          
+                  </select> 
+                      </div>
+              </div>
+              <div class="row">
+                    <div class="col-md-8">
+                      <label class="control-label" for="deliverycontact2">Contact 2 Name:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverycontact2" id="deliverycontact2" placeholder="" value="">
+
+                      <label class="control-label" for="deliverytel2">Tel 2:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverytel2" id="deliverytel2" placeholder="" value="">
+                    
+                    
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="control-label" for="deliveryphonetype2">Select Phone Type:</label>
+                      <select class="form-control" name="deliveryphonetype2" id="deliveryphonetype2">
+                      <?php 
+                  foreach ($phonenotypes as $phonenotype):
+                     ?>
+                            <option value="<?php echo $phonenotype['typename'] ?>" <?= $selected ?>><?php echo $phonenotype['typename']?> </option>
+                  <?php endforeach; ?>          
+                  </select> 
+                      </div>
+              </div>
+              <div class="row">
+                    <div class="col-md-8">
+                      <label class="control-label" for="deliverycontact3">Contact 3 Name:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverycontact3" id="deliverycontact3" placeholder="" value="">
+
+                      <label class="control-label" for="deliverytel3">Tel 3:</label>
+                      <input type="text" class="form-control form-control-sm" name="deliverytel3" id="deliverycondeliverytel3tact3" placeholder="" value="">
+
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label class="control-label" for="deliveryphonetype3">Select Phone Type:</label>
+                      <select class="form-control" name="deliveryphonetype3" id="deliveryphonetype3">
+                      <?php 
+                  foreach ($phonenotypes as $phonenotype):
+                    ?>
+                            <option value="<?php echo $phonenotype['typename'] ?>" <?= $selected ?>><?php echo $phonenotype['typename']?> </option>
+                  <?php endforeach; ?>          
+                  </select> 
+                      
+              </div>
+
+          
+            </div></div></div>
+       </div>
+  </div>
+  <div class="tab-pane" id="notes">
+    <h1><b>Add Communication / Note (will be dated today):</b></h1>
+  <div class="table-responsive">
+  <table class="table">
+   <thead>
+    <th>Created by</th>
+    <th>Date created</th>
+    <th>Contact name</th>
+    <th>Notes</th>
+    <th>Follow-up date</th>
+    <th>Status</th>
+   </thead>
+   <tbody>
+    <tr>
+      <td><?=$username?></td>
+      <td><input name="commdate" type="text" value="<?=$today?>" readonly></td>
+      <td valign="top"><input name="commperson" type="text" value="<?=$custname?>"></td>
+      <td><textarea name="commnote" rows="5"></textarea></td>
+      <td><label for="commnext" id="commnext">
+		  <input name="commnextdate" type="text" class="text" id="commnextdate" value="" size="10" /></label></td>
+      <td><select name="commstatus" size="1" class="formtext" id="commstatus">
+            <option value="n">Select Status:</option>
+           
+            <option value="To Do">To Do</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+            
+          </select></td>
+    </tr>
+   
+   </tbody>
+  </table>
+</div>  
+
+<div class="table-responsive table-striped">
+  <table class="table">
+  <thead>
+  <tr>
+    <td colspan="8"> <b>Previous Correspondence / Notes:</b><br><?=$commscount?> comments/notes<br /></td></tr>
+  <tr>
+    <th>Date Created</th>
+    <th>Type</th>
+    <th>Contact Name</th>
+    <th>Contacted By:</th>
+    <th>Notes</th>
+    <th>Follow Up Date</th>
+    <th>Response</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <?php foreach ($communications as $commsrow): 
+    $commdate='';
+    if (isset($commsrow['commDate'])) {
+    $commdate = new FrozenTime($commsrow['commDate']);
+    $commdate = $commdate->format('d/m/Y H:i:s');
+    }
+    $followup='';
+    if (!empty($commsrow['actionnext'])) {
+    $followup = new FrozenTime($commsrow['actionnext']);
+    $followup = $followup->format('d/m/Y');
+    }
+    $completeddate ='';
+    if (isset($commsrow['completeddate'])) {
+      $completeddate = new FrozenTime($commsrow['completeddate']);
+      $completeddate = $completeddate->format('d/m/Y');
+      }
+    ?>
+  <tr>
+    <td><?=$commdate?></td>
+    <td><?=$commsrow['commType']?></td>
+    <td><?=$commsrow['person']?></td>
+    <td><?=$commsrow['staff']?></td>
+    <td>
+      <?php if ($commsrow['commstatus']=='To Do' && str_contains($commsrow['notes'], 'Brochure Request')!=0 && $commsrow['notes'] != 'Brochure Request Follow-Up') { ?>
+        <textarea name="notesactive_<?=$commsrow['communicationid']?>"><?=$commsrow['notes']?></textarea>
+      <? } else { ?>
+        <?=$commsrow['notes']?>&nbsp;
+      <?php } ?>
+    
+    </td>
+    <td>
+      <?php if ($commsrow['commstatus']=='To Do' && str_contains($commsrow['notes'], 'Brochure Request')!=0) { ?>
+        <input name="nextactive_<?=$commsrow['communicationid']?>" id="nextactive_<?=$commsrow['communicationid']?>" type="text" value="<?=$followup?>" readonly >
+        <? } else { ?>
+          <?=$followup?>&nbsp;
+      <?php } ?>
+   </td>
+    <td>
+    <?php if ($commsrow['commstatus']=='To Do') { ?>
+    <textarea rows="5" name="responseactive_<?=$commsrow['communicationid']?>" id="responseactive_<?=$commsrow['communicationid']?>"></textarea><br><br>
+    <?php } ?>
+      <?=$commsrow['actionresponse']?>&nbsp;
+    </td>
+    <td>
+    <?php 
+    if ($commsrow['commstatus']==null) {
+
+    } elseif (isset($commsrow['commstatus']) && ($commsrow['commstatus']=='Completed' || $commsrow['commstatus']=='Cancelled')) { 
+      echo  $commsrow['commstatus'].'<br>'.$completeddate.'<br>'.$commsrow['completedby'];
+    } else { 
+      $selectToDo='';
+      $selectComp='';
+      $selectCan='';
+      if ($commsrow['commstatus'] == 'To Do') {
+        $selectToDo='selected';
+      }
+      if ($commsrow['commstatus'] == 'Completed') {
+        $selectComp='selected';
+      }
+      if ($commsrow['commstatus'] == 'Cancelled') {
+        $selectCan='selected';
+      }
+      ?>
+    <select name="commstatusActive_<?=$commsrow['communicationid']?>" size="1" class="formtext" id="commstatusActive_<?=$commsrow['communicationid']?>">           
+            <option value="To Do" <?=$selectToDo?>>To Do</option>
+            <option value="Completed" <?=$selectComp?>>Completed</option>
+            <option value="Cancelled" <?=$selectCan?>>Cancelled</option>
+            
+          </select>&nbsp;
+
+          <?php } ?>
+
+   &nbsp;</td>
+  </tr>
+  <?php endforeach; ?>
+
+  </tbody>
+  </table>
+</div>  
+
+  </div>
+
+
+  <div class="tab-pane" id="additional">
+  <div class="row"> 
+      <div class="form-group col-md-6"> 
+      <label class="control-label" for="removecontact1"><b>Additional Contact 1:</b></label>
+         <p>Tick to remove contact 1 <input name="removecontact1" type="checkbox" id="removecontact1" value="y" onchange="cTrig('removecontact1')">
+
+                     <br></p>
+                      <p><label class="control-label" for="addcontact1title"><b>Title:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1title" type="text" id="addcontact1title" size="40" value="<?=$additionalcontact1['title']?>">
+                      </p>
+                      <p><label class="control-label" for="addcontact1name"><b>First Name:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1name" type="text" id="addcontact1name" size="40" value="<?=$additionalcontact1['first']?>">
+                      </p>
+                      <p><label class="control-label" for="addcontact1surname"><b>Surname:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1surname" type="text" id="addcontact1surname" size="40" value="<?=$additionalcontact1['surname']?>">
+                      </p>
+                      <p><label class="control-label" for="addcontact1tel"><b>Telephone:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1tel" type="text" id="addcontact1tel" size="40" value="<?=$additionalcontact1['telwork']?>">
+                      </p>
+                      <p><label class="control-label" for="addcontact1mobile"><b>Mobile:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1mobile" type="text" id="addcontact1mobile" size="40" value="<?=$additionalcontact1['mobile']?>">
+                      </p>
+                      <p><label class="control-label" for="addcontact1email"><b>Email:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1email" type="text" id="addcontact1email" size="40" value="<?=$additionalcontact1['AdditionalContactEmail']?>">
+                      </p>
+                      <p><label class="control-label" for="addcontact1pos"><b>Position in company:</b></label><br>
+                        <input class="form-control form-control-sm" name="addcontact1pos" type="text" id="addcontact1pos" size="40" value="<?=$additionalcontact1['position']?>">
+                      </p>
+
+    </div> 
+    <div class="form-group col-md-6">
+    <label class="control-label" for="removecontact2"><b>Additional Contact 2:</b></label>
+    <p>Click to remove contact 2 <input name="removecontact2" type="checkbox" id="removecontact2" value="y" onchange="cTrig2('removecontact2')">
+
+<br></p>
+ <p><label class="control-label" for="addcontact2title"><b>Title:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2title" type="text" id="addcontact2title" size="40" value="<?=$additionalcontact2['title']?>">
+ </p>
+ <p><label class="control-label" for="addcontact2name"><b>First Name:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2name" type="text" id="addcontact2name" size="40" value="<?=$additionalcontact2['first']?>">
+ </p>
+ <p><label class="control-label" for="addcontact2surname"><b>Surname:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2surname" type="text" id="addcontact2surname" size="40" value="<?=$additionalcontact2['surname']?>">
+ </p>
+ <p><label class="control-label" for="addcontact2tel"><b>Telephone:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2tel" type="text" id="addcontact2tel" size="40" value="<?=$additionalcontact2['telwork']?>">
+ </p>
+ <p><label class="control-label" for="addcontact2mobile"><b>Mobile:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2mobile" type="text" id="addcontact2mobile" size="40" value="<?=$additionalcontact2['mobile']?>">
+ </p>
+ <p><label class="control-label" for="addcontact2email"><b>Email:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2email" type="text" id="addcontact2email" size="40" value="<?=$additionalcontact2['AdditionalContactEmail']?>">
+ </p>
+ <p><label class="control-label" for="addcontact2pos"><b>Position in company:</b></label><br>
+   <input class="form-control form-control-sm" name="addcontact2pos" type="text" id="addcontact2pos" size="40" value="<?=$additionalcontact2['position']?>">
+ </p>
+              </div>
+              </div>
+              </div>
+  </div>
 </div>
     
 </form> 
@@ -554,7 +1061,7 @@ $( "#contactagain" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
     order: [[0, 'desc']]
 });
 
-  $(document).ready(showHideTradeDiscountRate());
+$(document).ready(showHideTradeDiscountRate());
   $('#viptooltip').powerTip({
     placement: 'n',
     smartPlacement: true
@@ -680,7 +1187,7 @@ jconfirm.defaults = {
     closeIconClass: false,
     watchInterval: 100,
     columnClass: 'col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1',
-    boxWidth: '50%',
+    boxWidth: '100%',
     scrollToPreviousElement: true,
     scrollToPreviousElementAnimate: true,
     useBootstrap: true,
@@ -819,24 +1326,67 @@ function orderQuoteChangeHandler() {
 	}
 }
 
-function cTrig(removecontact1) {
-      if (document.getElementById(removecontact1).checked == true) {
-		var box= confirm("Are you sure you want to delete contact 1?\n\nThe contact will be deleted when you hit save");
-		if (box!=true)
-		document.getElementById(removecontact1).checked = false;
-	  } else {
-        return true;
-	  }
-}
-function cTrig2(removecontact2) {
-      if (document.getElementById(removecontact2).checked == true) {
-		var box= confirm("Are you sure you want to delete contact 2?\n\nThe contact will be deleted when you hit save");
-		if (box!=true)
-		document.getElementById(removecontact2).checked = false;
-	  } else {
-        return true;
-	  }
-}
+$(document).ready(function() {
+    $('#removecontact1').on('change', function() {
+        if ($(this).is(':checked')) {
+            var confirmDelete = confirm("Are you sure you want to delete additional contact 1");
+            if (confirmDelete) {
+              $('#addcontact1title').val('');
+              $('#addcontact1name').val('');
+              $('#addcontact1surname').val('');
+              $('#addcontact1tel').val('');
+              $('#addcontact1mobile').val('');
+              $('#addcontact1email').val('');
+              $('#addcontact1pos').val('');
+              var confirmMove = confirm("Do you want to change contact 2 to be contact 1?");
+                if (confirmMove) {
+                    var contact1Title = $('#addcontact2title').val();
+                    $('#addcontact1title').val(contact1Title);
+                    $('#addcontact2title').val('');
+                    var contact1Name = $('#addcontact2name').val();
+                    $('#addcontact1name').val(contact1Name);
+                    $('#addcontact2name').val('');
+                    var contact1Surname = $('#addcontact2surname').val();
+                    $('#addcontact1surname').val(contact1Surname);
+                    $('#addcontact2surname').val('');
+                    var contact1Tel = $('#addcontact2tel').val();
+                    $('#addcontact1tel').val(contact1Tel);
+                    $('#addcontact2tel').val('');
+                    var contact1Mobile = $('#addcontact2mobile').val();
+                    $('#addcontact1mobile').val(contact1Mobile);
+                    $('#addcontact2mobile').val('');
+                    var contact1Email = $('#addcontact2email').val();
+                    $('#addcontact1email').val(contact1Email);
+                    $('#addcontact2email').val('');
+                    var contact1Pos = $('#addcontact2pos').val();
+                    $('#addcontact1pos').val(contact1Pos);
+                    $('#addcontact2pos').val('');
+                    $(this).prop('checked', false);
+                }
+            } else {
+                $(this).prop('checked', false); // Uncheck the checkbox if user cancels
+            }
+        }
+    });
+    $('#removecontact2').on('change', function() {
+        if ($(this).is(':checked')) {
+            var confirmDelete = confirm("Are you sure you want to delete additional contact 2");
+            if (confirmDelete) {
+              $('#addcontact2title').val('');
+              $('#addcontact2name').val('');
+              $('#addcontact2surname').val('');
+              $('#addcontact2tel').val('');
+              $('#addcontact2mobile').val('');
+              $('#addcontact2email').val('');
+              $('#addcontact2pos').val('');
+            } else {
+                $(this).prop('checked', false); // Uncheck the checkbox if user cancels
+            }
+        }
+    });
+});
+
+
 
 //-->
 </script>

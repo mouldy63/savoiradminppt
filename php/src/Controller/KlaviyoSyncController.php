@@ -2,16 +2,11 @@
 namespace App\Controller;
 
 use Cake\I18n\Time;
-use Klaviyo\Client;
-use KlaviyoAPI\KlaviyoAPI;
 use Exception;
 use \App\Controller\Component\UtilityComponent;
 
 class KlaviyoSyncController extends AbstractImportController {
 
-    private $client;
-    private $publicKey;
-    
 	public function initialize() : void {
         parent::initialize();
         $this->loadModel('PendingMailchimpUpdates');
@@ -20,8 +15,6 @@ class KlaviyoSyncController extends AbstractImportController {
         $this->loadModel('QcHistory');
         $this->loadModel('Address');
         $this->loadModel('Contact');
-        $this->client = new Client($this->_getComregVal("KLAVIYO_PRIVATE_KEY"));
-        $this->publicKey = $this->_getComregVal("KLAVIYO_PUBLIC_KEY");
         $this->privateKey = $this->_getComregVal("KLAVIYO_PRIVATE_KEY");
 	}
 	
@@ -33,36 +26,49 @@ class KlaviyoSyncController extends AbstractImportController {
 			http_response_code(404);
 			exit;
 		}
-		
-        $segmentId = $this->_getComregVal('KLAVIYO_UNSUBSCRIBE_SEGMENTID');  // 'Skywire - Unsubscribes'
-		$klaviyo = new KlaviyoAPI($this->privateKey, $num_retries = 3, $wait_seconds = 3);
+
+		$rooturl = 'https://a.klaviyo.com/api/segments/' . $this->_getComregVal('KLAVIYO_UNSUBSCRIBE_SEGMENTID') . '/profiles/?page[size]=20';
 		$cursor = $this->_getComregVal('KLAVIYO_UNSUBSCRIBE_SEGMENT_CURSOR');
-		$loop = 0;
-		
+
 		for ($n = 0; $n < 10; $n++) {
 			echo '<br>old cursor = '.$cursor;
 			error_log('old cursor = '.$cursor);
 			$profileCount = 0;
 
-			$profiles = $klaviyo->Segments->getSegmentProfiles($segmentId, null, null, $cursor, null);
-			foreach($profiles['data'] as $profile) {
-				$profileId = $profile['id'];
+			$url = $rooturl;
+			if (!empty($cursor)) {
+				$url .= '&page[cursor]=' . $cursor;
+			}
+			$response = $this->getGuzzleClient()->request('GET', $url, [
+				'headers' => [
+					'Authorization' => 'Klaviyo-API-Key ' . $this->privateKey,
+					'accept' => 'application/json',
+					'revision' => '2024-06-15',
+				],
+			]);
+			$body = json_decode($response->getBody(), true);
+			foreach($body['data'] as $profile) {
 				$emailAddress = trim($profile['attributes']['email']);
 				$this->unsubscribeContact($emailAddress);
 				echo '<br>' . $emailAddress . ' unsubscribed from savoiradmin';
 				$profileCount++;
 			}
 
-			$cursor = $this->_getNextPageCursor($profiles);
+			$cursor = $this->_getNextPageCursor($body);
 			echo '<br>new cursor = '.$cursor;
 			error_log('new cursor = '.$cursor);
+			if (!$cursor) {
+				break;
+			}
 		}
+
 		$this->_saveComregVal('KLAVIYO_UNSUBSCRIBE_SEGMENT_CURSOR', $cursor);
 		
 		echo "<br>$profileCount Klaviyo unsubscibes processed";
 		error_log("$profileCount Klaviyo unsubscibes processed");
+		
 	}
-	
+
 	private function unsubscribeContact($emailAddress) {
 		
 		$rs = $this->Address->find('all', ['conditions'=> ['EMAIL_ADDRESS' => $emailAddress]])->toArray();
@@ -81,28 +87,17 @@ class KlaviyoSyncController extends AbstractImportController {
 		}
 	}
 
-	private function _getNextPageCursor($profiles) {
+	private function _getNextPageCursor($body) {
 		$cursor = null;
-		if (!array_key_exists('links', $profiles)) {
-			return $cursor;
-		}
-		if (!array_key_exists('next', $profiles['links'])) {
-			return $cursor;
-		}
-
-		$nextUrl = $profiles['links']['next'];
-		if (empty($nextUrl)) {
-			return $cursor;
-		}
-		$urlParts = parse_url($nextUrl);
-		$bits = explode('=', $urlParts['query']);
-		$i = 0;
-		foreach($bits as $bit) {
-			if ($bit == 'page%5Bcursor%5D') {
-				$cursor = $bits[$i+1];
-				break;
+		if (isset($body['links']) && isset($body['links']['next'])) {
+			$nextUrl = $body['links']['next'];
+			$queryString = parse_url($nextUrl, PHP_URL_QUERY);
+			if ($queryString) {
+				parse_str($queryString, $queryParams);
+				if (isset($queryParams['page']) && isset($queryParams['page']['cursor'])) {
+					$cursor = $queryParams['page']['cursor'];
+				}
 			}
-			$i++;
 		}
 		return $cursor;
 	}
@@ -146,21 +141,14 @@ class KlaviyoSyncController extends AbstractImportController {
 			$this->printElapsedTime('marked invalid email address', $startTime);
 
 			$acceptemail = ($c['acceptemail'] == 'y');
-			$exists = $this->_profileExists($emailAddress);
-			$this->printElapsedTime('checked profile exists', $startTime);
-			echo '<br>emailAddress='. $emailAddress. ' acceptemail=' . $acceptemail . ' exists=' . $exists;
-			if (!$exists) {
-			    $this->_createNewProfile($emailAddress);
-			    echo '<br>New profile added for ' . $emailAddress;
-			}
-			$this->printElapsedTime('created new profile if necessary', $startTime);
+			echo '<br>emailAddress='. $emailAddress. ' acceptemail=' . $acceptemail;
 			
 			$tryCount = 0;
 			while ($tryCount < 5) {
 				$tryCount++;
 				$success = false;
 				try {
-			$this->_updateProfile($contact, $acceptemail);
+					$this->sendProfile($contact, $acceptemail);
 					$success = true;
 				} catch (Exception $e) {
 					echo '<br>Trycount=' . $tryCount . ' Exception: ' . $e->getMessage();
@@ -187,7 +175,7 @@ class KlaviyoSyncController extends AbstractImportController {
 		echo '<br>' . $label . ': elapsed=' . $elapsed;
 	}
 	
-	private function _updateProfile($contact, $acceptemail) {
+	private function sendProfile($contact, $acceptemail) {
 		$address = $this->Address->find('all', array('conditions'=> array('CODE' => $contact['CODE'])))->toArray()[0];
 
 		// mobile
@@ -284,79 +272,98 @@ class KlaviyoSyncController extends AbstractImportController {
 			}
 		}
 
-		// get the customer ID from Klaviyo
-		$response = $this->client->Profiles->getProfileId(trim($address['EMAIL_ADDRESS']));
-		$personId = $response['id'];
-		echo '<br>EMAIL_ADDRESS = ' . $address['EMAIL_ADDRESS'] . ' personId = '. $personId;
-		
-		// Klaviyo properties
+		echo '<br>EMAIL_ADDRESS = ' . $address['EMAIL_ADDRESS'];
+
 		$data = [];
-		$this->_pushValToArray($data, '$email', trim($address['EMAIL_ADDRESS']));
-        $this->_pushValToArray($data, '$first_name', $contact['first']);
-		$this->_pushValToArray($data, '$last_name', $contact['surname']);
-        $this->_pushValToArray($data, '$address1', $address['street1']);
-		$this->_pushValToArray($data, '$address2', $address['street2']);
-        $this->_pushValToArray($data, '$city', $address['town']);
-		$this->_pushValToArray($data, '$region', $address['county']);
-        $this->_pushValToArray($data, '$zip', $address['postcode']);
-		$this->_pushValToArray($data, '$country', $address['country']);
-        $this->_pushValToArray($data, '$organization', $address['company']);
-		$this->_pushValToArray($data, '$title', $contact['title']);
-        $this->_pushValToArray($data, '$phone_number', $address['tel']);
+		$data['type'] = 'profile';
+
+		$attributes = [];
+		$this->_pushValToArray($attributes, 'email', trim($address['EMAIL_ADDRESS']));
+		$this->_pushValToArray($attributes, 'first_name', $contact['first']);
+		$this->_pushValToArray($attributes, 'last_name', $contact['surname']);
+		$this->_pushValToArray($attributes, 'organization', $address['company']);
+		$this->_pushValToArray($attributes, 'title', $contact['title']);
+
+		$location = [];
+        $this->_pushValToArray($location, 'zip', $address['postcode']);
+        $this->_pushValToArray($location, 'address2', $address['street2']);
+        $this->_pushValToArray($location, 'address1', $address['street1']);
+        $this->_pushValToArray($location, 'region', $address['county']);
+        $this->_pushValToArray($location, 'city', $address['town']);
+        $this->_pushValToArray($location, 'country', $address['country']);
+		$attributes['location'] = $location;
 		
 		// custom properties
-        $this->_pushValToArray($data, 'Title', $contact['title']);
-        $this->_pushValToArray($data, 'First Name', $contact['first']);
-        $this->_pushValToArray($data, 'Last Name', $contact['surname']);
-        $this->_pushValToArray($data, 'Email Address', trim($address['EMAIL_ADDRESS']));
-        $this->_pushValToArray($data, 'Address', $address['street1']);
-        $this->_pushValToArray($data, 'Address Line 2', $address['street2']);
-        $this->_pushValToArray($data, 'Address Line 3', $address['street3']);
-        $this->_pushValToArray($data, 'Town', $address['town']);
-        $this->_pushValToArray($data, 'County', $address['county']);
-        $this->_pushValToArray($data, 'Postcode', $address['postcode']);
-        $this->_pushValToArray($data, 'Country', $address['country']);
-        $this->_pushValToArray($data, 'Mobile', $mobile);
-        $this->_pushValToArray($data, 'Company', $address['company']);
-        $this->_pushValToArray($data, 'Brochure Type', $brochureRequestType);
-        $this->_pushValToArray($data, 'Source', $source);
-        $this->_pushValToArray($data, 'Type', $address['CHANNEL']);
-        $this->_pushValToArray($data, 'Accepts Marketing', $acceptemail ? 'Yes' : 'No');
-        $this->_pushValToArray($data, 'Accepts Postal Marketing', $acceptPost);
-        $this->_pushValToArray($data, 'Owning Showroom', $owningShowroom['location']);
-        $this->_pushValToArray($data, 'Showroom', $showroom['location']);
-        $this->_pushValToArray($data, 'Status', isset($address['STATUS']) ? $address['STATUS'] : 'Unknown');
-        $this->_pushValToArray($data, 'Customer Type', $customerType);
-        $this->_pushValToArray($data, 'Order Number', $orderNumbers);
-        $this->_pushValToArray($data, 'Last Order Date', $latestOrder ? $latestOrder['ORDER_DATE'] : 'None');
-        $this->_pushValToArray($data, 'Last Order Value', $latestOrderValue);
-        $this->_pushValToArray($data, 'Product Purchased', $productsPurchased);
-        $this->_pushValToArray($data, 'Mattress Type', ($latestOrder && $latestOrder['mattressrequired']=='y') ? $latestOrder['savoirmodel'] : 'None');
-        $this->_pushValToArray($data, 'Base Type', ($latestOrder && $latestOrder['baserequired']=='y') ? $latestOrder['basesavoirmodel'] : 'None');
-        $this->_pushValToArray($data, 'Headboard', ($latestOrder && $latestOrder['headboardrequired']=='y') ? $latestOrder['headboardstyle'] : 'None');
-        $this->_pushValToArray($data, 'Topper Type', ($latestOrder && $latestOrder['topperrequired']=='y') ? $latestOrder['toppertype'] : 'None');
-        $this->_pushValToArray($data, 'Accessories', ($latestOrder && $latestOrder['accessoriesrequired']=='y') ? 'Yes' : 'None');
-        $this->_pushValToArray($data, 'Order Status', $orderStatus);
-        $this->_pushValToArray($data, 'Order Confirmed Date', $orderConfirmedDate);
-        $this->_pushValToArray($data, 'Mattress Issued Date', $mattressIssuedDate);
-        $this->_pushValToArray($data, 'Base Issued Date', $baseIssuedDate);
-        $this->_pushValToArray($data, 'Order Delivery Date', $latestOrder ? $latestOrder['bookeddeliverydate'] : 'None');
+		$properties = [];
+        $this->_pushValToArray($properties, 'Title', $contact['title']);
+        $this->_pushValToArray($properties, 'First Name', $contact['first']);
+        $this->_pushValToArray($properties, 'Last Name', $contact['surname']);
+        $this->_pushValToArray($properties, 'Email Address', trim($address['EMAIL_ADDRESS']));
+        $this->_pushValToArray($properties, 'Address', $address['street1']);
+        $this->_pushValToArray($properties, 'Address Line 2', $address['street2']);
+        $this->_pushValToArray($properties, 'Address Line 3', $address['street3']);
+        $this->_pushValToArray($properties, 'Town', $address['town']);
+        $this->_pushValToArray($properties, 'County', $address['county']);
+        $this->_pushValToArray($properties, 'Postcode', $address['postcode']);
+        $this->_pushValToArray($properties, 'Country', $address['country']);
+        $this->_pushValToArray($properties, 'Mobile', $mobile);
+        $this->_pushValToArray($properties, 'Company', $address['company']);
+        $this->_pushValToArray($properties, 'Brochure Type', $brochureRequestType);
+        $this->_pushValToArray($properties, 'Source', $source);
+        $this->_pushValToArray($properties, 'Type', $address['CHANNEL']);
+        $this->_pushValToArray($properties, 'Accepts Marketing', $acceptemail ? 'Yes' : 'No');
+        $this->_pushValToArray($properties, 'Accepts Postal Marketing', $acceptPost);
+        $this->_pushValToArray($properties, 'Owning Showroom', $owningShowroom['location']);
+        $this->_pushValToArray($properties, 'Showroom', $showroom['location']);
+        $this->_pushValToArray($properties, 'Status', isset($address['STATUS']) ? $address['STATUS'] : 'Unknown');
+        $this->_pushValToArray($properties, 'Customer Type', $customerType);
+        $this->_pushValToArray($properties, 'Order Number', $orderNumbers);
+        $this->_pushValToArray($properties, 'Last Order Date', $latestOrder ? $latestOrder['ORDER_DATE'] : 'None');
+        $this->_pushValToArray($properties, 'Last Order Value', $latestOrderValue);
+        $this->_pushValToArray($properties, 'Product Purchased', $productsPurchased);
+        $this->_pushValToArray($properties, 'Mattress Type', ($latestOrder && $latestOrder['mattressrequired']=='y') ? $latestOrder['savoirmodel'] : 'None');
+        $this->_pushValToArray($properties, 'Base Type', ($latestOrder && $latestOrder['baserequired']=='y') ? $latestOrder['basesavoirmodel'] : 'None');
+        $this->_pushValToArray($properties, 'Headboard', ($latestOrder && $latestOrder['headboardrequired']=='y') ? $latestOrder['headboardstyle'] : 'None');
+        $this->_pushValToArray($properties, 'Topper Type', ($latestOrder && $latestOrder['topperrequired']=='y') ? $latestOrder['toppertype'] : 'None');
+        $this->_pushValToArray($properties, 'Accessories', ($latestOrder && $latestOrder['accessoriesrequired']=='y') ? 'Yes' : 'None');
+        $this->_pushValToArray($properties, 'Order Status', $orderStatus);
+        $this->_pushValToArray($properties, 'Order Confirmed Date', $orderConfirmedDate);
+        $this->_pushValToArray($properties, 'Mattress Issued Date', $mattressIssuedDate);
+        $this->_pushValToArray($properties, 'Base Issued Date', $baseIssuedDate);
+        $this->_pushValToArray($properties, 'Order Delivery Date', $latestOrder ? $latestOrder['bookeddeliverydate'] : 'None');
 
-        $this->_pushValToArray($data, 'Lifetime Spend (GBP)', 0);
-        $this->_pushValToArray($data, 'Lifetime Spend (USD)', 0);
-        $this->_pushValToArray($data, 'Lifetime Spend (EUR)', 0);
-        $this->_pushValToArray($data, 'Lifetime AOV (GBP)', 0);
-        $this->_pushValToArray($data, 'Lifetime AOV (USD)', 0);
-        $this->_pushValToArray($data, 'Lifetime AOV (EUR)', 0);
+        $this->_pushValToArray($properties, 'Lifetime Spend (GBP)', 0);
+        $this->_pushValToArray($properties, 'Lifetime Spend (USD)', 0);
+        $this->_pushValToArray($properties, 'Lifetime Spend (EUR)', 0);
+        $this->_pushValToArray($properties, 'Lifetime AOV (GBP)', 0);
+        $this->_pushValToArray($properties, 'Lifetime AOV (USD)', 0);
+        $this->_pushValToArray($properties, 'Lifetime AOV (EUR)', 0);
 		$lifetimeSpendArray = $this->Contact->getLifetimeSpendByCurrency($contact['CONTACT_NO']);
 		foreach ($lifetimeSpendArray as $item) {
 			$name = 'Lifetime Spend ('.$item['ordercurrency'].')';
-	        $this->_pushValToArray($data, $name, $item['tot']);
+	        $this->_pushValToArray($properties, $name, $item['tot']);
 			$name = 'Lifetime AOV ('.$item['ordercurrency'].')';
-	        $this->_pushValToArray($data, $name, $item['tot']/$item['n']);
+	        $this->_pushValToArray($properties, $name, $item['tot']/$item['n']);
 		}
-        
-		$result = $this->client->Profiles->updateProfile($personId, $data);
+		$attributes['properties'] = $properties;
+		$data['attributes'] = $attributes;
+		$payload['data'] = $data;
+		echo '<br>' . json_encode($payload);
+
+		$response = $this->getGuzzleClient()->request('POST', 'https://a.klaviyo.com/api/profile-import/', [
+			'body' => json_encode($payload),
+			'headers' => [
+			  'Authorization' => 'Klaviyo-API-Key ' . $this->privateKey,
+			  'accept' => 'application/json',
+			  'content-type' => 'application/json',
+			  'revision' => '2024-06-15',
+			],
+		]);
+
+		if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
+			debug($response);
+			throw new Exception('sendProfile returned code ' . $response->getStatusCode());
+		}
 	}
 	
 	private function _pushValToArray(&$trgArray, $trgName, $val) {
@@ -365,38 +372,12 @@ class KlaviyoSyncController extends AbstractImportController {
 		}
 	}
 	
-	private function _profileExists($emailAddress) {
-		
-	    try {
-	        $response = $this->client->Profiles->getProfileId($emailAddress);
-	        $profile = $this->client->Profiles->getProfile($response['id']);
-	    } catch (Exception $e) {
-	        return false;
-	    }
-		return true;
-	}
-	
-	private function _createNewProfile($emailAddress) {
-	    $gclient = new \GuzzleHttp\Client();
-	    $data = [
-	        'form_params' => [
-	            'data' => '{"token": "'. $this->publicKey .'","properties": {"$email":"'. $emailAddress .'"}}'
-	        ],
-	        'headers' => [
-	            'accept' => 'text/html',
-	            'content-type' => 'application/x-www-form-urlencoded',
-	        ]
-        ];
-	    
-	    $response = $gclient->request('POST', 'https://a.klaviyo.com/api/identify', $data);
-	    $result = $response->getBody();
-	    if (intval(strval($result)) == 0) {
-	        throw new Exception('_createNewProfile failed for email ' . $emailAddress);
-	    }
-	}
-	
 	protected function _getHeader() {
 		return "";
+	}
+
+	private function getGuzzleClient() {
+		return new \GuzzleHttp\Client();
 	}
 
 }

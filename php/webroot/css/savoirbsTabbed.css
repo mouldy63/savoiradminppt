@@ -1,6 +1,7 @@
 
 @import 'reset.css';
-body {font-size: 75%;}
+body {font-family: "Trebuchet MS", Arial, Verdana, San serif;
+font-size: 12px;}
 .delnote {
     height: 100px;
     margin-left: 1059px;
@@ -616,12 +617,12 @@ padding:8px;}
 .jconfirm .jconfirm-box-container.jconfirm-no-transition {
     -webkit-transition: none !important;
     transition: none !important;
-    min-width: 80%;
+    min-width: 500px;
 }
 
 .jconfirm.jconfirm-white .jconfirm-box, .jconfirm.jconfirm-light .jconfirm-box {
 	font-family:"Trebuchet MS",Arial,Verdana,San serif !important;
-	margin-right:40% !important;
+	margin-right:10% !important;
 	}
 .jconfirm.jconfirm-white .jconfirm-box .jconfirm-buttons button.btn-default, .jconfirm.jconfirm-light .jconfirm-box .jconfirm-buttons button.btn-default {
   font-size:14px !important;}
@@ -754,7 +755,7 @@ textarea.form-control {
     border: 0;    
 }
 .nav-tabs > li > a {
-	padding:13px;
+	padding:9px;
 	border-top-left-radius: 5px;
 	border-top-right-radius:5px;
 	border-bottom-left-radius: 0;
