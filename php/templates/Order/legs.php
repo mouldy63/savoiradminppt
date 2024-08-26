@@ -8,7 +8,7 @@
 	<div class="form-row">
         <div class="form-group col-sm-2">
         <label for="legstyle">Feature Leg:<br></label>  
-        <select name = "legstyle" id = "legstyle" class="form-select legsfield" onChange = "setLegFinishes(); showFloorType(); getLegsListPrice(); showLegStylePriceField(); setLegQty();">
+        <select name = "legstyle" id = "legstyle" class="form-select legsfield" onChange = "setLegFinishes(); showFloorType(); getLegsListPrice(); setLegQty();">
          <?php foreach ($legs as $legsrow): 
                 $slcted=''; 
                 if ($purchase['legstyle']== $legsrow['optionText']) {
@@ -202,7 +202,6 @@
         });
         hideLegsDiscountFields();
         legspecialheightSelected(false);
-        showLegStylePriceField();
         showHideWholesale();
         disableLegsComponentSections(<?=$isComponentLocked?>, '<?=$lockColour?>');
     }
@@ -214,6 +213,8 @@
             $('.legsdiscountcls').show();
         }
     }
+
+
 
 function setLegFinishes() {
     var slct = $("#legstyle option:selected").val();

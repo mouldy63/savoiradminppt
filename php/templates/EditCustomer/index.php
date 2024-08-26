@@ -136,7 +136,7 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 <input name="owningregion" type="hidden" id="owningregion" value="<?=$customer['OWNING_REGION']?>">
 <!-- Tab panes -->
 <div class="tab-content responsive">
-  <div class="tab-pane active" id="details">
+  <div id="details" class="tab-pane fade in active">
     <div class="form-row">
         <div class="form-group col-md-6">
         
@@ -260,7 +260,7 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 
 
 
-  <div class="tab-pane" id="info">
+  <div id="info" class="tab-pane fade">
   <div class="form-row">
       <div class="form-group col-md-6">
           <b>Interested in the following products:</b><br><br>
@@ -440,7 +440,7 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 
 </div>
 
-<div class="tab-pane" id="orders">
+<div class="tab-pane" id="orders" class="tab-pane fade">
   <?php if (count($allorders)==0) {
     echo '<p>No orders currently</p>';
   } else { ?>
@@ -509,20 +509,20 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
       $colorclass='';
       $extratext='';
       if ($allorder['cancelled']=='y') {
-		      echo '<a class="greytext" href="/edit-purchase.asp?order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' CANCELLED ORDER</a>';
+		      echo '<a class="greytext" href="/php/order/?pn='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' CANCELLED ORDER</a>';
       } else if ($allorder['completedorders']=='n' && $allorder['orderonhold']=='n' && $allorder['quote']=='d') {
-          echo '<a class="greentext" href="/edit-purchase.asp?quote=y&order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' Declined</a>';
+          echo '<a class="greentext" href="/php/order/?quote=y&pn=?'.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' Declined</a>';
       } else if ($allorder['completedorders']=='n' && $allorder['orderonhold']=='n' && $allorder['quote']=='y' ) {
-          echo '<a class="greentext" href="/edit-purchase.asp?quote=y&order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
+          echo '<a class="greentext" href="/php/order/?quote=y&pn='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
       } else if ($allorder['completedorders']=='n' && $allorder['orderonhold']=='n' && $allorder['quote']=='n') {
-          echo '<a class="redtext" href="/edit-purchase.asp?order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
+          echo '<a class="redtext" href="/php/order/?pn='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
       } else if ($allorder['orderonhold']=='y' && $allorder['completedorders']=='n') {
-        echo '<a class="bluetext" href="/edit-purchase.asp?order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
+        echo '<a class="bluetext" href="/php/order/?pn='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
     } else if ($allorder['completedorders']=='y') {
-        echo '<a class="bluetext" href="/edit-purchase.asp?readonly=y&order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
+        echo '<a style="color:grey;" href="/php/order/?readonly=y&pn='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
     } else {
       //just in case
-        echo '<a class="bluetext" href="/edit-purchase.asp?readonly=y&order='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
+        echo '<a class="bluetext" href="/php/order/?readonly=y&pn='.$allorder['PURCHASE_No'].'">'.$allorder['ORDER_NUMBER'].' </a>';
   }?>
 
   </td>
@@ -558,7 +558,7 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 </div>
 
 
-<div class="tab-pane" id="delivery">
+<div id="delivery" class="tab-pane fade">
   <?php if (count($deliveryaddresses)==0) {
     echo '<p>No delivery addresses available</p>';
     } else { 
@@ -854,7 +854,7 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
             </div></div></div>
        </div>
   </div>
-  <div class="tab-pane" id="notes">
+  <div id="notes" class="tab-pane fade">
     <h1><b>Add Communication / Note (will be dated today):</b></h1>
   <div class="table-responsive">
   <table class="table">
@@ -988,7 +988,7 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
   </div>
 
 
-  <div class="tab-pane" id="additional">
+  <div id="additional" class="tab-pane fade">
   <div class="row"> 
       <div class="form-group col-md-6"> 
       <label class="control-label" for="removecontact1"><b>Additional Contact 1:</b></label>
@@ -1386,6 +1386,34 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function() {
+    // Get the current hash from the URL
+    var hash = window.location.hash;
+
+    // Function to activate the tab
+    function activateTab(hash) {
+        // Remove 'active' and 'in' classes from all tabs and tab content
+        $('.nav-tabs li, .tab-pane').removeClass('active').removeClass('in').removeClass('show');
+
+        // Add 'active' class to the tab link and 'in active show' to the tab content
+        $('.nav-tabs a[href="' + hash + '"]').parent().addClass('active');
+        $(hash).addClass('in active show');
+    }
+
+    // Check if a valid hash is provided, and activate the corresponding tab
+    if (hash && $(hash).length) {
+        activateTab(hash);
+    } else {
+        // No hash or invalid hash, activate the 'details' tab by default
+        activateTab('#details');
+    }
+
+    // Update the URL hash when a tab is clicked and activate it
+    $('.nav-tabs a').on('shown.bs.tab', function(e) {
+        window.location.hash = e.target.hash;
+        activateTab(e.target.hash);
+    });
+});
 
 
 //-->

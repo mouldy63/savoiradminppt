@@ -500,7 +500,7 @@ ENDSQL;
 		}
 		
     	if ($purchase['istrade']=='y') {
-			$totalcompprice =$totalcompprice/(1+$purchase['vatrate']/100);
+			$totalcompprice =$totalcompprice+($totalcompprice*($purchase['vatrate']/100));
 		}
 		$totalcompprice = number_format($totalcompprice,2);
 		return $totalcompprice;
@@ -524,7 +524,43 @@ ENDSQL;
 		$myconn = ConnectionManager::get('default');
 		return $myconn->execute($sql, ['fromDateTime' => $fromDateTime])->fetchAll('assoc');
     }
-    
+
+	public function getPaymentsForInvoiceNo($invno, $pn) {	
+		$sql = "select sum(amount) as amt from payment where invoice_number='".$invno."' and purchase_no=".$pn;		
+		$myconn = ConnectionManager::get('default');
+		$rs = $myconn->execute($sql)->fetchAll('assoc');
+		if (count($rs)>0 && isset($rs[0]['amt'])) {
+		return $rs[0]['amt'];
+		} else {
+			return 0;
+		}
+		
+    }
+
+	public function getOutstandingForInvoiceNo($totalinvoice, $invno, $pn) {	
+		$sql = "select sum(amount) as amt from payment where invoice_number='".$invno."' and purchase_no=".$pn;		
+		$myconn = ConnectionManager::get('default');
+		$rs = $myconn->execute($sql)->fetchAll('assoc');
+		if (count($rs)>0) {
+		return $totalinvoice-$rs[0]['amt'];
+		} else {
+			return $totalinvoice;
+		}
+		
+	}
+
+	public function getComponentStatus($pn, $compid) {	
+		$sql = "select QC_StatusID from qc_history_latest where Purchase_No=".$pn." and ComponentID=".$compid." order by QC_Date desc";		
+		$myconn = ConnectionManager::get('default');
+		$rs = $myconn->execute($sql)->fetchAll('assoc');
+		if (count($rs)>0) {
+		return $rs[0]['QC_StatusID'];
+		} else {
+			return null;
+		}
+		
+	}
+	
     private function convertDateToMysql($date) {
 		$myDateTime = DateTime::createFromFormat('d/m/Y', $date);
 		$date = $myDateTime->format('Y-m-d');

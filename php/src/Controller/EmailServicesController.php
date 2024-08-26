@@ -8,6 +8,11 @@ use Cake\ORM\TableRegistry;
 class EmailServicesController extends AppController {
 	public $uses = false;
 	public $autoRender = false;
+
+	public function initialize() : void {
+		parent::initialize();
+        $this->loadComponent('OrderHelper');
+    }
 	
     public function sendSimpleEmail() {
         $this->viewBuilder()->setLayout('ajax');
@@ -68,11 +73,18 @@ class EmailServicesController extends AppController {
         $this->generateBatchEmail('david@natalex.co.uk', 'info@natalex.co.uk', 'david@natalex.co.uk', 'david', 'test', 'test', 'html', null);
     }
     
-    public function generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, $format, $attachment, $attachment2=null, $attachment3=null) {
+    public function generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, $format, $attachment, $attachment2=null, $attachment3=null, $pn = null, $useTempTable=false) {
         $conn = ConnectionManager::get('default');
         $conn->getDriver()->enableAutoQuoting();
-        $batchEmail = TableRegistry::get('BatchEmail');
+		if ($useTempTable) {
+	        $batchEmail = TableRegistry::get('TempBatchEmail');
+		} else {
+			$batchEmail = TableRegistry::get('BatchEmail');
+		}
         $email = $batchEmail->newEntity([]);
+		if ($useTempTable) {
+			$email->batchemail_id  = $this->OrderHelper->getNextPrimeKeyValForTable('batchemail', 1);
+		}
         $email->to = $to;
         $email->from = $from;
         $email->fromalias = $fromName;
@@ -84,6 +96,9 @@ class EmailServicesController extends AppController {
         $email->attachment2 = $attachment2;
         $email->attachment3 = $attachment3;
         $email->added = date('Y-m-d H:i:s');
+		if (isset($pn)) {
+			$email->purchase_no = $pn;
+		}
 
         $batchEmail->save($email);
 

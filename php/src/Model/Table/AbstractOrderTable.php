@@ -4,8 +4,15 @@ namespace App\Model\Table;
 use Cake\ORM\Table;
 use Cake\Datasource\ConnectionManager;
 use \DateTime;
+use Cake\ORM\TableRegistry;
 
 class AbstractOrderTable extends Table {
+
+    private $purchaseBaseFabricChangeFields = ['basefabric', 'basefabricdirection', 'basefabricchoice', 'basefabricprice', 'basefabricmeters', 'basefabriccost', 'basefabricdesc'];
+    private $purchaseLegsFabricChangeFields = ['specialinstructionslegs'];
+    private $purchaseHBFabricChangeFields = ['headboardfabricchoice', 'headboardfabricdirection', 'headboardfabric', 'hbfabricprice', 'hbfabricmeters', 'hbfabriccost', 'headboardfabricdesc'];
+    private $purchaseValanceFabricChangeFields = ['pleats', 'valfabriccost', 'valfabricmeters', 'valfabricprice', 'valancefabric', 'specialinstructionsvalance', 'valancefabricchoice', 'valancefabricdirection', 'valancewidth', 'valancelength', 'valancedrop', 'valancefabricoptions'];
+    private $purchaseChangeFields = ['pleats', 'valfabriccost', 'valfabricmeters', 'valfabricprice', 'valancefabric', 'specialinstructionsvalance', 'valancefabricchoice', 'valancefabricdirection', 'valancewidth', 'valancelength', 'valancedrop', 'valancefabricoptions'];
     
     public function initialize(array $config) : void {
     }
@@ -26,7 +33,10 @@ class AbstractOrderTable extends Table {
         $sql = "select a.PRICE_LIST from contact c, address a where a.CODE=c.CODE and c.CONTACT_NO=".$contactno;
         $conn = ConnectionManager::get('default');
 		$row = $conn->execute($sql)->fetchAll('assoc')[0];
-        $priceList = strtolower($row['PRICE_LIST']);
+        $priceList='';
+        if (isset($row['PRICE_LIST']) && !empty($row['PRICE_LIST'])) {
+            $priceList = strtolower($row['PRICE_LIST']);
+        }
         $isTrade = false;
         if ($priceList=='trade' || $priceList=='savoy' || $priceList=='contract' || $priceList =='wholesale' ||$priceList=='net retail') {
             $isTrade = true;
@@ -79,18 +89,26 @@ class AbstractOrderTable extends Table {
 		return $conn->execute($sql)->fetchAll('assoc');
     }
 
-    public function orderHasExportsNoInvoices($pn) {
+    public function getOrderExportInvoiceData($pn) {
+    	$conn = ConnectionManager::get('default');
+        $sql = "Select distinct(E.CollectionDate),E.exportcollectionsID from exportcollections E, exportLinks L, exportCollShowrooms S where (L.invoiceNo IS NOT NULL and L.invoiceNo<>'') and L.purchase_no=".$pn." and L.linksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=E.exportCollectionsID";
+		$rows = $conn->execute($sql)->fetchAll('assoc');
+        debug($rows);
+        foreach ($rows as $row) {
+            $sql = "Select L.componentid, L.invoiceNo, L.invoicedate, E.exportCollectionsID from exportcollections E, exportLinks L, exportCollShowrooms S where L.purchase_no=".$pn." and E.collectiondate='" . $row['CollectionDate'] . "' AND L.linksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=E.exportCollectionsID";
+            $invRows = $conn->execute($sql)->fetchAll('assoc');
+            debug($invRows);
+            foreach ($invRows as $invRow) {
+            }
+        }
+        die;
+    }
+
+    public function orderhasexportsNoInvoices($pn) {
     	$conn = ConnectionManager::get('default');
         $sql = "Select distinct(E.CollectionDate),E.exportcollectionsID from exportcollections E, exportLinks L, exportCollShowrooms S where (L.invoiceNo IS NULL or L.invoiceNo='') and L.purchase_no=".$pn." and L.linksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=E.exportCollectionsID";
 		return $conn->execute($sql)->fetchAll('assoc');
     }
-
-    public function invoiceNumbersExistForOrder($pn) {
-    	$conn = ConnectionManager::get('default');
-        $sql = "Select distinct(E.CollectionDate),E.exportcollectionsID from exportcollections E, exportLinks L, exportCollShowrooms S where (L.invoiceNo IS NOT NULL and L.invoiceNo<>'') and L.purchase_no=".$pn." and L.linksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=E.exportCollectionsID";
-		return count($conn->execute($sql)->fetchAll('assoc')) > 0;
-    }
-    
 
     public function copyRealPurchaseToTempTables($pn) {
         $conn = ConnectionManager::get('default');
@@ -115,11 +133,20 @@ class AbstractOrderTable extends Table {
         $conn->execute($sql, ['pn' => $pn]);
         $sql = "insert into temp_payment select * from payment where purchase_no=:pn";
         $conn->execute($sql, ['pn' => $pn]);
+        $sql = "insert into temp_batchemail select * from batchemail where purchase_no=:pn";
+        $conn->execute($sql, ['pn' => $pn]);
+        $sql = "insert into temp_exportlinks select * from exportlinks where purchase_no=:pn";
+        $conn->execute($sql, ['pn' => $pn]);
 
         $conn->commit();
     }
 
-    public function moveTempTablesToRealPurchase($pn, $currentUsersId, $purchaseHistoryTable) {
+    public function moveTempTablesToRealPurchase($pn, $currentUsersId, $purchaseHistoryTable, $isNewOrder) {
+        if (!$isNewOrder) {
+            $purchaseTable = TableRegistry::getTableLocator()->get('Purchase');
+            $oldPurchase = $purchaseTable->get($pn)->toArray();
+        }
+
         $conn = ConnectionManager::get('default');
         $conn->begin();
         $this->clearRealTablesForPurchase($conn, $pn);
@@ -132,10 +159,82 @@ class AbstractOrderTable extends Table {
         $this->copyTempTableToReal($conn, 'comp_price_discount', $pn);
         $this->copyTempTableToReal($conn, 'orderaccessory', $pn);
         $this->copyTempTableToReal($conn, 'payment', $pn);
+        $this->copyTempTableToReal($conn, 'batchemail', $pn);
+        $this->copyTempTableToReal($conn, 'exportlinks', $pn);
         $this->clearTempTablesForPurchase($conn, $pn);
         $this->applyStampToPurchase($conn, $pn, $currentUsersId);
         $this->copyPurchaseToHistory($conn, $pn, $currentUsersId, $purchaseHistoryTable);
         $conn->commit();
+        
+        $changes=[];
+        if (!$isNewOrder) {
+            $newPurchase = $purchaseTable->get($pn)->toArray();
+            $purchaseBaseFabricChanges = $this->getPurchaseBaseFabricChanges($oldPurchase, $newPurchase);
+            $purchaseLegsFabricChanges = $this->getPurchaseLegsFabricChanges($oldPurchase, $newPurchase);
+            $purchaseHBFabricChanges = $this->getPurchaseHBFabricChanges($oldPurchase, $newPurchase);
+            $purchaseValanceFabricChanges = $this->getPurchaseValanceFabricChanges($oldPurchase, $newPurchase);
+            $changes['purchaseBaseFabricChanges']=$purchaseBaseFabricChanges;
+            $changes['purchaseLegsFabricChanges']=$purchaseLegsFabricChanges;
+            $changes['purchaseHBFabricChanges']=$purchaseHBFabricChanges;
+            $changes['purchaseValanceFabricChanges']=$purchaseValanceFabricChanges;
+        }
+        return $changes;
+    }
+
+    private function getPurchaseBaseFabricChanges($oldPurchase, $newPurchase) {
+        $changes = [];
+        foreach ($oldPurchase as $key => $value) {
+            if (!in_array($key, $this->purchaseBaseFabricChangeFields)) {
+                continue;
+            }
+            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
+            if ($newPurchase[$key] != $value) {
+                $changes[$key] = [$value, $newPurchase[$key]];
+            }
+        }
+        return $changes;
+    }
+
+    private function getPurchaseLegsFabricChanges($oldPurchase, $newPurchase) {
+        $changes = [];
+        foreach ($oldPurchase as $key => $value) {
+            if (!in_array($key, $this->purchaseLegsFabricChangeFields)) {
+                continue;
+            }
+            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
+            if ($newPurchase[$key] != $value) {
+                $changes[$key] = [$value, $newPurchase[$key]];
+            }
+        }
+        return $changes;
+    }
+
+    private function getPurchaseHBFabricChanges($oldPurchase, $newPurchase) {
+        $changes = [];
+        foreach ($oldPurchase as $key => $value) {
+            if (!in_array($key, $this->purchaseHBFabricChangeFields)) {
+                continue;
+            }
+            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
+            if ($newPurchase[$key] != $value) {
+                $changes[$key] = [$value, $newPurchase[$key]];
+            }
+        }
+        return $changes;
+    }
+
+    private function getPurchaseValanceFabricChanges($oldPurchase, $newPurchase) {
+        $changes = [];
+        foreach ($oldPurchase as $key => $value) {
+            if (!in_array($key, $this->purchaseValanceFabricChangeFields)) {
+                continue;
+            }
+            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
+            if ($newPurchase[$key] != $value) {
+                $changes[$key] = [$value, $newPurchase[$key]];
+            }
+        }
+        return $changes;
     }
 
     private function copyPurchaseToHistory($conn, $pn, $currentUsersId, $purchaseHistoryTable) {
@@ -176,6 +275,10 @@ class AbstractOrderTable extends Table {
     }
 
     private function clearTempTablesForPurchase($conn, $pn) {
+        $sql = "delete from temp_exportlinks where purchase_no=:pn";
+        $conn->execute($sql, ['pn' => $pn]);
+        $sql = "delete from temp_batchemail where purchase_no=:pn";
+        $conn->execute($sql, ['pn' => $pn]);
         $sql = "delete from temp_payment where purchase_no=:pn";
         $conn->execute($sql, ['pn' => $pn]);
         $sql = "delete from temp_orderaccessory where purchase_no=:pn";
@@ -197,6 +300,10 @@ class AbstractOrderTable extends Table {
     }
 
     private function clearRealTablesForPurchase($conn, $pn) {
+        $sql = "delete from exportlinks where purchase_no=:pn";
+        $conn->execute($sql, ['pn' => $pn]);
+        $sql = "delete from batchemail where purchase_no=:pn";
+        $conn->execute($sql, ['pn' => $pn]);
         $sql = "delete from payment where purchase_no=:pn";
         $conn->execute($sql, ['pn' => $pn]);
         $sql = "delete from orderaccessory where purchase_no=:pn";

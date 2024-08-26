@@ -23,6 +23,7 @@ class OrderEmailHelperComponent extends \Cake\Controller\Component {
         $this->OrderNote = TableRegistry::getTableLocator()->get('OrderNote');
         $this->PhoneNumber = TableRegistry::getTableLocator()->get('PhoneNumber');
         $this->ProductionSizes = TableRegistry::getTableLocator()->get('ProductionSizes');
+        $this->PaymentMethod = TableRegistry::getTableLocator()->get('PaymentMethod');
     }
 
     public function sendNewOrderToSales($pn, $salesusername, $userregion, $idlocation) {
@@ -440,6 +441,148 @@ public function sendOrderToBedworks($pn, $salesusername, $userregion, $idlocatio
 
 
 
+    $body .= '</font></body></html>';
+    $emailServices = new EmailServicesController();
+    $emailServices->generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, 'html', '');
+}
+
+public function sendAdditionalPaymentEmail($useTempTables, $pn, $salesusername, $userregion, $idlocation, $paymentid) {
+    if ($useTempTables) {
+        $purchaseTable = TableRegistry::getTableLocator()->get('TempPurchase');
+        $paymentTable = TableRegistry::getTableLocator()->get('TempPayment');
+    } else {
+        $purchaseTable = TableRegistry::getTableLocator()->get('Purchase');
+        $paymentTable = TableRegistry::getTableLocator()->get('Payment');
+    }
+    $purchase = $purchaseTable->get($pn);
+    $contact = $this->Contact->get($purchase['contact_no']);
+    $address = $this->Address->get($contact['CODE']);
+    $showroom = $this->Location->get($idlocation);
+    $payment = $paymentTable->get($paymentid);
+    $paymentmethod = $this->PaymentMethod->get($payment['paymentmethodid']);
+    if ($salesusername=='maddy') {
+        $to='info@natalex.co.uk';
+    } else if ($salesusername=='dave') {
+        $to='david@natalex.co.uk';
+    } else {
+        $to='SavoirAdminAccounts@savoirbeds.co.uk';
+    }
+    $cc = $showroom['payment_notification_email'];
+    $from = "noreply@savoirbeds.co.uk";
+    $fromName = null;
+    $contactname=$contact['surname'];
+    if (isset($payment['invoicedate'])) {
+        $invdate=$payment['invoicedate'];
+    } else {
+        $invdate='';
+    }
+    if ($address['company'] !='') {
+        $contactname .=' - '.$address['company'];
+    }
+    $subject=$contactname.' - '.$purchase['ORDER_NUMBER'].' - '.$purchase['ordercurrency']. $payment['amount'].' - '.$paymentmethod['paymentmethod'];
+    $body = '<html><body><font face="Arial, Helvetica, sans-serif"><b>CUSTOMER PAYMENT</b><br /><table width="98%" border="1"  cellpadding="3" cellspacing="0">';
+    $body .= '<tr><td>Order Type</td><td>'.$this->OrderType->get($purchase['ordertype'])['ordertype'].'</td></tr>';
+    $body .= '<tr><td>Payment Amount</td><td>'.UtilityComponent::formatMoneyWithHtmlSymbol($payment['amount'], $purchase['ordercurrency']).'</td></tr>';
+    $body .= '<tr><td>Invoice Date</td><td>'.$invdate.'</td></tr>';
+    $body .= '<tr><td>Invoice No:</td><td>'.$payment['invoice_number'].'</td></tr>';
+    $body .= '<tr><td>Payment Type</td><td>'.$paymentmethod['paymentmethod'].'</td></tr>';
+    if (isset($payment['creditdetails'])) {
+        $body .= '<tr><td>Credit Details</td><td>'.$payment['creditdetails'].'</td></tr>';
+    }
+    $body .= '<tr><td>Customer Surname</td><td>'.$contact['surname'].'</td></tr>';
+    $body .= '<tr><td>Order No</td><td>'.$purchase['ORDER_NUMBER'].'</td></tr>';
+    $body .= '<tr><td>Amount Outstanding on this order</td><td>'.UtilityComponent::formatMoneyWithHtmlSymbol($purchase['balanceoutstanding'], $purchase['ordercurrency']).'</td></tr>';
+    $body .= '<tr><td>Order Total Amount</td><td>'.UtilityComponent::formatMoneyWithHtmlSymbol($purchase['total'], $purchase['ordercurrency']).'</td></tr>';
+    $body .= '<tr><td>Payment Source</td><td>'.$showroom['location'].'</td></tr>';
+    $body .= '<tr><td>Price List</td><td>'.$address['PRICE_LIST'].'</td></tr>';
+    $body .= '<tr><td>Receipt No.</td><td>'.$payment['receiptno'].'</td></tr>';
+    $body .= '</table></font></body></html>';
+    $emailServices = new EmailServicesController();
+    
+    $emailServices->generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, 'html', '', null, null, $pn, $useTempTables);
+}
+
+public function sendRefundEmail($useTempTables, $pn, $salesusername, $userregion, $idlocation, $paymentid) {
+    if ($useTempTables) {
+        $purchaseTable = TableRegistry::getTableLocator()->get('TempPurchase');
+        $paymentTable = TableRegistry::getTableLocator()->get('TempPayment');
+    } else {
+        $purchaseTable = TableRegistry::getTableLocator()->get('Purchase');
+        $paymentTable = TableRegistry::getTableLocator()->get('Payment');
+    }
+    $purchase = $purchaseTable->get($pn);
+    $contact = $this->Contact->get($purchase['contact_no']);
+    $address = $this->Address->get($contact['CODE']);
+    $showroom = $this->Location->get($idlocation);
+    $payment = $paymentTable->get($paymentid);
+    $paymentmethod = $this->PaymentMethod->get($payment['paymentmethodid']);
+    if ($salesusername=='maddy') {
+        $to='info@natalex.co.uk';
+    } else if ($salesusername=='dave') {
+        $to='david@natalex.co.uk';
+    } else {
+        $to='SavoirAdminAccounts@savoirbeds.co.uk';
+    }
+    $cc = $showroom['payment_notification_email'];
+    $from = "noreply@savoirbeds.co.uk";
+    $fromName = null;
+    $contactname=$contact['surname'];
+    if (isset($payment['invoicedate'])) {
+        $invdate=$payment['invoicedate'];
+    } else {
+        $invdate='';
+    }
+    if ($address['company'] !='') {
+        $contactname .=' - '.$address['company'];
+    }
+    $subject=$contactname.' - '.$purchase['ORDER_NUMBER'].' - '.$purchase['ordercurrency']. $payment['amount'].' - '.$paymentmethod['paymentmethod'];
+    $body = '<html><body><font face="Arial, Helvetica, sans-serif"><b>CUSTOMER REFUND</b><br /><table width="98%" border="1"  cellpadding="3" cellspacing="0">';
+    $body .= '<tr><td>Order Type</td><td>'.$this->OrderType->get($purchase['ordertype'])['ordertype'].'</td></tr>';
+    $body .= '<tr><td>Refund Amount</td><td>'.UtilityComponent::formatMoneyWithHtmlSymbol($payment['amount'], $purchase['ordercurrency']).'</td></tr>';
+    $body .= '<tr><td>Refund Type</td><td>'.$paymentmethod['paymentmethod'].'</td></tr>';
+    $body .= '<tr><td>Customer Surname</td><td>'.$contact['surname'].'</td></tr>';
+    $body .= '<tr><td>Order No</td><td>'.$purchase['ORDER_NUMBER'].'</td></tr>';
+    $body .= '<tr><td>Amount Outstanding on this order</td><td>'.UtilityComponent::formatMoneyWithHtmlSymbol($purchase['balanceoutstanding'], $purchase['ordercurrency']).'</td></tr>';
+    $body .= '<tr><td>Order Total Amount</td><td>'.UtilityComponent::formatMoneyWithHtmlSymbol($purchase['total'], $purchase['ordercurrency']).'</td></tr>';
+    $body .= '<tr><td>Refund Source</td><td>'.$showroom['location'].'</td></tr>';
+    $body .= '<tr><td>Price List</td><td>'.$address['PRICE_LIST'].'</td></tr>';
+    $body .= '<tr><td>Refund Receipt No.</td><td>'.$payment['receiptno'].'</td></tr>';
+    $body .= '</table></font></body></html>';
+    $emailServices = new EmailServicesController();
+    
+    $emailServices->generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, 'html', '', null, null, $pn, $useTempTables);
+}
+public function sendFabricAccEmail($pn, $salesusername, $userregion, $idlocation) {
+    $purchase = $this->Purchase->get($pn);
+    $contact = $this->Contact->get($purchase['contact_no']);
+    $showroom = $this->Location->get($idlocation);
+    if ($salesusername=='maddy') {
+        $to='info@natalex.co.uk';
+    } else if ($salesusername=='dave') {
+        $to='david@natalex.co.uk';
+    } else if ($userregion==17 || $userregion==19) {
+        $to='SavoirAdminFabric@savoirbeds.co.uk';
+    } else {
+        $to=$this->SavoirUser->find()->where(['username' => $salesusername])->first()['adminemail'];
+    }
+    $cc = null;
+    $from = "noreply@savoirbeds.co.uk";
+    $fromName = null;
+    $subject='Fabrics / Accessories Update notification';
+    $body = '<html><body><font face="Arial, Helvetica, sans-serif">This auto generated email has been sent to the distribution group called SavoirAdminFabric@savoirbeds.co.uk and confirms that there have been fabric updates for an order.<br><br>FABRIC / ACCESSORIES UPDATE FOR:<table border="1" cellspacing="0" cellpadding="3">"';
+    $body .= '<tr><td>Order No.</td><td><a href="http://www.savoiradmin.co.uk/edit-purchase.asp?order="'.$pn.'"">'.$purchase['ORDER_NUMBER'].'</a></td></tr>';
+    $body .= '<tr><td>Order Date.</td><td>'.$purchase['ORDER_DATE'].'</td></tr>';
+    $body .= '<tr><td>Customer Name</td><td>'.$contact['surname'].'</td></tr>';
+
+    $body .= '<tr><td>Changed By</td><td>'.$salesusername.'</td></tr>';
+    $body .= '</table>';
+    //if fabric change from here
+    $body .= '<br><table border="1" cellspacing="0" cellpadding="3">';
+    $body .= '<tr><td>Field Changed</td><td>Old Value</td><td>New Value</td></tr>';
+
+//all fabric field changes here
+
+    $body .= '</table>';
     $body .= '</font></body></html>';
     $emailServices = new EmailServicesController();
     $emailServices->generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, 'html', '');

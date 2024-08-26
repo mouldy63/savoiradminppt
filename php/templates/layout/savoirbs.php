@@ -32,6 +32,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP {0}', Configure::version())
 		echo $this->Html->css(['//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css']);
 		echo $this->Html->css(['//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css']);
 		echo $this->Html->css(['//cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css']);
+		echo $this->Html->css(['//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.css']);
 		echo $this->Html->css(['jquery.signaturepad.css']);
 		if ($this->get('viewPrices') === false) {
 			echo $this->Html->css(['noprices.css']);
@@ -39,6 +40,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP {0}', Configure::version())
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
 		echo $this->Html->script('//code.jquery.com/jquery-3.6.0.js');
+		echo $this->Html->script('//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.js');
 		echo $this->Html->script('//code.jquery.com/ui/1.13.2/jquery-ui.js');
 		echo $this->Html->script('jquery.eComboBox.custom.js', array('inline' => false));
 		echo $this->Html->script('priceMatrixFuncs.js', array('inline' => false));

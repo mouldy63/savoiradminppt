@@ -83,11 +83,11 @@ $(function() {
                 <?php 
                 if ($custPostcode != '') { 
                 ?>
-                <input name="postcode" type="text" id="postcode" value="<?=$custPostcode ?>"><SCRIPT LANGUAGE=JAVASCRIPT SRC="https://services.postcodeanywhere.co.uk/popups/javascript.aspx?account_code=savoi11112&license_key=tf86-hh48-pc89-wj73"></SCRIPT>
+                <input name="postcode" type="text" id="postcode" value="<?=$custPostcode ?>"  maxlength = "20"><SCRIPT LANGUAGE=JAVASCRIPT SRC="https://services.postcodeanywhere.co.uk/popups/javascript.aspx?account_code=savoi11112&license_key=tf86-hh48-pc89-wj73"></SCRIPT>
 				<?php 
                 } else { 
                 ?>
-                <input name="postcode" type="text" id="postcode" value=""><SCRIPT LANGUAGE=JAVASCRIPT SRC="https://services.postcodeanywhere.co.uk/popups/javascript.aspx?account_code=savoi11112&license_key=tf86-hh48-pc89-wj73"></SCRIPT>
+                <input name="postcode" type="text" id="postcode" value="" maxlength = "20"><SCRIPT LANGUAGE=JAVASCRIPT SRC="https://services.postcodeanywhere.co.uk/popups/javascript.aspx?account_code=savoi11112&license_key=tf86-hh48-pc89-wj73"></SCRIPT>
                 <?php 
                 }
                 ?>

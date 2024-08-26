@@ -24,6 +24,7 @@ class FinaliseOrderController extends SecureAppController {
         $this->loadModel('TempProductionSizes');
         $this->loadModel('TempQcHistory');
         $this->loadModel('TempWholesalePrices');
+        $this->loadModel('TempOrder');
         $this->loadModel('TempPayment');
         
         // the other tables
@@ -231,6 +232,7 @@ class FinaliseOrderController extends SecureAppController {
         if ($deposit != '') {
             $deposit = floatval($deposit);
             $payment = $this->TempPayment->newEntity([]);
+            $payment->paymentid  = $this->TempOrder->getNextPrimeKeyValForTable('payment', 1);
             $payment->paymentmethodid = $formData['paymentmethod'];
             if ($deposit < $purchase['total']) {
                 $payment->paymenttype = 'Deposit';
@@ -258,7 +260,7 @@ class FinaliseOrderController extends SecureAppController {
         $this->OrderHelper->cleanUpPurchase($pn, $this->TempPurchase, $this->TempQcHistory, $this->QcHistoryLatest, $this->TempCompPriceDiscount, $this->TempWholesalePrices, $this->TempProductionSizes, $this->TempAccessory, $this->TempPayment);
 
         // move the data to the real tables
-        $this->Order->moveTempTablesToRealPurchase($pn, $this->getCurrentUsersId(), $this->PurchaseHistory);
+        $this->Order->moveTempTablesToRealPurchase($pn, $this->getCurrentUsersId(), $this->PurchaseHistory, true);
 
         // emails
         $this->OrderEmailHelper->sendNewOrderToSales($pn, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());

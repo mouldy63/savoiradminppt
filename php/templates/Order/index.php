@@ -115,10 +115,10 @@ if ($quote=='y') {
     $orderwording=' Quote';
 }
 ?>
-
+<form name="partoneform" id="partoneform" method="post" action="/php/Order/addPartOne">	
     <div class="row">
         <div class="col-sm-12">
-         <h1><a href="/editcust2.asp?val=<?=$contact_no?>&tab=2#TabbedPanels1">GO TO CUSTOMER DETAILS</a></h1>
+         <h1><a href="/php/editcustomer?val=<?=$contact_no?>#orders">GO TO CUSTOMER DETAILS</a></h1>
             <div>
                 <a href="javascript:void(0)" class="stickleft" onclick="loadOtherCustomerOrders(<?=$pn?>, <?=$contact_no?>, 'otherCustomerOrders', 'otherOrdersImg')">&nbsp;&nbsp;<img id="otherOrdersImg" src="/php/img/plus.gif"/>&nbsp;Other Current Orders</a>
             </div>
@@ -137,7 +137,7 @@ if ($quote=='y') {
         <p><?php  if ($isAdministrator=='y' && $wholesaleenabled=='y') { ?>
             <div align="right" id="wholesaleswitch">WHOLESALE INVOICE : ON
 			
-            <input name="wholesaleinv" id="wholesaleinv_y" type="radio" value="y" onClick="showHideWholesale();" class="partonefield" /> OFF<input name="wholesaleinv" id="wholesaleinv_n" type="radio" value="n" checked onClick="showHideWholesale();" class="partonefield" />&nbsp;&nbsp;
+            <input name="wholesaleinv" id="wholesaleinv_y" type="radio" value="y" onClick="showHideWholesale();" /> OFF<input name="wholesaleinv" id="wholesaleinv_n" type="radio" value="n" checked onClick="showHideWholesale();" />&nbsp;&nbsp;
         </div>
         <?php } ?>
         </p>
@@ -145,9 +145,11 @@ if ($quote=='y') {
             <a href="/orderdetails.asp?pn=<?=$purchase['PURCHASE_No'] ?>">PRODUCTION</a>&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="/php/balancerequest.pdf?pn=<?=$purchase['PURCHASE_No'] ?>">BALANCE REQUEST LETTER</a>&nbsp;&nbsp;|&nbsp;&nbsp;
             <a href="/php/PrintPDF.pdf?val=<?=$purchase['PURCHASE_No'] ?>">PRINT PDF</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="/duplicateorder1.asp?pn=<?=$purchase['PURCHASE_No'] ?>">DUPLICATE ORDER</a>&nbsp;&nbsp;
+            <input type="button" class="duplicate-button" id="duplicate-button" value="Duplicate Order" />
+            
          </p>
          <?php } ?>
+        
       </div>
    </div>
    <?php } 
@@ -160,7 +162,7 @@ if ($quote=='y') {
 } ?>
  | Contact: <?php echo $this->Security->retrieveUserName(); ?></h1>
 <p></p>
-<form name="partoneform" id="partoneform" method="post" action="/php/Order/addPartOne">		      
+	      
 	<input type="hidden" name="contact" id="contact" value="<?php echo $this->Security->retrieveUserName(); ?>" />
     <input type="hidden" name="contact_no" id="contact_no" value="<?=$contactdetails['CONTACT_NO'] ?>" />
     <input type="hidden" name="ordersource" id="ordersource" value="<?=$ordersource ?>" />
@@ -222,7 +224,7 @@ if ($quote=='y') {
                 <p class="ordertxt1" >Line 3: <input type="text" name="add3" id="add3" value="<?=$contactdetails['street3'] ?>" class="partonefield" /></p>
                 <p class="ordertxt1" >Town: <input type="text" name="town" id="town" value="<?=$contactdetails['town'] ?>" class="partonefield" /></p>
                 <p class="ordertxt1" >County: <input type="text" name="county" id="county" value="<?=$contactdetails['county'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Postcode: <input type="text" name="postcode" id="postcode" value="<?=$contactdetails['postcode'] ?>" class="partonefield" /></p>
+                <p class="ordertxt1" >Postcode: <input type="text" name="postcode" id="postcode" value="<?=$contactdetails['postcode'] ?>" class="partonefield" maxlength="20" /></p>
                 <p class="ordertxt1" >Country: 
                 <select name="country" id="country" style="width:138px;" class="partonefield">
                     <?php foreach ($countrylist as $row): 
@@ -265,7 +267,7 @@ if ($quote=='y') {
                 <p class="ordertxt1" >Line 3: <input type="text" name="deladd3" id="deladd3" value="<?=$partOneFormData['deladd3'] ?>" class="partonefield" /></p>
                 <p class="ordertxt1" >Town: <input type="text" name="deltown" id="deltown" value="<?=$partOneFormData['deladdtown'] ?>" class="partonefield" /></p>
                 <p class="ordertxt1" >County: <input type="text" name="delcounty" id="delcounty" value="<?=$partOneFormData['deladdcounty'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Postcode: <input type="text" name="delpostcode" id="delpostcode" value="<?=$partOneFormData['deladdpostcode'] ?>" class="partonefield" /></p>
+                <p class="ordertxt1" >Postcode: <input type="text" name="delpostcode" id="delpostcode" maxlength="20" value="<?=$partOneFormData['deladdpostcode']?>" class="partonefield" /></p>
                 <p class="ordertxt1" >Country: <select name="delcountry" id="delcountry" style="width:138px;" class="partonefield">
                     <?php foreach ($countrylist as $row): 
                         $slcted='';
@@ -613,7 +615,7 @@ Exit shots only:</b><br/><?php echo $this->element('dropzone', ['dzType'=>'exit'
 <?php
 $submitButtonWording='';
 $action='';
-if (isset($purchase) && !isset($purchase['cancelled']) && $purchase['cancelled'] != 'y') {
+if (isset($purchase) && (!isset($purchase['cancelled']) || $purchase['cancelled'] != 'y')) {
     if (isset($purchase['ORDER_NUMBER'])) {
         $submitButtonWording = ($quote=='y') ? 'Update Quote' : 'Update Order';
         $action = 'Order/updateOrder';
@@ -623,15 +625,15 @@ if (isset($purchase) && !isset($purchase['cancelled']) && $purchase['cancelled']
     }
 }
 ?>
-<?php if (isset($purchase['PURCHASE_No']) && !isset($purchase['cancelled']) && $purchase['cancelled'] != 'y') { ?>
-    <a href="/php/<?=$action?>?pn=<?=$purchase['PURCHASE_No'] ?>" class="btn btn-info otherfield" onclick="return checkPurchaseStamp(event)"><?=$submitButtonWording?></a>
+<?php if (isset($purchase['PURCHASE_No']) && (!isset($purchase['cancelled']) || $purchase['cancelled'] != 'y')) { ?>
+    <a href="/php/<?=$action?>?pn=<?=$purchase['PURCHASE_No'] ?>" class="btn btn-info otherfield" id="updateorder" onclick="return checkPurchaseStamp(event)"><?=$submitButtonWording?></a>
     <?php if ($quote=='y') { ?>
-        <a href="/php/FinaliseOrder?pn=<?=$purchase['PURCHASE_No'] ?>" class="btn btn-info otherfield" onclick="return checkPurchaseStamp(event)">Convert Quote to Order</a>
+        <a href="/php/FinaliseOrder?pn=<?=$purchase['PURCHASE_No'] ?>" class="btn btn-info otherfield" id="updateorder"onclick="return checkPurchaseStamp(event)">Convert Quote to Order</a>
     <?php } ?>
 <?php } ?>
 
 <?php if (isset($purchase['PURCHASE_No']) && $quote!='y' && !isset($purchase['cancelled']) && $purchase['cancelled'] != 'y') { ?>
-    <p style="padding-top:30px;"><a href="/php/CancelOrder?pn=<?=$purchase['PURCHASE_No'] ?>" class="btn btn-warning otherfield" onclick="return checkPurchaseStamp(event)">Cancel Order</a></p>
+    <p style="padding-top:30px;"><a href="/php/CancelOrder?pn=<?=$purchase['PURCHASE_No'] ?>" class="btn btn-warning otherfield" id="updateorder" onclick="return checkPurchaseStamp(event)">Cancel Order</a></p>
 <?php } ?>
 
 <p><br><a href = "#top" class = "addorderbox">&gt;&gt; Back to
@@ -680,7 +682,6 @@ document.getElementById('generatePDF').addEventListener('click', function(event)
   // Navigate to the constructed URL
   window.location.href = url;
 });
-
 
 
     function clearackdate() {
@@ -1169,6 +1170,9 @@ document.getElementById('generatePDF').addEventListener('click', function(event)
         if (changedCompId != 99 && typeof deliveryFieldChanged !== 'undefined' && deliveryFieldChanged) {
             submitDeliveryForm();
         }
+        if (changedCompId != 98 && typeof summaryFieldChanged !== 'undefined' && summaryFieldChanged) {
+            submitOrdersummaryForm();
+        }
     }
 
     $(".otherfield").on("focus", function() {
@@ -1392,7 +1396,14 @@ document.getElementById('generatePDF').addEventListener('click', function(event)
             currentUrl.searchParams.append('open', 'y');
             history.pushState(null, null, currentUrl.toString());
         }
+        disablePartOneComponentSections(<?=$isComponentLocked?>);
     });
+
+    function disablePartOneComponentSections(disable) {
+        if (disable) {
+            $('.partonefield').attr('disabled', true);
+        }
+    }
 
     function checkPurchaseStamp(event) {
         var stampValue = $('input[name="stamp"]').val();
@@ -1421,6 +1432,171 @@ document.getElementById('generatePDF').addEventListener('click', function(event)
             return false;
         }
     }
+
+    $(document).ready(function() {
+        $('#duplicate-button').click(function() {
+            jconfirm.defaults = {
+                title: 'Hello',
+                titleClass: '',
+                type: 'default',
+                draggable: true,
+                alignMiddle: true,
+                typeAnimated: true,
+                content: '',
+                buttons: {},
+                defaultButtons: {
+                    ok: {
+                        action: function () {
+                        }
+                        },
+                    close: {
+                        action: function () {
+                        }
+                        },
+                },
+                contentLoaded: function(data, status, xhr){
+                },
+                icon: '',
+                lazyOpen: false,
+                bgOpacity: null,
+                theme: 'light',
+                animation: 'zoom',
+                closeAnimation: 'scale',
+                animationSpeed: 400,
+                animationBounce: 1.2,
+                rtl: false,
+                container: 'body',
+                containerFluid: false,
+                backgroundDismiss: false,
+                backgroundDismissAnimation: 'shake',
+                autoClose: false,
+                closeIcon: null,
+                closeIconClass: false,
+                watchInterval: 100,
+                columnClass: 'col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1',
+                boxWidth: '50%',
+                scrollToPreviousElement: true,
+                scrollToPreviousElementAnimate: true,
+                useBootstrap: true,
+                offsetTop: 50,
+                offsetBottom: 50,
+                dragWindowGap: 15,
+                bootstrapClasses: {
+                    container: 'container',
+                    containerFluid: 'container-fluid',
+                    row: 'row',
+                },
+                onContentReady: function () {},
+                onOpenBefore: function () {},
+                onOpen: function () {},
+                onClose: function () {},
+                onDestroy: function () {},
+                onAction: function () {}
+            };
+            $.confirm({//2
+                    title: 'Are you sure you want to create a copy of this order?',
+                    buttons: {//3
+                        Cancel: function () {
+                            $.alert('Duplication Cancelled');
+                            jconfirm.instances[0].close();
+                            return false;
+                        },
+                        Proceed: {
+                            action: function () {
+                                    $.confirm({
+                                        title: 'Please choose order type:',
+                                        content: '<span> <br></span>',
+                                        buttons: {
+                                            confirm: {
+                                                text: 'Customer Order',
+                                                btnClass: 'btn-orange',
+                                                action: function () {
+                                                    $.confirm({
+                                                    title: 'Please let us know what type of customer:',
+                                                    content: '<span> <br></span>',
+                                                    buttons: {
+                                                        confirm: {
+                                                        text: 'Retail',
+                                                        btnClass: 'btn-orange',
+                                                        action: function () {
+                                                            window.location.href = '/php/Order/duplicateOrder/?order=<?=$pn?>&ordersource=Client Retail';
+                                                            $("#form1").submit();
+                                                            }
+                                                        },
+                                                        confirm2: {
+                                                        text: 'Trade',
+                                                        btnClass: 'btn-orange',
+                                                        action: function () {
+                                                            window.location.href = '/php/Order/duplicateOrder/?order=<?=$pn?>&ordersource=Client Trade';
+                                                            $("#form1").submit();
+                                                            }
+                                                        },
+                                                        confirm3: {
+                                                        text: 'Contract',
+                                                        btnClass: 'btn-orange',
+                                                        action: function () {
+                                                            window.location.href = '/php/Order/duplicateOrder/?order=<?=$pn?>&ordersource=Client Contract';
+                                                            $("#form1").submit();
+                                                            }
+                                                        }
+                                                    },
+                                                    });
+                                                }
+                                            },
+                                            confirm2: {
+                                                text: 'Floorstock Order',
+                                                btnClass: 'btn-orange',
+                                                action: function () {
+                                                    window.location.href = '/php/duplicateOrder/?order=<?=$pn?>&ordersource=Floorstock';
+                                                }
+                                            },
+                                            confirm3: {
+                                                text: 'Stock Order',
+                                                btnClass: 'btn-orange',
+                                                action: function () {
+                                                    window.location.href = '/php/Order/duplicateOrder/?order=<?=$pn?>&ordersource=Stock';
+                                                }
+                                            },
+                                            confirm4: {
+                                                text: 'Marketing Order',
+                                                btnClass: 'btn-orange',
+                                                action: function () {
+                                                    window.location.href = '/php/Order/duplicateOrder/?order=<?=$pn?>&ordersource=Marketing';
+                                                }
+                                            },
+                                            confirm5: {
+                                                text: 'Test Order',
+                                                btnClass: 'btn-orange',
+                                                action: function () {
+                                                    window.location.href = '/php/Order/duplicateOrder/?order=<?=$pn?>&ordersource=Test';
+                                                }
+                                            },
+                                            
+                                            someButton: {
+                                                text: 'HELP',
+                                                btnClass: 'btn-green',
+                                                action: function () {
+                                                    this.$content.find('span').append('<br><b>Customer Order:</b><br>Select this option if you want to place an order for your customer.<br><br><b>Floorstock Order:</b><br>Select this option if you are placing an order which is a floorstock bed for your showroom display.<br><br><b>Stock Order:</b><br>Select this option if you are placing an order for delivery or storage to your warehouse.<br><br><b>Marketing Order:</b><br>Select this option if you are placing an order for Marketing purposes.<br><br>');
+                                                    return false; // prevent dialog from closing.
+                                                }
+                                            },
+                                            cancel: function () {
+                                                $.alert('Duplication Cancelled');
+                                                jconfirm.instances[0].close();
+                                                return false;
+                                            },
+                                        },
+                                    });
+                                }
+                        }
+                    }
+                });
+        });
+    });
+
+
+//-->
+</script>
 
 </script>
 

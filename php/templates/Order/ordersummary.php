@@ -1,6 +1,6 @@
 <?php use Cake\Routing\Router; ?>
 <div class="container" style="padding-left:20px;">
-<form name="legsform" id="legsform" method="post" action="/php/Order/saveOrdersummary">
+<form name="ordersummaryform" id="ordersummaryform" method="post" action="/php/Order/saveOrdersummary">
 <input type="hidden" name="pn" id="pn" value="<?=$purchase['PURCHASE_No'] ?>" />
 <div class="row">
     <hr class="h-divider">
@@ -174,12 +174,15 @@
     <?php } ?>
     <tr>
       <th scope="row">Bed Set Total</th>
-      <td class="xview" align='right'><?=$this->OrderForm->getCurrencySymbol()?><?=$purchase['bedsettotal']?></td>
+      <td class="xview" align='right'>
+            <?=$this->OrderForm->formatCurrency($purchase['bedsettotal'])?>
+            <input type="hidden" name="bedsettotal" id="bedsettotal" value="<?=$purchase['bedsettotal']?>" />
+        </td>
       <td class="xview" align='right'></td>
       <td class="xview" align='right'></td>
     </tr>
     <tr id = "dceditdiv" class="xview">
-        <td><button type = "button" class="xview" onClick = "showHideDiscounts(true);">Edit DC</button></td>
+        <td><button type = "button" class="xview summaryfield" onClick = "showHideDiscounts(true);">Edit DC</button></td>
         <td>&nbsp;
         </td>
         <td>&nbsp;
@@ -188,7 +191,7 @@
         </td>
     </tr>
     <tr id = "dcremovediv" class="xview">
-        <td><button type = "button" class="xview" onClick = "showHideDiscounts(false);">Remove DC</button></td>
+        <td><button type = "button" class="xview summaryfield" onClick = "showHideDiscounts(false);">Remove DC</button></td>
         <td>&nbsp;
         </td>
         <td>&nbsp;
@@ -201,20 +204,16 @@
         <td>
             DC &nbsp;&nbsp; %
 
-            <input type = "radio" name = "dc" class="xview" id = "dc"
-                value = "percent"
-                >
+            <input type = "radio" name = "dc" class="xview summaryfield" id = "dc" value = "percent" <?php if ($purchase["discounttype"]=="percent") echo 'checked' ?> >
             &nbsp;&nbsp; <?=$this->OrderForm->getCurrencySymbol()?>
 
-            <input type = "radio" name = "dc" class="xview" id = "dc2"
-                value = "currency"
-                >
+            <input type = "radio" name = "dc" class="xview summaryfield" id = "dc2" value = "currency" <?php if ($purchase["discounttype"]=="currency") echo 'checked' ?> >
         </td>
 
         <td>
             <label>
-            <input name = "dcresult" type = "text" class="xview" id = "dcresult"
-                value = "<?php $purchase['discount'] ?>" size = "10"
+            <input name = "dcresult" type = "text" class="xview summaryfield" id = "dcresult"
+                value = "<?= $purchase['discount'] ?>" size = "10"
                 maxlength = "25"></label>
         </td>
         <td>&nbsp;
@@ -225,40 +224,59 @@
     </tr>
     <tr class="xview">
       <td scope="row">Sub Total</td>
-      <td><?=$this->OrderForm->getCurrencySymbol()?><?=$purchase['subtotal']?></td>
+      <td>
+        <span id="subtotalspan"><?=$this->OrderForm->formatCurrency($purchase['subtotal'])?></span>
+        <input type="hidden" name="subtotal" id="subtotal" value="<?=$purchase['subtotal']?>" />
+      </td>
       <td></td>
       <td></td>
     </tr>
-    <?php if ($purchase['istrade']=='y' && $purchase['tradeDiscountRate']>0) { ?>
+    <?php if ($purchase['istrade']=='y' && $purchase['tradediscountrate']>0) { ?>
     <tr class="xview">
-      <td scope="row" class="xview">Trade Discount $purchase['tradeDiscountRate']%</td>
-      <td><?=$this->OrderForm->getCurrencySymbol()?></td>
+      <td scope="row" class="xview">Trade Discount (<?=$purchase['tradediscountrate']?>%)</td>
+      <td>
+        <span id="tradediscountspan"></span>
+        <input type="hidden" name="tradediscount" id="tradediscount" />
+        <input type="hidden" name="tradediscountrate" id="tradediscountrate" value="<?=$purchase['tradediscountrate']?>" />
+      </td>
       <td></td>
       <td></td>
     </tr>
 <?php } ?>
 <tr>
       <td scope="row">Delivery Charge</td>
-      <td class="xview"><?=$this->OrderForm->getCurrencySymbol()?><?=isset($purchase['deliveryprice']) ? $purchase['deliveryprice'] : 0 ?></td>
+      <td class="xview">
+          <?=$this->OrderForm->formatCurrency($purchase['deliveryprice'])?>
+          <input type="hidden" name="deliveryprice" id="deliveryprice" value="<?=$purchase['deliveryprice']?>" />
+      </td>
       <td class="xview"></td>
       <td class="xview"></td>
     </tr>
     <tr class="xview">
       <td scope="row"><?php echo $OrderTotalExVAT ?></td>
-      <td><?=$this->OrderForm->getCurrencySymbol()?><?=$purchase['totalexvat']?></td>
+      <td>
+        <span id="totalexvatspan"><?=$this->OrderForm->formatCurrency($purchase['totalexvat'])?></span>
+        <input type="hidden" name="totalexvat" id="totalexvat" value="<?=$purchase['totalexvat']?>" />
+      </td>
       <td></td>
       <td></td>
     </tr>
     <tr class="xview">
       <td scope="row"><?php echo $VATWording ?></td>
-      <td><?=$this->OrderForm->getCurrencySymbol()?><?=$purchase['vat']?></td>
+      <td>
+        <span id="vatspan"><?=$this->OrderForm->formatCurrency($purchase['vat'])?></span>
+        <input type="hidden" name="vat" id="vat" value="<?=$purchase['vat']?>" />
+      </td>
       <td></td>
       <td></td>
     </tr>
 
     <tr style="height:50px;" class="xview">
       <th scope="row">TOTAL</th>
-      <td><?=$this->OrderForm->getCurrencySymbol()?><?=$purchase['total'] ?></td>
+      <td>
+        <span id="totalspan"><?=$this->OrderForm->formatCurrency($purchase['total'])?></span>
+        <input type="hidden" name="total" id="total" value="<?=$purchase['total']?>" />
+      </td>
       <td></td>
       <td></td>
     </tr>
@@ -301,7 +319,11 @@
       <td scope="col"><?=$payment['paymenttype']?></td>
       <td scope="col"><?=$payment['paymentmethod']?></td>
       <td scope="col"><?=$invoicedate?></td>
-      <td scope="col"><?=$payment['invoice_number']?></td>
+       <?php if ($payment['invoice_number']!='') { ?>
+          <td scope="col"><?=$payment['invoice_number']?></td>
+          <?php } else { ?>
+          <td scope="col"><input class="summaryfield" name = "invono_<?= $payment['paymentid']?>" id = "invono_<?= $payment['paymentid']?>"type="text" size = "5"></td>
+       <?php } ?>                                                                                        
       <td scope="col"><?=$dateplaced?></td>
       <td scope="col"><?=$payment['receiptno']?></td>
       <td scope="col"><?=$payment['amount']?></td>
@@ -328,7 +350,7 @@
     </tr>
     <tr>
       <th scope="row">Amount Not Invoiced</th>
-      <td><?=$this->OrderForm->getCurrencySymbol()?></td>
+      <td><?=$this->OrderForm->getCurrencySymbol()?><?=number_format($notinvoiced,2)?></td>
       <td></td>
       <td></td>
     </tr>
@@ -341,6 +363,7 @@
 
 </div>
 <script>
+    var summaryFieldChanged = false;
     function ordersummaryInit() {
     
         overrideOrdersummarySubmit();
@@ -348,8 +371,11 @@
         $(".summaryfield").on("change", function() {
             summaryFieldChanged = true;
         });
+        $(".summaryfield").on("click", function() {
+            summaryFieldChanged = true;
+        });
         $(".summaryfield").on("focus", function() {
-            submitComponentForm(99);
+            submitComponentForm(98);
         });
     }
 
@@ -361,7 +387,7 @@
     
             $.ajax({
                 type: 'POST',
-                url: '/php/Order/saveOrderSummary',
+                url: '/php/Order/saveOrdersummary',
                 data: formData,
                 success: function(compsToReload) {
                     reloadComponents(compsToReload);
@@ -377,7 +403,103 @@
         summaryFieldChanged = false;
     }
 
-    showHideDiscounts($('#dcresult').val() != "");
+  showHideDiscounts($('#dcresult').val() != "");
+
+  $('#dcresult').blur(function()
+{
+    calcSubtotal();
+});
+
+$('#dc').change(function()
+{
+    calcSubtotal();
+});
+
+$('#dc2').change(function()
+{
+    calcSubtotal();
+});
+
+function calcSubtotal() {
+        var dcType = $('input[name="dc"]:checked').val();
+        var discount = $('#dcresult').val() / 1.0; // this makes sure we get a number
+        var bedsettotal = $('#bedsettotal').val();
+
+        if (discount > 0.0) {
+            var subtotal;
+
+            if (dcType == 'percent') {
+                subtotal = bedsettotal * (1.0 - discount / 100.0);
+            } else {
+                subtotal = bedsettotal - discount;
+            }
+            $('#subtotalspan').html(getCurrSym() + subtotal.toFixed(2));
+            $('#subtotal').val(subtotal.toFixed(2));
+        } else {
+            $('#subtotalspan').html(getCurrSym() + (bedsettotal * 1.0).toFixed(2));
+            $('#subtotal').val((bedsettotal * 1.0).toFixed(2));
+        }
+        setTotal();
+    }
+
+    function setTotal() {
+        var deliveryPrice = $('#deliveryprice').val() * 1.0;
+        var total = $('#subtotal').val() * 1.0;
+        <?php if ($purchase['istrade']=='y') { ?>
+            var jsIsTrade = true;
+            var jsTradeDiscountRate = <?=$purchase['tradediscountrate']?>;
+        <?php } else { ?>
+            var jsIsTrade = false;
+        <?php } ?>
+        var jsVatRate = <?=$purchase['vatrate']?>;
+        var jsDelIncVat = true;
+        <?php if (!$deliveryIncludesVat) { ?>
+            jsDelIncVat = false;
+        <?php } ?>
+
+        if(jsIsTrade) {
+            if (jsTradeDiscountRate > 0) {
+                var tradeDiscount = total * jsTradeDiscountRate / 100.0;
+                total = total - tradeDiscount;
+                $('#tradediscountspan').html(getCurrSym() + tradeDiscount.toFixed(2));
+                $('#tradediscount').val((tradeDiscount).toFixed(2));
+            }
+            if (jsDelIncVat) {
+                total = total + deliveryPrice;
+                var totalExVat = total;
+                var vat = totalExVat * jsVatRate / 100.0;
+                total = totalExVat + vat;
+            } else {
+                var vat = total * jsVatRate / 100.0;
+                var totalExVat = total + deliveryPrice;
+                total = totalExVat + vat;
+            }
+        } else {
+            if (jsDelIncVat) {
+                total = total + deliveryPrice;
+                var totalExVat = total / (1 + jsVatRate / 100.0);
+                var vat = total - totalExVat;
+            } else {
+                var totalExVat = total / (1 + jsVatRate / 100.0) + deliveryPrice;
+                total = total + deliveryPrice;
+                var vat = total - totalExVat;
+            }
+        }
+        
+        $('#totalexvatspan').html(getCurrSym() + totalExVat.toFixed(2));
+        $('#totalexvat').val(totalExVat.toFixed(2));
+        $('#vatspan').html(getCurrSym() + vat.toFixed(2));
+        $('#vat').val((vat).toFixed(2));
+        $('#totalspan').html(getCurrSym() + total.toFixed(2));
+        $('#total').val((total).toFixed(2));
+        setOutstanding();
+    }
+  
+    function setOutstanding() {
+        var outstanding = $('#total').val() * 1.0 - $('#deposit').val() * 1.0;
+        $('#outstandingspan').html(getCurrSym() + outstanding.toFixed(2));
+        $('#outstanding').val(outstanding.toFixed(2));
+    }
 
   function showHideDiscounts(show) {
       if (show) {
@@ -394,7 +516,11 @@
   }
 
     function submitOrdersummaryForm() {
-        $('#deliveryform').submit();
-    }    
+        $('#ordersummaryform').submit();
+    }  
+    
+    function getCurrSym() {
+        return '<?=$this->OrderForm->getCurrencySymbol()?>';
+    }
     
 </script>

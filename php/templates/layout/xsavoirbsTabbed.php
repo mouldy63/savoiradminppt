@@ -30,14 +30,10 @@ $cakeVersion = __d('cake_dev', 'CakePHP {0}', Configure::version())
 		echo $this->Html->meta('icon');
 
 		echo $this->Html->css(['//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css']);
-		//echo $this->Html->css(['//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css']);
-		//echo $this->Html->css(['//cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css']);
-		echo $this->Html->css(['//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css']);
-		echo $this->Html->css(['//cdn.datatables.net/2.0.8/css/dataTables.bootstrap4.css']);
-		echo $this->Html->css(['//cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap4.css']);
-		echo $this->Html->css(['//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.css']);
+		echo $this->Html->css(['//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css']);
+		echo $this->Html->css(['//cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css']);
 		echo $this->Html->css(['//cdn.jsdelivr.net/npm/bootstrap-responsive-tabs@2.0.3/dist/css/bootstrap-responsive-tabs.min.css']);
-		//echo $this->Html->css(['//cdn.datatables.net/2.0.8/css/dataTables.bootstrap4.css']);
+		echo $this->Html->css(['//cdn.datatables.net/2.0.8/css/dataTables.bootstrap4.css']);
 		
 		echo $this->Html->css(['jquery.signaturepad.css']);
 		if ($this->get('viewPrices') === false) {
@@ -46,8 +42,6 @@ $cakeVersion = __d('cake_dev', 'CakePHP {0}', Configure::version())
 		echo $this->fetch('meta');
 		echo $this->fetch('css');
 		echo $this->Html->script('//code.jquery.com/jquery-3.6.0.js');
-		echo $this->Html->script('//cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.4/jquery-confirm.min.js');
-	
 		echo $this->Html->script('//code.jquery.com/ui/1.13.2/jquery-ui.js');
 		echo $this->Html->script('jquery.eComboBox.custom.js', array('inline' => false));
 		echo $this->Html->script('priceMatrixFuncs.js', array('inline' => false));
@@ -65,15 +59,12 @@ $cakeVersion = __d('cake_dev', 'CakePHP {0}', Configure::version())
 	
 	<!-- Bootstrap - Latest compiled and minified JavaScript -->
 	
-
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>	
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>	
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-responsive-tabs@2.0.3/dist/js/jquery.bootstrap-responsive-tabs.min.js"></script>
 
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.js"></script>
-<script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap4.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-powertip/1.2.0/jquery.powertip.min.js" integrity="sha512-fB6Pu241Qezb2hxUhQCKYoo3cmZwfY8AQyCaWBQ1NjA6b2IFXp+5wTB6ONsUucd3jXdn7GiTEToxy52v0jrpVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-powertip/1.2.0/css/jquery.powertip-dark.css" integrity="sha512-CS3URA90MiFxS2kV7BX0USw/1WdwSXOQA2aFwHRfuJVQP8Ku4SBoNAfUZlVuq++8p8p5V4SRjs53BVaJvQMVgA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script></script>

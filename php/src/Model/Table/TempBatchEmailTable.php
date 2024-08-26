@@ -4,11 +4,11 @@ namespace App\Model\Table;
 use Cake\ORM\Table;
 
 
-class BatchEmailTable extends AbstractBatchEmailTable {
+class TempBatchEmailTable extends AbstractBatchEmailTable {
 
     public function initialize(array $config) : void {
         parent::initialize($config);
-        $this->setTable('batchemail');
+        $this->setTable('temp_batchemail');
         $this->setPrimaryKey('batchemail_id');
     }
 }

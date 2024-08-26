@@ -1,6 +1,7 @@
 <?php
 namespace App\View\Helper;
 use Cake\View\Helper;
+use Cake\ORM\TableRegistry;
 
 class OrderFormHelper extends Helper {
 
@@ -89,4 +90,11 @@ class OrderFormHelper extends Helper {
 		$regionId = $this->myConfig['regionId'];
 		return ($regionId == 8); // for the mo hide if NY 
 	}
+
+	public function getComponentPriceXVat($useTempTable, $compid, $pn, $incextras) {
+        $tablename = $useTempTable ? 'TempPurchase' : 'Purchase';
+        $purchaseTable = TableRegistry::get($tablename);
+        $price = $purchaseTable->getComponentPriceXVat($compid, $pn, $incextras);
+		return floatval(str_replace(',', '', $price));
+    }
 }

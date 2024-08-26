@@ -4,6 +4,7 @@ namespace App\Controller;
 use Cake\Mailer\Email;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+use Cake\Datasource\ConnectionManager;
 use \App\Controller\Component\UtilityComponent;
 use \DateTime;
 use Cake\Event\EventInterface;
@@ -28,10 +29,12 @@ class OrderController extends SecureAppController {
         $this->loadModel('TempWholesalePrices');
         $this->loadModel('TempOrder');
         $this->loadModel('TempPayment');
+        $this->loadModel('TempExportLinks');
 
         // the other tables
 		$this->loadModel('Contact');
         $this->loadModel('Address');
+        $this->loadModel('Accessory');
         $this->loadModel('BedOptions');
         $this->loadModel('ComponentDimensions');
         $this->loadModel('ComponentType');
@@ -42,6 +45,9 @@ class OrderController extends SecureAppController {
         $this->loadModel('Location');
         $this->loadModel('MattressSupport');
         $this->loadModel('OrderFormMiscData');
+        $this->loadModel('Payment');
+        $this->loadModel('PhoneNumber');
+        $this->loadModel('ProductionSizes');
         $this->loadModel('Ticking');
         $this->loadModel('VatRate');
         $this->loadModel('WholesaleInvoices');
@@ -52,6 +58,7 @@ class OrderController extends SecureAppController {
         // the components
         $this->loadComponent('Flash');
         $this->loadComponent('OrderHelper');
+        $this->loadComponent('OrderEmailHelper');
     }
 
     public function beforeRender(EventInterface $event) {
@@ -60,7 +67,9 @@ class OrderController extends SecureAppController {
     	$leadTimes = $this->OrderFormMiscData->getLeadTimes();
     	$builder = $this->viewBuilder();
         $builder->addHelpers([
-        	'OrderFormProduction' => ['leadTimes' => $leadTimes]
+        	'OrderFormProduction' => ['leadTimes' => $leadTimes],
+            'MyForm',
+            'AuxiliaryData'
         ]);
     }
 
@@ -217,6 +226,13 @@ class OrderController extends SecureAppController {
         $this->set('cardiffDeliveryDate', $cardiffDeliveryDate);
         $this->set('londonDeliveryDate', $londonDeliveryDate);
 
+        $isComponentLocked=false;
+        if (isset($params['pn'])) {
+            if ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y') {
+                $isComponentLocked = true;
+            }
+            $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
+        }
         $this->viewBuilder()->addHelpers(['OrderForm' => ['currencyCode' => $currencyCode], 'MyForm']);
 	}
 
@@ -275,6 +291,9 @@ class OrderController extends SecureAppController {
             $purchaserow->AmendedDate = FrozenTime::createFromFormat('d/m/Y H:i:s', $formData['orderdate']);
         }
 
+        
+
+
         // if (!isset($orderno)) {
         //     $orderno=$this->Comreg->getNextOrderNumber();
         // }
@@ -317,6 +336,13 @@ class OrderController extends SecureAppController {
         $purchaserow->overseas = $formData['overseas'];
         $purchaserow->quote = $formData['quote'];
         $purchaserow->customerreference = trim($formData['customerref']);
+
+        if (isset($formData['complete']) && $formData['complete']=='y')  {
+            $purchaserow->ordercompletedUser = $this->getCurrentUsersId();
+            $purchaserow->ordercompletedDate = date("d/m/Y h:i:s");
+            $purchaserow->completedorders = 'y';
+        }
+    
 
         $this->TempPurchase->save($purchaserow);
         $pn=$purchaserow->PURCHASE_No;
@@ -436,6 +462,7 @@ class OrderController extends SecureAppController {
         $support=$this->MattressSupport->getSupport();
         $ventpos=$this->BedOptions->getVentPosition();
         $ventfinish=$this->BedOptions->getOptionFinish();
+        $mattressstatus=$this->TempPurchase->getComponentStatus($pn, 1);
         $prodsizes = $this->TempProductionSizes->find()->where(['Purchase_No' => $pn])->first();
         if (!isset($prodsizes)) {
             $prodsizes = ['Matt1Width' => '', 'Matt1Length' => ''];
@@ -458,6 +485,9 @@ class OrderController extends SecureAppController {
         $this->set('mattresswholesaleprice', $mattresswholesaleprice);
         $this->set('mattressDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 1, ""));
         [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 1);
+        if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+            $isComponentLocked = true;
+        }
         $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
         $this->set('lockColour', $lockColour);
 
@@ -648,6 +678,9 @@ class OrderController extends SecureAppController {
         $this->set('purchase', $purchase);
         $this->set('topperDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 5, ""));
         [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 5);
+        if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+            $isComponentLocked = true;
+        }
         $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
         $this->set('lockColour', $lockColour);
 
@@ -824,6 +857,9 @@ class OrderController extends SecureAppController {
     $this->set('baseTrimDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 11, ""));
     $this->set('baseDrawersDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 13, ""));
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 3);
+    if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+        $isComponentLocked = true;
+    }
     $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
     $this->set('lockColour', $lockColour);
 
@@ -1035,6 +1071,9 @@ public function legs() {
     $this->set('legsDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 7, ""));
     $this->set('addLegsDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 16, ""));
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 7);
+    if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+        $isComponentLocked = true;
+    }
     $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
     $this->set('lockColour', $lockColour);
 
@@ -1158,6 +1197,9 @@ public function headboard() {
     $this->set('headboardDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 8, ""));
     $this->set('headboardTrimDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 10, ""));
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 8);
+    if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+        $isComponentLocked = true;
+    }
     $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
     $this->set('lockColour', $lockColour);
 
@@ -1263,6 +1305,9 @@ public function valance() {
     $this->set('valancefabdirection', $valancefabdirection);
     $this->set('valanceDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 6, ""));
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 6);
+    if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+        $isComponentLocked = true;
+    }
     $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
     $this->set('lockColour', $lockColour);
 
@@ -1337,6 +1382,9 @@ public function accessories() {
     $this->set('purchase', $purchase);
     $this->set('accessories', $accessories);
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 9);
+    if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
+        $isComponentLocked = true;
+    }
     $this->set('isComponentLocked', $isComponentLocked ? 'true' : 'false');
     $this->set('lockColour', $lockColour);
 
@@ -1460,6 +1508,7 @@ public function ordersummary() {
     $pn = $this->request->getQuery('pn');
     $purchase=$this->TempPurchase->get($pn);    
     $userregion=$this->getCurrentUserRegionId();
+    $locationinfo=$this->Location->get($this->getCurrentUserLocationId());
     $OrderTotalExVAT="Order Total, Ex VAT";
     $VATWording="VAT";
     $VATRatewording="VAT Rate";
@@ -1470,6 +1519,7 @@ public function ordersummary() {
     } 
     $paymentsTotal=0;
     $paymentsTotal = $this->TempPayment->getPaymentSum($pn)[0]['paymenttotal'];
+    $notinvoiced= $purchase['total']-$paymentsTotal;
     $paymentsfororder='';
     $paymentsfororder=$this->TempPayment->getPayments($pn);
     $pendinginvoices='';
@@ -1516,6 +1566,7 @@ public function ordersummary() {
     $this->set('paymentsTotal', $paymentsTotal);
     $this->set('paymentsfororder', $paymentsfororder);
     $this->set('pendinginvoices', $pendinginvoices);
+    $this->set('notinvoiced', $notinvoiced);
     $this->set('OrderTotalExVAT', $OrderTotalExVAT);
     $this->set('VATWording', $VATWording);
     $this->set('VATRatewording', $VATRatewording);
@@ -1528,6 +1579,7 @@ public function ordersummary() {
     $this->set('valanceinc', $valanceinc);
     $this->set('userregion', $userregion);
     $this->set('purchase', $purchase);
+    $this->set('deliveryIncludesVat', $locationinfo['delivery_includes_vat']=='y');
     $this->viewBuilder()->addHelpers(['OrderForm' => ['currencyCode' => $purchase['ordercurrency']]]);
 }
 
@@ -1538,12 +1590,30 @@ public function saveOrdersummary() {
         $this->redirect(array('controller' => 'Order', 'action' => 'index'));
         return;
     }
+    
     $formData = $this->request->getData();
+    foreach ($formData as $key => $value) {
+        // Check if the key matches the radio button pattern
+        if (strpos($key, 'invono_') !== false) {
+            $paymentid = str_replace('invono_', '', $key);
+            
+            $paymentupdate = $this->TempPayment->find()->where(['paymentid' => $paymentid])->first();
+            $paymentupdate->invoice_number=$formData['invono_'.$paymentid];
+            $this->TempPayment->save($paymentupdate);
+        }               
+    }
+
     $pn = $formData['pn'];
     $purchase = $this->TempPurchase->get($pn);
+    $purchase['discounttype'] = $formData['dc'];
+    $purchase['discount'] = $formData['dcresult'];
     $this->TempPurchase->save($purchase);
     $this->OrderHelper->recalculateTotals($this->TempPurchase, $this->Location, $pn);
 
+    $componentsToReload = [98]; // include itself
+    $this->response = $this->response->withType('application/json');
+    $this->response = $this->response->withStringBody(json_encode($componentsToReload));
+    return $this->response;
  }
 //order summary ends
 
@@ -1554,11 +1624,10 @@ public function orderpayments() {
     $paymentmethods=$this->TempPayment->getPaymentMethods();
     $userregion=$this->getCurrentUserRegionId();
     $userlocation=$this->getCurrentUserLocationId();
-    $orderhasexports='';
-    $orderhasexportsnoinvoices='';
     $orderhasexportsnoinvoices=$this->TempOrder->orderhasexportsNoInvoices($pn);
     $orderhasexports=$this->TempOrder->orderhasexports($pn); //here invoices have been allocated
-    $noofinvoices=count($orderhasexports);
+    $noofinvoices=count($orderhasexportsnoinvoices);
+
     $pendinginvoices='';
     $pendinginvoices=$this->TempOrder->getPendingInvoices($pn);
     $finalinvoiceno='';
@@ -1574,6 +1643,7 @@ public function orderpayments() {
     $this->set('finalinvoiceno', $finalinvoiceno);
     $this->set('orderhasexportsnoinvoices', $orderhasexportsnoinvoices);
     $this->set('orderhasexports', $orderhasexports);
+    
     $this->set('noofinvoices', $noofinvoices);
     $this->set('userregion', $userregion);
     $this->set('userlocation', $userlocation);
@@ -1586,54 +1656,100 @@ public function saveOrderpayments() {
     $this->autoRender = false;
 
     $formData = $this->request->getData();
-    if ($formData['additionalpayment'] == '') {
+
+    if ($formData['additionalpayment'] == '' && $formData['refund'] == '') {
         return;
     }
-    $pn = $formData['pn'];
 
+    $pn = $formData['pn'];
     $purchase = $this->TempPurchase->get($pn);
     $paymentsForOrder = $this->TempPayment->getPayments($pn);
-    $oldPaymentsTotal = $this->TempPayment->getPaymentSum($pn)[0]['paymenttotal'];
-    
-    $paymentamount = floatval($formData['additionalpayment']);
-    $newPaymentsTotal = $oldPaymentsTotal + $paymentamount;
-    $newbalanceoutstanding = $purchase->total - $newPaymentsTotal;
-    if ($newbalanceoutstanding < 0) {
-        return;
-    }
     $salesusername = $this->getCurrentUserName();
+    $additionalPaymentEmailReq=false;
+    
+    if ($formData['additionalpayment'] != '') {
+        $oldPaymentsTotal = $this->TempPayment->getPaymentSum($pn)[0]['paymenttotal'];
+        $paymentamount = floatval($formData['additionalpayment']);
+        $newPaymentsTotal = $oldPaymentsTotal + $paymentamount;
+        $newbalanceoutstanding = $purchase->total - $newPaymentsTotal;
+        if ($newbalanceoutstanding >= 0) {
+            $payment = $this->TempPayment->newEntity([]);
+            $payment->paymentid  = $this->TempOrder->getNextPrimeKeyValForTable('payment', 1);
+            $payment->paymentmethodid = $formData['paymentmethod'];
+            if ($newbalanceoutstanding == 0 && count($paymentsForOrder) == 0) {
+                $payment->paymenttype = 'Full Payment';
+            } else if ($newbalanceoutstanding == 0) {
+                $payment->paymenttype = 'Final Payment';
+            } else if (count($paymentsForOrder) == 0) {
+                $payment->paymenttype = 'Deposit';
+            } else {
+                $payment->paymenttype = 'Additional Payment';  
+            }
+            $payment->amount = $paymentamount;
+            $payment->salesusername = $salesusername;
+            $payment->purchase_no = $pn;
+            $payment->invoice_number = $formData['invoiceno'];
+            if ($formData['invoicedate'] != '') {
+                $payment->invoicedate = FrozenTime::createFromFormat('d/m/Y', $formData['invoicedate']);
+            }
+            if ($formData['creditdetails'] != '') {
+                $payment->creditdetails = $formData['creditdetails'];
+            }
+            $payment->placed = date("Y/m/d h:i:s");
+            $payment->receiptno = $this->Comreg->getNextReceiptNumber();
+            $this->TempPayment->save($payment);
+            $paymentid=$payment['paymentid'];
+            $this->OrderEmailHelper->sendAdditionalPaymentEmail(true, $pn, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId(), $paymentid);
+        }
 
-    $payment = $this->TempPayment->newEntity([]);
-    $payment->paymentid  = $this->TempOrder->getNextPrimeKeyValForTable('payment', 1);
-    $payment->paymentmethodid = $formData['paymentmethod'];
-    if ($newbalanceoutstanding == 0 && count($paymentsForOrder) == 0) {
-        $payment->paymenttype = 'Full Payment';
-    } else if ($newbalanceoutstanding == 0) {
-        $payment->paymenttype = 'Final Payment';
-    } else if (count($paymentsForOrder) == 0) {
-        $payment->paymenttype = 'Deposit';
-    } else {
-        $payment->paymenttype = 'Additional Payment';  
     }
-    $payment->amount = $paymentamount;
-    $payment->salesusername = $salesusername;
-    $payment->purchase_no = $pn;
-    $payment->invoice_number = $formData['invoiceno'];
-    if ($formData['invoicedate'] != '') {
-        $payment->invoicedate = FrozenTime::createFromFormat('d/m/Y', $formData['invoicedate']);
+
+    if (isset($formData['exportchoice'])) {
+        $exportcollectionsID = $formData['exportchoice'];
+        $exportLinks = $this->TempExportLinks->getExportLinksForExportcollectionsID($exportcollectionsID, $pn);
+        foreach ($exportLinks as $links) {
+            $exportLink = $this->TempExportLinks->get($links['exportLinksID']);
+            $exportLink->InvoiceNo=$formData['invoiceno'];
+            $exportLink->InvoiceDate=FrozenDate::createFromFormat('d/m/Y', $formData['invoicedate']);
+            $this->TempExportLinks->save($exportLink);
+        }
     }
-    if ($formData['creditdetails'] != '') {
-        $payment->creditdetails = $formData['creditdetails'];
+
+    if ($formData['refund'] != '') {
+        $refundamount = floatval($formData['refund']);
+        $oldPaymentsTotal = $this->TempPayment->getPaymentSum($pn)[0]['paymenttotal'];
+        $newPaymentsTotal = $oldPaymentsTotal - $refundamount;
+        if ($newPaymentsTotal >= 0) {
+            $payment = $this->TempPayment->newEntity([]);
+            $payment->paymentid  = $this->TempOrder->getNextPrimeKeyValForTable('payment', 1);
+            $payment->paymentmethodid = $formData['refundmethod'];
+            $payment->paymenttype = 'Refund';
+            $payment->amount = $refundamount * -1.0;
+            $payment->salesusername = $salesusername;
+            $payment->purchase_no = $pn;
+            $payment->invoice_number = $formData['invoiceno'];
+            if ($formData['invoicedate'] != '') {
+                $payment->invoicedate = FrozenTime::createFromFormat('d/m/Y', $formData['invoicedate']);
+            }
+            if ($formData['creditdetails'] != '') {
+                $payment->creditdetails = $formData['creditdetails'];
+            }
+            $payment->placed = date("Y/m/d h:i:s");
+            $payment->receiptno = $this->Comreg->getNextReceiptNumber();
+            $this->TempPayment->save($payment);
+            $paymentid=$payment['paymentid'];
+            $this->OrderEmailHelper->sendRefundEmail(true, $pn, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId(), $paymentid);
+           
+            
+        }
+        
     }
-    $payment->placed = date("Y/m/d h:i:s");
-    $payment->receiptno = $this->Comreg->getNextReceiptNumber();
-    $this->TempPayment->save($payment);
 
     $purchase->paymentstotal = $this->TempPayment->getPaymentSum($pn)[0]['paymenttotal'];
     $purchase->balanceoutstanding = $purchase->total - $purchase->paymentstotal;
     $this->TempPurchase->save($purchase);
     $this->OrderHelper->recalculateTotals($this->TempPurchase, $this->Location, $pn);
-
+    
     $componentsToReload = [97, 98]; // self & order summary
     $this->response = $this->response->withType('application/json');
     $this->response = $this->response->withStringBody(json_encode($componentsToReload));
@@ -1653,9 +1769,19 @@ public function saveOrderpayments() {
         $this->OrderHelper->cleanUpPurchase($pn, $this->TempPurchase, $this->TempQcHistory, $this->QcHistoryLatest, $this->TempCompPriceDiscount, $this->TempWholesalePrices, $this->TempProductionSizes, $this->TempAccessory);
 
         // move the data to the real tables
-        $this->TempOrder->moveTempTablesToRealPurchase($pn, $this->getCurrentUsersId(), $this->PurchaseHistory);
-
+        $changes=$this->TempOrder->moveTempTablesToRealPurchase($pn, $this->getCurrentUsersId(), $this->PurchaseHistory, false);
+        
+        // send the order changes emails
+        $realPurchaseTable = TableRegistry::getTableLocator()->get('Purchase');
+        $purchase = $realPurchaseTable->get($pn);
+        if ($purchase['baserequired']=='y' && isset($changes['purchaseBaseFabricChanges']) && count($changes['purchaseBaseFabricChanges']) > 0) {
+            $this->sendBaseFabricChangesEmail($purchase, $changes['purchaseBaseFabricChanges']);
+        }
         $this->redirect(['controller' => 'Order', 'action' => 'index', '?' => ['pn' => $pn]]);
+    }
+
+    private function sendBaseFabricChangesEmail($purchase, $changes) {
+
     }
 
     public function checkPurchaseStamp() {
@@ -1676,6 +1802,173 @@ public function saveOrderpayments() {
         $this->response = $this->response->withType('application/json');
         $this->response = $this->response->withStringBody(json_encode($response));
         return $this->response;
+    }
+
+    
+    public function duplicateOrder() {
+        // wrap in a transaction
+		$conn = ConnectionManager::get('default');
+		$conn->begin();
+        
+        $pn = $this->request->getQuery('order');
+        $ordersource = $this->request->getQuery('ordersource');
+        $purchaseTable = TableRegistry::get('Purchase');
+        $QCHistoryTable = TableRegistry::get('QcHistory');
+        //$accessoryTable = TableRegistry::get('Accessory');
+        $sourceorder=$purchaseTable->get($pn);
+        $contactno=$sourceorder['contact_no'];
+        $origOrderNo=$sourceorder['ORDER_NUMBER'];
+        $fieldsToCopy = array('CODE','accessoriesrequired','accessoriestotalcost','AccountCode','addlegfinish','addlegprice','AddLegQty','addlegstyle','alpha_name','AmendedDate','balanceoutstanding','base2length','base2width','basedepth','basedrawerconfigID','basedrawerheight','basedrawers','basedrawersprice','basefabric','basefabricchoice','basefabriccost','basefabricdesc','basefabricdirection', 'basefabricmeters','basefabricprice','baseheightspring','baseinstructions','baselength','baseprice','baseqty','baserequired','basesavoirmodel','basetickingoptions','basetrim','basetrimcolour', 'basetrimprice','basetype','baseunitprice','basewidth','BED','bedsettotal','companyname','completedorders','contact_no','deliveryadd1','deliveryadd2','deliveryadd3','deliveryContact', 'deliverycountry','deliverycounty','deliveryinstructions','deliverypostcode','deliveryprice','deliverytown','discount','discounttype','drawerprice','drawerqty','drawertotal','extbase','floortype','footboardfinish','footboardheight','hbfabriccost','hbfabricmeters','hbfabricoptions','hbfabricprice','hblegheight','hbqty','hbunitprice','headboardfabric','headboardfabricchoice','headboardfabricdesc','headboardfabricdirection','headboardfinish','headboardheight','headboardlegqty','headboardprice','headboardrequired','headboardstyle','headboardtrimprice','headboardUnitPrice','headboardWidth','idlocation','istrade','leftsupport','legfinish','legheight','legposition','legprice','LegQty','legShape','legsrequired','legstyle','legUnitPrice','linkfinish','linkposition','manhattantrim','mattqty','mattr','mattress1length','mattress1width','mattress2length','mattress2width','mattressinstructions','mattresslength','mattressprice','mattressrequired','mattresstype','mattresswidth','mattunitprice','optcounter','ORDER_DATE','ORDER_NUMBER','ordercompletedDate','ordercompletedUser','orderConfirmationStatus','ordercurrency','orderonhold','orderSource','ordertype','overseasduty','overseasOrder','OWNING_REGION','paymentstotal','pinnacle','pinnacleAddItemsRequired','pinnacleBedRef','pleats','quote','rightsupport','salesusername','savoirmodel','shipperID','SOURCE_SITE','specialinstructionsdelivery','specialinstructionsheadboard','specialinstructionslegs','specialinstructionstopper','specialinstructionsvalance','stamp','subtotal','tickingoptions','topperlength','topperprice','topperrequired','toppertickingoptions','toppertype','topperwidth','total','totalexvat','tradediscount','tradediscountrate','upholsteredbase','upholsteryprice','UphUnitPrice','valancedrop','valancefabric','valancefabricchoice','valancefabricdesc','valancefabricdirection','valancefabricoptions','valancefabricstatusid','valancelength','valanceprice','valancerequired','valancewidth','valfabriccost','valfabricmeters','valfabricprice','vat','vatrate','ventfinish','ventposition','version','wholesaleInv');
+        
+        $newPurchaseRow = $purchaseTable->newEntity([]);
+        
+        foreach ($fieldsToCopy as $field) {
+            if (isset($sourceorder[$field])) {
+                $newPurchaseRow[$field] = $sourceorder[$field];
+            }
+        }
+        $newPurchaseRow['ORDER_NUMBER']=$this->Comreg->getNextOrderNumber();
+        $newPurchaseRow['completedorders']='n';
+        $newPurchaseRow['orderConfirmationStatus']='n';
+        $newPurchaseRow['orderonhold']='n';
+        $newPurchaseRow['ORDER_DATE']=date("Y/m/d h:i:s");
+        $newPurchaseRow['AmendedDate']=date("Y/m/d h:i:s");
+        $newPurchaseRow['orderSource']=$ordersource;
+        $newPurchaseRow['copied_from_pn']=$pn; 
+      
+        $purchaseTable->save($newPurchaseRow);
+        $newpn=$newPurchaseRow['PURCHASE_No'];
+        $newOrderNo=$newPurchaseRow['ORDER_NUMBER'];
+        //add history rows
+        $newHistoryRow = $QCHistoryTable->newEntity([]);
+        $newHistoryRow['ComponentID']=0;
+        $newHistoryRow['QC_StatusID']=0;
+        $newHistoryRow['Purchase_No']=$newpn;
+        $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+        $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+        $QCHistoryTable->save($newHistoryRow);
+
+        if ($sourceorder['mattressrequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=1;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $newHistoryRow['MadeAt']=$this->OrderHelper->getMattressMadeAt($sourceorder);
+            $QCHistoryTable->save($newHistoryRow);
+        }
+        if ($sourceorder['baserequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=3;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $newHistoryRow['MadeAt']=$this->OrderHelper->getBaseMadeAt($sourceorder);
+            $QCHistoryTable->save($newHistoryRow);
+        }
+        if ($sourceorder['topperrequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=5;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $newHistoryRow['MadeAt']=$this->OrderHelper->getTopperMadeAt($sourceorder);
+            $QCHistoryTable->save($newHistoryRow);
+        }
+        if ($sourceorder['valancerequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=6;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $newHistoryRow['MadeAt']=2;
+            $QCHistoryTable->save($newHistoryRow);
+        }
+        if ($sourceorder['legsrequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=7;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $newHistoryRow['MadeAt']=2;
+            $QCHistoryTable->save($newHistoryRow);
+        }
+        if ($sourceorder['headboardrequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=8;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $newHistoryRow['MadeAt']=$this->OrderHelper->getHBMadeAt($sourceorder);
+            $QCHistoryTable->save($newHistoryRow);
+        }
+        if ($sourceorder['accessoriesrequired']=='y') {
+            $newHistoryRow = $QCHistoryTable->newEntity([]);
+            $newHistoryRow['ComponentID']=9;
+            $newHistoryRow['QC_StatusID']=0;
+            $newHistoryRow['Purchase_No']=$newpn;
+            $newHistoryRow['QC_Date']=date("Y/m/d h:i:s");
+            $newHistoryRow['UpdatedBy']=$this->getCurrentUsersId();
+            $QCHistoryTable->save($newHistoryRow);
+//debug($pn);
+//die;
+            $accrow=$this->Accessory->getAccessories($pn);
+            foreach ($accrow as $row) {
+                $accfieldsToCopy = array('colour','description','design','productcode','purchase_no','qty','QtyToFollow','size','SpecialInstructions','Supplier','tariffCode','unitprice','wholesalePrice');
+
+                $newAccRow = $this->Accessory->newEntity([]);
+                foreach ($accfieldsToCopy as $field) {
+                    if (isset($row[$field])) {
+                        $newAccRow[$field] = $row[$field];
+                    }
+                }
+                $newAccRow['purchase_no']=$newpn;
+                $this->Accessory->save($newAccRow);
+            }
+        }
+
+        $phonenos=$this->PhoneNumber->getNumbersForPurchase($pn);
+        if (isset($phonenos)) {
+            foreach ($phonenos as $phonerow) {
+                $phonefieldsToCopy = array('phonenumbertype','number','seq');
+
+                $newPhoneRow = $this->PhoneNumber->newEntity([]);
+                foreach ($phonefieldsToCopy as $field) {
+                    if (isset($phonerow[$field])) {
+                        $newPhoneRow[$field] = $phonerow[$field];
+                    }
+                }
+                $newPhoneRow['purchase_no']=$newpn;
+                $this->PhoneNumber->save($newPhoneRow);
+            }
+
+        }
+
+        $prodsizes=$this->ProductionSizes->find()->where(['Purchase_No' => $pn])->first();
+        
+        if (isset($prodsizes)) {
+         
+                $prodfieldsToCopy = array('Matt1Width','Matt2Width','Matt1Length','Matt2Length','Base1Width','Base2Width','Base1Length','Base2Length','topper1Width','topper1Length','legheight');
+
+                $newProdRow = $this->ProductionSizes->newEntity([]);
+                foreach ($prodfieldsToCopy as $field) {
+                    if (isset($prodsizes[$field])) {
+                        $newProdRow[$field] = $prodsizes[$field];
+                    }
+                }
+                $newProdRow['Purchase_No']=$newpn;
+                $this->ProductionSizes->save($newProdRow);
+
+        }
+        $conn->commit();
+        $this->Flash->success("Order No ".$newOrderNo." created. You are now editing the new order.");
+        $this->redirect(['controller' => 'Order', 'action' => 'index', '?' => ['pn' => $newpn]]);
     }
     
     private function makePartOneFormData($contactdetails, $purchase) {
