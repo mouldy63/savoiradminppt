@@ -137,6 +137,17 @@
         });
         showHideWholesale();
         disableValanceComponentSections(<?=$isComponentLocked?>, '<?=$lockColour?>');
+
+        <?php if ($valancePoNo != '') { ?>
+            $('#valancefabric').attr('disabled', 'disabled');
+            $('#valancefabricchoice').attr('disabled', 'disabled');
+            $('#valancefabricoptions').attr('disabled', 'disabled');
+            $('#valancefabricdirection').attr('disabled', 'disabled');
+            $('#valfabricmeters').attr('disabled', 'disabled');
+            $('#valancedrop').attr('disabled', 'disabled');
+            $('#valancewidth').attr('disabled', 'disabled');
+            $('#valancelength').attr('disabled', 'disabled');
+        <?php } ?>
     }
 
    

@@ -468,6 +468,16 @@
         });
         hideBaseDiscountFields();
         showHideWholesale();
+        <?php if ($basePoNo != '') { ?>
+            $('#basefabricdirection').attr('disabled', 'disabled');
+            $('#upholsteredbase').attr('disabled', 'disabled');
+            $('#basefabric').attr('disabled', 'disabled');
+            $('#basefabricchoice').attr('disabled', 'disabled');
+            $('#basefabricmeters').attr('disabled', 'disabled');
+            $('#basefabricdesc').attr('disabled', 'disabled');
+        <?php } ?>
+
+
         disableBaseComponentSections(<?=$isComponentLocked?>, '<?=$lockColour?>');
     }
 

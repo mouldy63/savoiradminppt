@@ -834,176 +834,93 @@ class OrderEmailHelperComponent extends \Cake\Controller\Component {
 		
         }
         // valance end
-
         // acc begin
-        $fieldsToCheck = ['description', 'design', 'colour', 'size', 'unitprice', 'qty'];
+
+
+
         $accemail = false;
+        $emailArray1 = [];
+        $emailArray2 = [];
+        $emailArray3 = [];
 
         foreach ($accessories as $accessory) {
-            $orderAccessoryId = $accessory['orderaccessory_id'];
-            $oldOrderAccessoryIds = array_column($oldAccessories, 'orderaccessory_id');
-        
-            // Check if the orderaccessory_id exists in the old accessories
-            if (in_array($orderAccessoryId, $oldOrderAccessoryIds)) {
-                $oldAccessory = null;
-                foreach ($oldAccessories as $a) {
-                    if ($a['orderaccessory_id'] == $orderAccessoryId) {
-                        $oldAccessory = $a;
-                        break;
-                    }
-                }
-        
-                // Compare each field
-                foreach ($fieldsToCheck as $field) {
-                    if ($oldAccessory[$field] != $accessory[$field]) {
-                        $accemail = true;
-                        $emailArray1[] = "Order Accessory {$accessory['description']} {$field} has been changed.";
-                        $emailArray2[] = $oldAccessory[$field]; // Old value
-                        $emailArray3[] = $accessory[$field]; // New value
-                    }
-                }
+            $id=$accessory['orderaccessory_id'];
+            // Check if the id exists in the backup
+            if (isset($oldAccessories[$id])) {
+                $oldAccessory = $oldAccessories[$id];
                 
+                // Compare each field
+                foreach ($accessory as $field => $value) {
+                    if ($oldAccessory[$field] != $value) {
+                        $accemail = true;
+                        $emailArray1[] = ucwords(str_replace('_', ' ', $field)); // Field name description
+                        $emailArray2[] = $oldAccessory[$field]; // Old value
+                        $emailArray3[] = $value; // New value
+                    }
+                }
             } else {
-                // The orderaccessory_id is missing in the old accessories
+                // The ID is missing in the backup (optional: handle it if needed)
                 $accemail = true;
-                $emailArray1[] = "Order Accessory {$accessory['description']} has been added.";
+                $emailArray1[] = "Order Accessory ID {$accessory['description']} has been added.";
                 $emailArray2[] = "N/A";
                 $emailArray3[] = $accessory['description'];
             }
         }
-        
+
         // Check for IDs that are in the backup but not in the original table
         foreach ($oldAccessories as $oldAccessory) {
-            $oldOrderAccessoryId = $oldAccessory['orderaccessory_id'];
-            $orderAccessoryIds = array_column($accessories, 'orderaccessory_id');
-        
-            if (!in_array($oldOrderAccessoryId, $orderAccessoryIds)) {
-                // This orderaccessory_id is not present in the current accessories
+            $id=$oldAccessory['orderaccessory_id'];
+            if (!isset($accessories[$id])) {
+                // This ID is new in the backup
                 $accemail = true;
-                $emailArray1[] = "Order Accessory {$oldAccessory['description']} has been removed.";
+                $emailArray1[] = "Order Accessory ID {$oldAccessory['description']} has been removed.";
                 $emailArray2[] = $oldAccessory['description'];
                 $emailArray3[] = "N/A";
             }
         }
-        
+debug($oldAccessories);
+debug($accessories);
         // acc end
 
-        if (count($emailArray1) > 0) {
-            $contact = $this->Contact->get($purchase['contact_no']);
-            $showroom = $this->Location->get($idlocation);
-            if ($salesusername=='maddy') {
-                $to='info@natalex.co.uk';
-            } else if ($salesusername=='dave') {
-                $to='david@natalex.co.uk';
-            } else if ($userregion==17 || $userregion==19) {
-                $to='SavoirAdminFabric@savoirbeds.co.uk';
-            } else {
-                $to=$this->SavoirUser->find()->where(['username' => $salesusername])->first()['adminemail'];
-            }
-
-            if ($accemail && ($fabricbaseemail || $fabrichbemail || $fabriclegsemail || $fabricvalanceemail)) {
-                $amendemailhdg='FABRIC & ACCESSORIES';
-            }
-            if ($accemail==false && ($fabricbaseemail || $fabrichbemail || $fabriclegsemail || $fabricvalanceemail)) {
-                $amendemailhdg='FABRIC';
-            }
-            if ($accemail && ($fabricbaseemail==false && $fabrichbemail==false && $fabriclegsemail==false && $fabricvalanceemail==false)) {
-                $amendemailhdg='ACCESSORIES';
-            }
-
-            $cc = null;
-            $from = "noreply@savoirbeds.co.uk";
-            $fromName = null;
-            $subject=$amendemailhdg;
-            $body = '<html><body><font face="Arial, Helvetica, sans-serif">This auto generated email has been sent to the distribution group called SavoirAdminFabric@savoirbeds.co.uk and confirms that there have been fabric updates for an order.<br><br>'.$amendemailhdg.' UPDATE FOR:<table border="1" cellspacing="0" cellpadding="3">';
-            $body .= '<tr><td>Order No.</td><td><a href="http://www.savoiradmin.co.uk/edit-purchase.asp?order="'.$purchase['PURCHASE_No'].'"">'.$purchase['ORDER_NUMBER'].'</a></td></tr>';
-            $body .= '<tr><td>Order Date.</td><td>'.$purchase['ORDER_DATE'].'</td></tr>';
-            $body .= '<tr><td>Customer Name</td><td>'.$contact['surname'].'</td></tr>';
-    
-            $body .= '<tr><td>Changed By</td><td>'.$salesusername.'</td></tr>';
-            $body .= '</table>';
-            //if fabric change from here
-            $body .= '<br><table border="1" cellspacing="0" cellpadding="3">';
-            $body .= '<tr><td>Field Changed</td><td>Old Value</td><td>New Value</td></tr>';
-            $arrayCounter = count($emailArray1);
-    
-            for ($i = 0; $i < $arrayCounter; $i++) {
-                $body .= "<tr>";
-                $body .= "<td>";
-                if (!empty($emailArray1[$i])) {
-                    $body .= htmlspecialchars($emailArray1[$i]);
-                } else {
-                    $body .= "&nbsp;";
-                }
-                $body .= "</td><td>";
-                if (!empty($emailArray2[$i])) {
-                    $body .= htmlspecialchars($emailArray2[$i]);
-                } else {
-                    $body .= "&nbsp;";
-                }
-                $body .= "</td><td>";
-                if (!empty($emailArray3[$i])) {
-                    $body .= htmlspecialchars($emailArray3[$i]);
-                } else {
-                    $body .= "&nbsp;";
-                }
-                $body .= "</td></tr>";
-            }
-            $body .= '</table>';
-            $body .= '</font></body></html>';
-            $emailServices = new EmailServicesController();
-            $emailServices->generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, 'html', '');
-        }
-
-    }
-
-    public function sendPurchaseChangedEmail($purchase, $oldPurchase, $salesusername, $userregion, $idlocation) {
-        $ignoreKeys = ["stamp","additionalpayment","invoicedate","invoiceno","paymentmethod","creditdetails","refund","refundmethod","bookeddeliverydate",
-            "add1d","add2d","add3d","townd","countyd","postcoded","countryd","delphonetype1","delphone1",
-            "delphonetype2","delphone2","delphonetype3",
-            "delphone3","deldate","reference",
-            "clientstitle","clientsfirst","clientssurname",
-            "tel","telwork","mobile",
-            "email_address","acknowdate","add1",
-            "add2","add3","town",
-            "county","country","postcode",
-            "companyname","acknowversion","productiondate",
-            "bookeddeliverydate","ordernote_notetext",
-            "ordernote_followupdate","ordernote_action",
-            "accesscheck","oldbed","specialinstructionsdelivery","deliveryprice","productiondate"];
-        $diff1 = array_diff_assoc($oldPurchase, $purchase);
-        $diff2 = array_diff_assoc($purchase, $oldPurchase);
-        $differences = array_merge($diff1, $diff2);
-
-        $hasSignificantChanges = false;
-        foreach ($differences as $key => $value) {
-            if (!in_array($key, $ignoreKeys)) {
-                $hasSignificantChanges = true;
-                break;
-            }
-        }
-
-        if (!$hasSignificantChanges) {
-            return false;
-        }
-        
         $contact = $this->Contact->get($purchase['contact_no']);
-        $body = "<html><body><font face='Arial, Helvetica, sans-serif'>The following order has been amended on Savoir Admin, this needs to be confirmed before it proceeds to production.  Please log in to Savoir Admin and check the 'Orders to be Confirmed' list.<br /><br />" . $contact['title'] . " " . $contact['surname'] . " -  Order number " . $purchase['ORDER_NUMBER'] . ".  <br>Order date: " . $purchase['ORDER_DATE'] . ".  <br>Order Value: " . $purchase['ORDER_DATE'] . "</font></body></html>";
-        $recepient = "";
-        if ($salesusername == "maddy") {
-            $recepient = "info@natalex.co.uk";
+        $showroom = $this->Location->get($idlocation);
+        if ($salesusername=='maddy') {
+            $to='info@natalex.co.uk';
+        } else if ($salesusername=='dave') {
+            $to='david@natalex.co.uk';
         } else if ($userregion==17 || $userregion==19) {
-            $recepient = "SavoirAdminNewOrder@savoirbeds.co.uk";
-        } else if ($salesusername == "dave") {
-            $recepient = "david@natalex.co.uk";
+            $to='SavoirAdminFabric@savoirbeds.co.uk';
         } else {
-            $recepient = $this->SavoirUser->find()->where(['username' => $salesusername])->first()['adminemail'];
+            $to=$this->SavoirUser->find()->where(['username' => $salesusername])->first()['adminemail'];
         }
-        $subject = $purchase['ORDER_NUMBER'] . ", Order to be Confirmed,  " . $contact['title'] . " " . $contact['first'] . " " . $contact['surname'];
-        $emailServices = new EmailServicesController();
-        $emailServices->generateBatchEmail($recepient, "", "noreply@savoirbeds.co.uk", null, $subject, $body, 'html', '');
+        $cc = null;
+        $from = "noreply@savoirbeds.co.uk";
+        $fromName = null;
+        $subject='Fabrics / Accessories Update notification';
+        $body = '<html><body><font face="Arial, Helvetica, sans-serif">This auto generated email has been sent to the distribution group called SavoirAdminFabric@savoirbeds.co.uk and confirms that there have been fabric updates for an order.<br><br>FABRIC / ACCESSORIES UPDATE FOR:<table border="1" cellspacing="0" cellpadding="3">"';
+        $body .= '<tr><td>Order No.</td><td><a href="http://www.savoiradmin.co.uk/edit-purchase.asp?order="'.$purchase['PURCHASE_No'].'"">'.$purchase['ORDER_NUMBER'].'</a></td></tr>';
+        $body .= '<tr><td>Order Date.</td><td>'.$purchase['ORDER_DATE'].'</td></tr>';
+        $body .= '<tr><td>Customer Name</td><td>'.$contact['surname'].'</td></tr>';
 
-        return true;
+        $body .= '<tr><td>Changed By</td><td>'.$salesusername.'</td></tr>';
+        $body .= '</table>';
+        //if fabric change from here
+        $body .= '<br><table border="1" cellspacing="0" cellpadding="3">';
+        $body .= '<tr><td>Field Changed</td><td>Old Value</td><td>New Value</td></tr>';
+        $arrayCounter = count($emailArray1);
+
+        for ($i = 0; $i < $arrayCounter; $i++) {
+            $body .= "<tr>";
+            $body .= "<td>" . htmlspecialchars($emailArray1[$i]) . "</td><td>" . htmlspecialchars($emailArray2[$i]) . "</td><td>" . htmlspecialchars($emailArray3[$i]) . "</td>";
+            $body .= "</tr>";
+        }
+        $body .= '</table>';
+        $body .= '</font></body></html>';
+        debug($body);
+        die;
+        $emailServices = new EmailServicesController();
+        $emailServices->generateBatchEmail($to, $cc, $from, $fromName, $subject, $body, 'html', '');
+
     }
 }
 ?>

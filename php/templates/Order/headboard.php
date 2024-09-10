@@ -384,6 +384,15 @@ align = "right">
         hideHeadboardDiscountFields();
         showHideWholesale();
         disableHeadboardComponentSections(<?=$isComponentLocked?>, '<?=$lockColour?>');
+
+        <?php if ($hbPoNo != '') { ?>
+            $('#hbfabricoptions').attr('disabled', 'disabled');
+            $('#headboardfabric').attr('disabled', 'disabled');
+            $('#hbfabricdirection').attr('disabled', 'disabled');
+            $('#headboardfabricchoice').attr('disabled', 'disabled');
+            $('#hbfabricmeters').attr('disabled', 'disabled');
+            $('#headboardfabricdesc').attr('disabled', 'disabled');
+        <?php } ?>
     }
 
     function hideHeadboardDiscountFields() {

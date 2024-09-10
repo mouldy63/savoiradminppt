@@ -145,6 +145,10 @@ class AbstractOrderTable extends Table {
         if (!$isNewOrder) {
             $purchaseTable = TableRegistry::getTableLocator()->get('Purchase');
             $oldPurchase = $purchaseTable->get($pn)->toArray();
+            $productionSizesTable = TableRegistry::getTableLocator()->get('ProductionSizes');
+            $oldProductionSizes = $productionSizesTable->find('all')->where(['purchase_no' => $pn])->toArray();
+            $orderAccessoryTable = TableRegistry::getTableLocator()->get('Accessory');
+            $oldAccessories = $orderAccessoryTable->find('all')->where(['purchase_no' => $pn])->toArray();
         }
 
         $conn = ConnectionManager::get('default');
@@ -166,76 +170,15 @@ class AbstractOrderTable extends Table {
         $this->copyPurchaseToHistory($conn, $pn, $currentUsersId, $purchaseHistoryTable);
         $conn->commit();
         
-        $changes=[];
+        $oldRecords=[];
         if (!$isNewOrder) {
-            $newPurchase = $purchaseTable->get($pn)->toArray();
-            $purchaseBaseFabricChanges = $this->getPurchaseBaseFabricChanges($oldPurchase, $newPurchase);
-            $purchaseLegsFabricChanges = $this->getPurchaseLegsFabricChanges($oldPurchase, $newPurchase);
-            $purchaseHBFabricChanges = $this->getPurchaseHBFabricChanges($oldPurchase, $newPurchase);
-            $purchaseValanceFabricChanges = $this->getPurchaseValanceFabricChanges($oldPurchase, $newPurchase);
-            $changes['purchaseBaseFabricChanges']=$purchaseBaseFabricChanges;
-            $changes['purchaseLegsFabricChanges']=$purchaseLegsFabricChanges;
-            $changes['purchaseHBFabricChanges']=$purchaseHBFabricChanges;
-            $changes['purchaseValanceFabricChanges']=$purchaseValanceFabricChanges;
+            $oldRecords['purchase']=$oldPurchase;
+            $oldRecords['productionSizes']=$oldProductionSizes;
+            $oldRecords['accessories']=$oldAccessories;
         }
-        return $changes;
+        return $oldRecords;
     }
 
-    private function getPurchaseBaseFabricChanges($oldPurchase, $newPurchase) {
-        $changes = [];
-        foreach ($oldPurchase as $key => $value) {
-            if (!in_array($key, $this->purchaseBaseFabricChangeFields)) {
-                continue;
-            }
-            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
-            if ($newPurchase[$key] != $value) {
-                $changes[$key] = [$value, $newPurchase[$key]];
-            }
-        }
-        return $changes;
-    }
-
-    private function getPurchaseLegsFabricChanges($oldPurchase, $newPurchase) {
-        $changes = [];
-        foreach ($oldPurchase as $key => $value) {
-            if (!in_array($key, $this->purchaseLegsFabricChangeFields)) {
-                continue;
-            }
-            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
-            if ($newPurchase[$key] != $value) {
-                $changes[$key] = [$value, $newPurchase[$key]];
-            }
-        }
-        return $changes;
-    }
-
-    private function getPurchaseHBFabricChanges($oldPurchase, $newPurchase) {
-        $changes = [];
-        foreach ($oldPurchase as $key => $value) {
-            if (!in_array($key, $this->purchaseHBFabricChangeFields)) {
-                continue;
-            }
-            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
-            if ($newPurchase[$key] != $value) {
-                $changes[$key] = [$value, $newPurchase[$key]];
-            }
-        }
-        return $changes;
-    }
-
-    private function getPurchaseValanceFabricChanges($oldPurchase, $newPurchase) {
-        $changes = [];
-        foreach ($oldPurchase as $key => $value) {
-            if (!in_array($key, $this->purchaseValanceFabricChangeFields)) {
-                continue;
-            }
-            //echo $key . " " . $value . " " . $newPurchase[$key] . "<br>";
-            if ($newPurchase[$key] != $value) {
-                $changes[$key] = [$value, $newPurchase[$key]];
-            }
-        }
-        return $changes;
-    }
 
     private function copyPurchaseToHistory($conn, $pn, $currentUsersId, $purchaseHistoryTable) {
         $history = $purchaseHistoryTable->newEntity([]);

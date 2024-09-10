@@ -260,7 +260,7 @@ class SugarContactsController extends AppController {
     protected function _getContactType($contacttype) {
 		$found=false;
         foreach ($this->contacttypes as $ct) {
-            if ($contacttype==$ct['ContactType']) {
+            if (strcasecmp($contacttype, $ct['ContactType']) == 0) {
                 $found=true;
                 break;
             }

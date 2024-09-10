@@ -261,7 +261,7 @@ if ($quote=='y') {
         </div>
         <div class="col-sm-4 gx-5" >
             <div class="col-md-12">    
-                <h5 class="card-title">Delivery Address (<a href="cleardeliveryaddress();">Clear delivery address X</a>)</h5>
+                <h5 class="card-title">Delivery Address (<a href= "#" onclick = "cleardeliveryaddress(); return false;"></a>)</h5>
                 <p class="ordertxt1" >Line 1: <input type="text" name="deladd1" id="deladd1" value="<?=$partOneFormData['deladd1'] ?>" class="partonefield" /></p>
                 <p class="ordertxt1" >Line 2: <input type="text" name="deladd2" id="deladd2" value="<?=$partOneFormData['deladd2'] ?>" class="partonefield" /></p>
                 <p class="ordertxt1" >Line 3: <input type="text" name="deladd3" id="deladd3" value="<?=$partOneFormData['deladd3'] ?>" class="partonefield" /></p>
@@ -296,8 +296,8 @@ if ($quote=='y') {
                     <?php endforeach; ?>
                 </select><br>
                 Contact No 3: <input type="text" name="delContact3" id="delContact3" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [3,'number'])?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Production Date: <input style="width:128px" type="text" name="productiondate" id="productiondate" value="" readonly class="partonefield" />&nbsp;<a href="clearproductiondate();">X</a></p>
-                <p class="ordertxt1" >Booked Delivery Date: <input style="width:128px" type="text" name="bookeddeldate" id="bookeddeldate" value="" readonly class="partonefield" />&nbsp;<a href="clearbookeddeldate();">X</a></p>
+                <p class="ordertxt1" >Production Date: <input style="width:128px" type="text" name="productiondate" id="productiondate" value="" readonly class="partonefield" />&nbsp;<a  href= "#" onclick = "clearproductiondate(); return false;">X</a></p>
+                <p class="ordertxt1" >Booked Delivery Date: <input style="width:128px" type="text" name="bookeddeldate" id="bookeddeldate" value="" readonly class="partonefield" />&nbsp;<a href= "#" onclick = "clearbookeddeldate(); return false;">X</a></p>
                 <p class="ordertxt1" >Order Currency: <select name="currency" id="currency" style="width:139px" class="partonefield">
                     <?php foreach ($currencylist as $row): ?>               
                     <option value="<?php echo $row ?>" <?= $row==$partOneFormData['currency'] ? 'selected':'' ?>><?php echo $row ?> </option>
@@ -316,7 +316,7 @@ if ($quote=='y') {
         </div>
         <div class="col-sm-2">
             <div class="col-md-12">
-            <p class="ordertxt1" ><label>Follow-up Date:</label><br><input style="width:80px" type="text" name="ordernote_followupdate" id="ordernote_followupdate" value="" readonly class="partonefield" />&nbsp;<a href="clearfollowupdate();">X</a></p>
+            <p class="ordertxt1" ><label>Follow-up Date:</label><br><input style="width:80px" type="text" name="ordernote_followupdate" id="ordernote_followupdate" value="" readonly class="partonefield" />&nbsp;<a href= "#" onclick = "clearfollowupdate(); return false;">X</a></p>
             
             </div>
         </div>
@@ -333,7 +333,7 @@ if ($quote=='y') {
     <?php if ($ordernotes != '') {
 ?>    <div class="row" style="padding-left:10px; padding-right:10px;">
         <div class="col-sm-12">
-            <p><a href = "showHideNotesHistory();">Show/Hide Previous Order
+            <p><a href= "#" onclick = "showHideNotesHistory(); return false;">Show/Hide Previous Order
                                             Notes</a></p>
         </div>
     </div>
@@ -1103,6 +1103,7 @@ document.getElementById('generatePDF').addEventListener('click', function(event)
     //Payments section of order ends
 
     function showHideNotesHistory() {
+        console.log('showHideNotesHistory');
         $('.ordernotehistory').toggle();
     }
 

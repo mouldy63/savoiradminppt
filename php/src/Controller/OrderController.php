@@ -393,6 +393,8 @@ class OrderController extends SecureAppController {
             $this->TempOrderNote->save($ordernote);
         }
 
+        
+
         if (isset($pn)) {
             $ordernoteid='';
             foreach ($formData as $fieldName => $fieldValue) {
@@ -420,6 +422,27 @@ class OrderController extends SecureAppController {
                     $this->TempOrderNote->save($ordernotes);
                 };
             }
+        }
+
+        if (isset($pn)) {
+            if (!isset($purchase['bookeddeliverydate']) && !isset($purchase['productiondate']) && (isset($formData['bookeddeliverydate']) || isset($formData['productiondate'])))
+            {
+                $ordernote = $this->TempOrderNote->newEntity([]);
+                $ordernote->ordernote_id = $this->TempOrder->getNextPrimeKeyValForTable('ordernote', 1);
+                $ordernote->createddate =  date("Y-m-d H:i:s");
+                $ordernote->notetext =  'Contact customer to discuss linen requirements, check production or booked delivery date.';
+                $ordernote->purchase_no =  $pn;
+                $ordernote->username = $username;
+                $ordernote->notetype = 'AUTO';
+                if ($formData['ordernote_followupdate'] != '') {
+                    
+                    $ordernote->followupdate =FrozenTime::createFromFormat('d/m/Y', $formData['ordernote_followupdate']);
+                }
+                $ordernote->action =  'Action Required';
+                
+                $this->TempOrderNote->save($ordernote);
+                
+            } 
         }
 
         if (isset($pn)) {
@@ -778,6 +801,11 @@ class OrderController extends SecureAppController {
         $purchase->basesavoirmodel = $purchase->savoirmodel;
         $this->TempPurchase->save($purchase);
     }
+    $basePoNo='';
+    $qchData=$this->QcHistoryLatest->find()->where(['Purchase_No' => $pn, 'ComponentID' => 3])->first();
+    if (isset($qchData)) {
+        $basePoNo=$qchData['PONumber'];
+    }
     $basewholesaleprice='';
     $basetrimwholesaleprice='';
     $baseuphwholesaleprice='';
@@ -856,6 +884,7 @@ class OrderController extends SecureAppController {
     $this->set('baseUpholsteryDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 12, ""));
     $this->set('baseTrimDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 11, ""));
     $this->set('baseDrawersDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 13, ""));
+    $this->set('basePoNo', $basePoNo);
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 3);
     if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
         $isComponentLocked = true;
@@ -1172,7 +1201,11 @@ public function headboard() {
         if (isset($wholesaledata)) {
             $hbfabricwholesaleprice=$wholesaledata['price'];
         }
-
+    $hbPoNo='';
+    $qchData=$this->QcHistoryLatest->find()->where(['Purchase_No' => $pn, 'ComponentID' => 8])->first();
+    if (isset($qchData)) {
+        $hbPoNo=$qchData['PONumber'];
+    }
 
     $headboardheights=$this->BedOptions->getHeadboardHeight();
     $footboardheights=$this->BedOptions->getFootboardHeight();
@@ -1194,6 +1227,7 @@ public function headboard() {
     $this->set('fabricoptions', $fabricoptions);
     $this->set('hbfabdirection', $hbfabdirection);
     $this->set('hbtrim', $hbtrim);
+    $this->set('hbPoNo', $hbPoNo);
     $this->set('headboardDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 8, ""));
     $this->set('headboardTrimDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 10, ""));
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 8);
@@ -1292,6 +1326,11 @@ public function valance() {
         if (isset($wholesaledata)) {
             $valancefabricwholesaleprice=$wholesaledata['price'];
         }
+    $valancePoNo='';
+    $qchData=$this->QcHistoryLatest->find()->where(['Purchase_No' => $pn, 'ComponentID' => 6])->first();
+    if (isset($qchData)) {
+        $valancePoNo=$qchData['PONumber'];
+    }
     $userregion=$this->getCurrentUserRegionId();
     $pleatno=$this->BedOptions->getPleatNo();
     $fabricoptions=$this->BedOptions->getFabricOptions();
@@ -1303,6 +1342,7 @@ public function valance() {
     $this->set('pleatno', $pleatno);
     $this->set('fabricoptions', $fabricoptions);
     $this->set('valancefabdirection', $valancefabdirection);
+    $this->set('valancePoNo', $valancePoNo);
     $this->set('valanceDiscount', $this->TempCompPriceDiscount->getDiscount($pn, 6, ""));
     [$isComponentLocked, $lockColour] = $this->QcHistoryLatest->isComponentLocked($pn, 6);
     if (!$isComponentLocked && ($purchase['cancelled'] == 'y' || $purchase['completedorders'] == 'y')) {
@@ -1769,19 +1809,20 @@ public function saveOrderpayments() {
         $this->OrderHelper->cleanUpPurchase($pn, $this->TempPurchase, $this->TempQcHistory, $this->QcHistoryLatest, $this->TempCompPriceDiscount, $this->TempWholesalePrices, $this->TempProductionSizes, $this->TempAccessory);
 
         // move the data to the real tables
-        $changes=$this->TempOrder->moveTempTablesToRealPurchase($pn, $this->getCurrentUsersId(), $this->PurchaseHistory, false);
-        
+        $oldRecords=$this->TempOrder->moveTempTablesToRealPurchase($pn, $this->getCurrentUsersId(), $this->PurchaseHistory, false);
+    
         // send the order changes emails
         $realPurchaseTable = TableRegistry::getTableLocator()->get('Purchase');
         $purchase = $realPurchaseTable->get($pn);
-        if ($purchase['baserequired']=='y' && isset($changes['purchaseBaseFabricChanges']) && count($changes['purchaseBaseFabricChanges']) > 0) {
-            $this->sendBaseFabricChangesEmail($purchase, $changes['purchaseBaseFabricChanges']);
-        }
+        $oldPurchase = $oldRecords['purchase'];
+        $realAccesoriesTable = TableRegistry::getTableLocator()->get('Accessory');
+        $accessories = $realAccesoriesTable->find('all')->where(['purchase_no' => $pn])->toArray();
+        $this->OrderEmailHelper->sendFabricAccEmail($purchase, $oldPurchase, $accessories, $oldRecords['accessories'], $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
+        $this->OrderEmailHelper->sendPurchaseChangedEmail($purchase->toArray(), $oldPurchase, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
+        
+        $this->OrderEmailHelper->sendOrderToBedworks($pn, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
+
         $this->redirect(['controller' => 'Order', 'action' => 'index', '?' => ['pn' => $pn]]);
-    }
-
-    private function sendBaseFabricChangesEmail($purchase, $changes) {
-
     }
 
     public function checkPurchaseStamp() {
