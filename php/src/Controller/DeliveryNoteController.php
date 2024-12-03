@@ -18,6 +18,7 @@ class DeliveryNoteController extends SecureAppController {
 		$this->loadModel('Location');
 		$this->loadModel('Contact');
 		$this->loadModel('Address');
+		$this->loadModel('PhoneNumber');
 		$this->loadModel('Accessory');
 		$this->loadModel('ProductionSizes');
 		$this->loadModel('Wrappingtypes');
@@ -47,6 +48,7 @@ class DeliveryNoteController extends SecureAppController {
 		$deliveredby='';
 		$linkscollectionid='';
 		$giftpack='';
+		
 		if(isset($formData['deltime'])) {
 			$deltime = $formData['deltime'];
 		}
@@ -143,18 +145,18 @@ class DeliveryNoteController extends SecureAppController {
 				$collectiondate=$row['CollectionDate'];
 			}
 		} else {
-			if (isset($purchase['bookeddeliverydate'])) {
-			$collectiondate=substr($purchase['bookeddeliverydate'],0,10);
-			}
+			if (!is_null($purchase['bookeddeliverydate']))
+			$collectiondate=date_format($purchase['bookeddeliverydate'],"d/m/Y");
 		}
 		
 		if ($linkscollectionid == '') {
-			$deliverydate="Delivery Date: <b>" .$collectiondate ."</b>";
+			$deliverydate="<td valign='top' width='80px'>Delivery Date:<br><br></td><td valign='top'><b>" .$collectiondate ."</b>";
 		}
 		if ($linkscollectionid != '') {
-			$deliverydate="Ex-Works Date: <b>" .$collectiondate ."</b>";
+			$deliverydate="<td valign='top' width='80px'>Ex-Works Date:<br><br></td><td valign='top'><b>" .$collectiondate ."</b>";
 		}
 		$ordernumber = $purchase['ORDER_NUMBER'];
+		$deliverycontact = $purchase['deliveryContact'];
 		$specialinstructionsdelivery = $purchase['specialinstructionsdelivery'];
 		$orderdate = substr($purchase['ORDER_DATE'],0,10);
 		$salesusername = $purchase['salesusername'];
@@ -179,6 +181,25 @@ class DeliveryNoteController extends SecureAppController {
 		foreach ($query as $row) {
 			$address = $row;
 		}
+		
+		$deliverynos='';
+		if ($deliverycontact != '') {
+			$deliverynos .= "<b>Contact:</b> ".$deliverycontact."<br>";
+		}
+		$telnocount=1;
+		$query = $this->PhoneNumber->find()->where(['purchase_no' => $pn])->order(['seq' => 'asc']);
+		$delnos = null;
+		foreach ($query as $row) {
+			if ($telnocount==2) {
+				$deliverynos .= "<br>";
+			}
+			$deliverynos .= $row['phonenumbertype']." - ".$row['number']."&nbsp;&nbsp;";
+			$telnocount++;
+		}
+		
+		$this->set('deliverynos', $deliverynos);
+		
+		
 		$query = $this->ProductionSizes->find()->where(['Purchase_No' => $pn]);
 		$psizes = null;
 		foreach ($query as $row) {
@@ -314,28 +335,27 @@ class DeliveryNoteController extends SecureAppController {
 		$header='';
 		$header .= "<p class=toplinespace><img src='webroot\\img\\logo.jpg' width='255' height='42' style='position:absolute;right:1px;top:40px;' />";
 		if (!empty($deliverydate)) {
-			$header .= $deliverydate ."<br>Delivery Time: <b>" .$deltime ."</b><br>Delivered by: <b>" .$deliveredby ."</b>";
+			$header .= "<table width='250px' cellpadding='0' cellspacing='0' style='font-size:12px;'><tr>".$deliverydate ."<br><br></td></tr><tr><td valign='top'>Delivery Time:<br><br></td><td valign='top'><b>" .$deltime ."</b><br><br></td></tr><tr><td valign='top'>Delivered by:<br><br></td><td valign='top'><b>" .$deliveredby ."</b></td></tr></table>";
 			}
 		$header .= "</p><p class=deliverynote>Delivery Note<br><span class='pnorderno'>Order Number: " .$ordernumber ."</span></p><hr style=position:relative; top:-60px; margin-bottom:1px;><p class=pnshowroom>Showroom: " .$showroomaddress;
 		if ($showroomtel != '') {
 		$header .= "<br>" .$showroomtel;
 		};
 		$header .= "</p>";
-		$header .= "<div><img src='" . $docroot . '/' . $this->QrCode->getOrderNumberImageUrl($ordernumber) . "' width='30px' height='30px'  style='position:absolute; top:100px;right:0px;'/></div>";
+		$header .= "<div><img src='webroot/img/" . $this->QrCode->getOrderNumberImageUrl($ordernumber) . "' width='30px' height='30px'  style='position:absolute; top:110px;right:0px;'/></div>";
 		
 		$this->set('header', $header);
 		
 		$header2='';
 		$header2 .= "<p class=toplinespace><img src='webroot\\img\\logo.jpg' width='255' height='42' style='position:absolute;right:1px;top:40px;' />";
 		if (!empty($deliverydate)) {
-			$header2 .= "<br><br>".$deliverydate ."<br>Delivery Time: <b>" .$deltime ."</b><br>Delivered by: <b>" .$deliveredby ."</b>";
-			}
+$header2 .= "<br><table width='250px' cellpadding='0' cellspacing='0' style='font-size:12px;'><tr>".$deliverydate ."<br><br></td></tr><tr><td valign='top'>Delivery Time:<br><br></td><td valign='top'><b>" .$deltime ."</b><br><br></td></tr><tr><td valign='top'>Delivered by:<br><br></td><td valign='top'><b>" .$deliveredby ."</b></td></tr></table>";			}
 		$header2 .= "</p><p class=deliverynote>Delivery Note<br><span class='pnorderno'>Order Number: " .$ordernumber ."</span></p><hr style=position:relative; top:-60px; margin-bottom:1px;><p class=pnshowroom>Showroom: " .$showroomaddress;
 		if ($showroomtel != '') {
 		$header2 .= "<br>" .$showroomtel;
 		};
 		$header2 .= "</p>";
-		$header2 .= "<div><img src='" . $docroot . '/' . $this->QrCode->getOrderNumberImageUrl($ordernumber) . "' width='30px' height='30px'  style='position:absolute; top:100px;right:0px;'/></div>";
+		$header2 .= "<div><img src='webroot/img/" . $this->QrCode->getOrderNumberImageUrl($ordernumber) . "' width='30px' height='30px'  style='position:absolute; top:110px;right:0px;'/></div>";
 		
 		$this->set('header2', $header2);
 		
@@ -1074,6 +1094,7 @@ class DeliveryNoteController extends SecureAppController {
 						$hbdetails .= "</tr>";
 						}
 					}
+				
 					if ($wraptype=='Box' && $purchase['accessoriesrequired']=='y') {
 						
 						$query = $this->PackagingData->find()->where(['Purchase_no' => $pn, 'ComponentID' => 9, 'PackedWith' => 8]);
@@ -1105,11 +1126,12 @@ class DeliveryNoteController extends SecureAppController {
 						}
 					}
 					$hbdetails .= "</table>";
+					
 					$itemsdelivered+=1;
 					}
 					$hbcount=1;
 					$itemcount=1;
-					
+
 					$this->set('hbdetails', $hbdetails);
 					$this->set('hbcount', $hbcount);
 			}
@@ -1152,7 +1174,7 @@ class DeliveryNoteController extends SecureAppController {
 			$accdetails .= "<tr style=font-size:12px;><td colspan=5>Accessories Delivered</td></tr>";
 			
 			$accqty=0;
-			$accdetails .= "<tr style=font-size:12px;><td>Item Description<br>&nbsp;</td><td>Design</td><td>Colour</td><td>Size</td><td align=right>Qty</td></tr>";
+			$accdetails .= "<tr style=font-size:12px;><td>Item Description<br>&nbsp;</td><td>Design</td><td>Colour</td><td>Size</td><td align=right>Qty</td><td align='right' width='45px'>Load</td></tr>";
 
 				foreach ($acc as $accline) {
 					if ($wraptype=='Box') {
@@ -1166,6 +1188,7 @@ class DeliveryNoteController extends SecureAppController {
 								$accdetails .= "<td>" .$accline['colour'] ."</td>";
 								$accdetails .= "<td>" .$accline['size'] ."</td>";
 								$accdetails .= "<td align=right>" .$accqty ."</td>";
+								$accdetails .= "<td align='right' width='45px' style='padding-right:12px;'><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>";
 								$accdetails .= "</tr>";
 								$accdetails .= "<tr><td colspan=5></td></tr>";
 							} 
@@ -1179,6 +1202,7 @@ class DeliveryNoteController extends SecureAppController {
 						$accdetails .= "<td>" .$accline['colour'] ."</td>";
 						$accdetails .= "<td>" .$accline['size'] ."</td>";
 						$accdetails .= "<td align=right>" .$accqty ."</td>";
+						$accdetails .= "<td align='right' width='45px' style='padding-right:12px;'><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>";
 						$accdetails .= "</tr>";
 						$accdetails .= "<tr><td colspan=5></td></tr>";
 					}
@@ -1240,10 +1264,10 @@ class DeliveryNoteController extends SecureAppController {
 			}
 		$this->set('accitemsdelivered', $accitemsdelivered);
 		
-		$signature = "<div class=colpayments><div class=ordersummaryhdg><b>Customer's Signature</b></div><div style=padding:5px; ><br>Print Name:<br><br>Company:<br><br><br><p>...........................................................&nbsp;Date:&nbsp;".date("d/m/Y")."</p></div>";
+		$signature = "<div class=colpayments><div class=ordersummaryhdg><b>Customer's Signature</b></div><div style=padding:5px; ><br>Print Name:<br><br>Company:<br><br><br><p>...........................................................&nbsp;Date:&nbsp;".$collectiondate."</p></div>";
 		$signature .= "</div>";
 		
-		$footer="<table width='100%' border='0' cellspacing='0' cellpadding='3' style='position:absolute; bottom:150px;'>";
+		$footer="<table width='97%' border='0' cellspacing='0' cellpadding='3' style='position:absolute;bottom:150px;'>";
 		$footer.="<tr style='font-size:10px; line-height:13px;'><td>I have requested that this item should not be assembled or installed today. I understand that if I request assembly in the future that this will incur an assembly charge.</td><td>No claim in respect of any loss or damage to goods in transit or any shortage on delivery will be accepted unless the Customer shall have notified the Company in writing of such loss, damage or shortage within three days of delivery.</td></tr>";
 		$footer.="<tr><td>".$signature."</td><td>".$signature."</td></tr></table>";
 		$this->set('footer', $footer);

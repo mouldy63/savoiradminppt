@@ -36,9 +36,9 @@ class PriceMatrixImportController extends SecureAppController {
 		foreach ($formData as $formfield => $value) {
 			$parts = explode("-", $formfield);
 			if ($parts[0] == "DELETE") {
-				array_push($rowsToDelete, $parts[1]);
+				array_push($rowsToDelete, str_replace('#', '.', $parts[1]));
 			} else if ($parts[0] == "KEY") {
-				array_push($rowsToSave, $parts[1]);
+				array_push($rowsToSave, str_replace('#', '.', $parts[1]));
 			}
 		}
 		if (count($rowsToSave) == 0 && count($rowsToDelete) == 0) {

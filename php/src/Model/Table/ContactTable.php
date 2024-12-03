@@ -422,6 +422,41 @@ class ContactTable extends Table {
 		$sql .= "p.idlocation=l.idlocation and p.contact_no=".$contactno." and (p.quote='n' or p.quote is null) and (p.cancelled='n' or p.cancelled is null) and p.completedorders='n' and P.PURCHASE_No <> ".$pn." group by p.purchase_no";
 		$myconn = ConnectionManager::get('default');
 		return $myconn->execute($sql)->fetchAll('assoc');
-	}    
+	}
+	
+	
+	
+	public function getCustomerOrdersTotal($contactNo) {
+		$sql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test' AND contact_no=:cn group by ordercurrency";
+		$myconn = ConnectionManager::get('default');
+		$rs = $myconn->execute($sql, ['cn' => $contactNo])->fetchAll('assoc');
+		
+        $overallTotals = [];
+        foreach ($rs as $result) {
+			$line['ordercurrency'] = $result['ordercurrency'];
+			$line['total'] = isset($result['tot']) ? $result['tot'] : 0;
+			$line['totExVat'] = isset($result['totexvat']) ? $result['totexvat'] : 0;
+            $overallTotals[] = $line;
+        }
+		$totals['overall'] = $overallTotals;
+
+		$sql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test' AND contact_no=:cn and year(ORDER_DATE) = year(now()) group by ordercurrency";
+		$rs = $myconn->execute($sql, ['cn' => $contactNo])->fetchAll('assoc');
+
+		$yearTotals = [];
+        foreach ($rs as $result) {
+			$line['ordercurrency'] = $result['ordercurrency'];
+			$line['total'] = isset($result['tot']) ? $result['tot'] : 0;
+			$line['totExVat'] = isset($result['totexvat']) ? $result['totexvat'] : 0;
+            $yearTotals[] = $line;
+        }
+		$totals['year'] = $yearTotals;
+
+		$sql = "select count(*) as totalorders from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test' AND contact_no=:cn";
+		$rs = $myconn->execute($sql, ['cn' => $contactNo])->fetchAll('assoc');
+		$totals['totalorders'] = $rs[0]['totalorders'];
+
+		return $totals;
+	}
 }
 ?>

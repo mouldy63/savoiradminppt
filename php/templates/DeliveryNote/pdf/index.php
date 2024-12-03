@@ -14,7 +14,7 @@
 <table  border="0" cellspacing="0" cellpadding="3" >
   <tr>
     <td><div class=addresshdg>Delivery Address</div>
-    <p class="addressbody" style="line-height:14px; font-size:10px; position:relative; top:-15px; left:10px;"><?= $deliveryaddress ?></p>
+    <p class="addressbody" style="line-height:12px; font-size:10px; position:relative; top:-15px; left:10px;"><?= $deliveryaddress ?><br><?= $deliverynos ?></p>
     </td>
   </tr>
 </table>
@@ -26,7 +26,18 @@
 <?php
  	echo $accitemsdelivered;
  	?>
- </td></tr></table>
+ </td></tr>
+ <?php
+if ($specialinstructionsdelivery != '') { ?>
+ <tr><td style="padding:10px; font-size:12px;">
+ 
+ <b>DELIVERY INSTRUCTIONS:</b><br><br>
+<?php
+ 	echo $specialinstructionsdelivery;
+?>
+</td></tr>
+<?php } ?> 
+ </table>
 <?php
  	echo $footer;
 } 
@@ -36,7 +47,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 <br><br>
 <table  border="0" cellspacing="0" cellpadding="3" width="90px" style="margin-top:-15px;" >
   <tr class="baytotals">
-    <td align="left" width="45px"><b>TOTALS</b></td><td align="left" width="45px"><b>WRAP</b></td>
+    <td align="left" width="45px"><b>TOTALS</b></td><td align="left" width="45px"><b>WRAP</b></td><td align="left" width="45px"><b>LOAD</b></td>
   </tr>
 </table>
 
@@ -58,7 +69,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 <div class="p2">
 <table  border="0" cellspacing="0" cellpadding="3" width="90px" >
   <tr class="baytotals">
-    <td align="left" width="45px"><b>QTY:&nbsp;<?= $mattresscount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td>
+    <td align="left" width="45px"><b>QTY:&nbsp;<?= $mattresscount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td><td align="left" width="45px"><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>
   </tr>
 </table>
 </div>
@@ -83,7 +94,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 <div class="p2">
 <table border="0" cellspacing="0" cellpadding="3" width="90px" >
   <tr class="baytotals">
-    <td align="left" width="45px"><b>QTY: <?= $basecount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td>
+    <td align="left" width="45px"><b>QTY: <?= $basecount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td><td align="left" width="45px"><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>
   </tr>
 </table>
 </div>
@@ -106,7 +117,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 <div class="p2">
 <table border="0" cellspacing="0" cellpadding="3" width="90px" >
   <tr class="baytotals">
-    <td align="left" width="45px"><b>QTY: <?= $toppercount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td>
+    <td align="left" width="45px"><b>QTY: <?= $toppercount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td><td align="left" width="45px"><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>
   </tr>
 </table>
 </div>
@@ -129,7 +140,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 <div class="p2">
 <table border="0" cellspacing="0" cellpadding="3" width="90px" >
   <tr class="baytotals">
-    <td align="left" width="45px"><b>QTY: <?= $legscount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td>
+    <td align="left" width="45px"><b>QTY: <?= $legscount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td><td align="left" width="45px"><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>
     </td>
   </tr>
 </table>
@@ -153,7 +164,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 <div class="p2">
 <table border="0" cellspacing="0" cellpadding="3" width="90px" >
   <tr class="baytotals">
-    <td align="left" width="45px"><b>QTY: <?= $valancecount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td>
+    <td align="left" width="45px"><b>QTY: <?= $valancecount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td><td align="left" width="45px"><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>
   </tr>
 </table>
 </div>
@@ -176,7 +187,7 @@ if ($accessoriesonly=='n' || $accessoriesonly=='x') { ?>
 	<div class="p2">
 	<table border="0" cellspacing="0" cellpadding="3" width="90px" >
 	  <tr class="baytotals">
-	    <td align="left" width="45px"><b>QTY: <?= $hbcount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td>
+	    <td align="left" width="45px"><b>QTY: <?= $hbcount ?></b></td><td align="left" width="45px"><b><?= $wraptype ?></b></td><td align="left" width="45px"><span class='boxsmall2'>&nbsp;&nbsp;&nbsp;</span></td>
 	  </tr>
 	</table>
 	</div>
@@ -203,10 +214,17 @@ if ($tobedelivered != '') {
  	echo $itemsdelivered;
  	?>
  </td></tr>
- <tr><td style="padding:10px; font-size:14px;"><b>DELIVERY INSTRUCTIONS:</b><br>
+<?php
+if ($specialinstructionsdelivery != '') { ?>
+ <tr><td style="padding:10px; font-size:12px;">
+ 
+ <b>DELIVERY INSTRUCTIONS:</b><br><br>
 <?php
  	echo $specialinstructionsdelivery;
- 	?></td></tr></table>
+?>
+</td></tr>
+<?php } ?> 	
+</table>
 
  <div class="clear">&nbsp;</div>
 
@@ -225,7 +243,17 @@ if ($tobedelivered != '') {
 <?php
  	echo $accitemsdelivered;
  	?>
- </td></tr></table>
+ </td></tr>
+ <?php
+if ($specialinstructionsdelivery != '') { ?>
+ <tr><td style="padding:10px; font-size:12px;">
+ 
+ <b>DELIVERY INSTRUCTIONS:</b><br><br>
+<?php
+ 	echo $specialinstructionsdelivery;
+?>
+</td></tr>
+<?php } ?> 	</table>
 <?php
  	echo $footer;
 }; 

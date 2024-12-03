@@ -84,6 +84,18 @@
 				<?php echo $user["no4 mattress"];?>
 			</td>
 			<td class = "tablecell align-left">
+				<?php echo $user["no4v mattress"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["no5 mattress"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["french mattress"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["state mattress"];?>
+			</td>
+			<td class = "tablecell align-left">
 				<?php echo $user["other mattress"];?>
 			</td>
 			<td class = "tablecell align-left">
@@ -99,7 +111,25 @@
 				<?php echo $user["no4 base"];?>
 			</td>
 			<td class = "tablecell align-left">
+				<?php echo $user["no4v base"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["no5 base"];?>
+			</td>
+			<td class = "tablecell align-left">
 				<?php echo $user["savoir slim base"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["state base"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["surround base"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["pegboard"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["platform base"];?>
 			</td>
 			<td class = "tablecell align-left">
 				<?php echo $user["other base"];?>
@@ -114,10 +144,16 @@
 				<?php echo $user["cw topper"];?>
 			</td>
 			<td class = "tablecell align-left">
-				<?php echo $user["cw topper"];?>
+				<?php echo $user["cfv topper"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["valance"];?>
 			</td>
 			<td class = "tablecell align-left">
 				<?php echo $user["headboard"];?>
+			</td>
+			<td class = "tablecell align-left">
+				<?php echo $user["leg"];?>
 			</td>
 			<td class = "tablecell align-left">
 				<?php echo $user["accessories"];?>

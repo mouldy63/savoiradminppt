@@ -44,10 +44,10 @@
 		<?php if ($this->Security->retrieveUserRegion()==1 || $this->Security->retrieveUserRegion()==17 || $this->Security->retrieveUserRegion()==19 || $this->Security->retrieveUserRegion()==4 || $this->Security->retrieveUserRegion()==26 || $this->Security->retrieveUserRegion()==18 || $this->Security->retrieveUserLocation()==14 || $this->Security->retrieveUserLocation()==17 || $this->Security->retrieveUserLocation()==25 || $this->Security->retrieveUserLocation()==31 || $this->Security->retrieveUserLocation()==33 || $this->Security->retrieveUserLocation()==34 || $this->Security->retrieveUserLocation()==41 || $this->Security->retrieveUserLocation()==35 || $this->Security->retrieveUserLocation()==38 || $this->Security->retrieveUserLocation()==51) { ?>
 		<li class='dropdown'><a href='#' class='dropbtn'>Orders</a>
 		<div class='dropdown-content'>
-				<a href='/php/awaitingorders'>Awaiting Confirmation</a><a
-					href='/php/currentorders'>Current Orders</a><a
-					href='/php/heldorders'>Held Orders</a>
-
+				<a href='/php/awaitingorders'>Awaiting Confirmation</a>
+				<a href='/php/currentorders'>Current Orders</a>
+				<a href='/php/heldorders'>Held Orders</a>
+				<a href="/php/harrodsImport">Harrods Ecom Import</a>
 					<?php if ($this->Security->retrieveUserRegion()==1 || $this->Security->retrieveUserLocation()==17 || $this->Security->retrieveUserLocation()==24 || $this->Security->retrieveUserLocation()==34 || $this->Security->retrieveUserLocation()==37 || $this->Security->retrieveUserLocation()==39) { ?>
 					<a href='/php/quotes'>Quotes</a>
 					<?php } ?>

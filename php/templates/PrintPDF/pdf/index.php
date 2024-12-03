@@ -64,13 +64,15 @@
  		echo $header;
 	} ?>
 	<div style="position: absolute;  bottom: -30px; width: 100%; margin:0; padding:0;">
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-	<div style='float:left; width:49%'><?= $ordersummary ?><br><?= $paymentsdetails ?>
-  	</div>
-	
-	<div style='float:right; width:49%'><span  style="padding: 10px;"><?= $deliverydetails ?></span><br><?= $customersig ?></div>
+	<table width="100%" border="0" cellspacing="0" cellpadding="3">
+  	<tr>
+    	<td width="50%" valign="top"><?= $ordersummary ?></td>
+    	<td width="50%" valign="top"><span  style="padding: 10px;"><?= $deliverydetails ?></span></td>
+  	</tr>
+  	<tr>
+    	<td width="50%" valign="top"><?= $paymentsdetails ?></td><td width="50%" valign="top"><?= $customersig ?></td>
+  	</tr>
 	</table>
-	<div style='clear: both;'>&nbsp;</div>
 	</div>
 <?php } ?>
 <?php if (!empty($accessoriesadd)) {
@@ -88,12 +90,16 @@ if ($accessoriesonly=='y') {
 	echo $accdetails; ?>
 	<div class="clear">&nbsp;</div>
 	<div style="position: absolute;  bottom: -30px; width: 100%; margin:0; padding:0;">
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-  	<div style='float:left; width:49%'><?= $ordersummary ?><br><?= $paymentsdetails ?></div>
-    <div style='float:right; width:49%'><?= $deliverydetails ?></span><br><?= $customersig ?></div>
-	</table>
-	<div style='clear: both;'>&nbsp;</div>
-	</div>
+	<table width="101%" border="0" cellspacing="0" cellpadding="3" style="position:relative; left:-3px; padding-right:1px;">
+  	<tr>
+    	<td width="50%" valign="top"><?= $ordersummary ?></td>
+    	<td width="50%" valign="top"><span  style="padding: 10px;"><?= $deliverydetails ?></span></td>
+  	</tr>
+  	<tr>
+    	<td width="50%" valign="top"><?= $paymentsdetails ?></td>
+    	<td width="50%" valign="top"><?= $customersig ?></td>
+  	</tr>
+	</table></div>
 <?php }
 if (!empty($termstext)) {
 	echo $pagebreak;

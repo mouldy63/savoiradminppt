@@ -282,7 +282,7 @@ class OrderController extends SecureAppController {
         if (isset($pn)) {
             $purchaserow = $this->TempPurchase->get($pn);
             //$purchaserow->ORDER_DATE = FrozenTime::createFromFormat('d/m/Y H:i:s', $formData['orderdate']);
-            $purchaserow->AmendedDate = date("d/m/Y h:i:s");
+            $purchaserow->AmendedDate = FrozenTime::now();
             //$orderno = $purchaserow->ORDER_NUMBER;
         } else {
             $purchaserow = $this->TempPurchase->newEntity([]);
@@ -339,7 +339,7 @@ class OrderController extends SecureAppController {
 
         if (isset($formData['complete']) && $formData['complete']=='y')  {
             $purchaserow->ordercompletedUser = $this->getCurrentUsersId();
-            $purchaserow->ordercompletedDate = date("d/m/Y h:i:s");
+            $purchaserow->ordercompletedDate = FrozenTime::now();
             $purchaserow->completedorders = 'y';
         }
     
@@ -1818,11 +1818,65 @@ public function saveOrderpayments() {
         $realAccesoriesTable = TableRegistry::getTableLocator()->get('Accessory');
         $accessories = $realAccesoriesTable->find('all')->where(['purchase_no' => $pn])->toArray();
         $this->OrderEmailHelper->sendFabricAccEmail($purchase, $oldPurchase, $accessories, $oldRecords['accessories'], $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
-        $this->OrderEmailHelper->sendPurchaseChangedEmail($purchase->toArray(), $oldPurchase, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
+        $significantChanges = $this->OrderEmailHelper->sendPurchaseChangedEmail($purchase->toArray(), $oldPurchase, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
+        if ($significantChanges) {
+            $purchase['orderConfirmationStatus'] = 'n';
+            $realPurchaseTable->save($purchase);
+        }
+
+        $this->removeUnwantedPackagingData($pn, $oldPurchase, $purchase, $oldRecords['productionSizes']);
         
-        $this->OrderEmailHelper->sendOrderToBedworks($pn, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
+        //$this->OrderEmailHelper->sendOrderToBedworks($pn, $this->getCurrentUserName(), $this->getCurrentUserRegionId(), $this->getCurrentUserLocationId());
 
         $this->redirect(['controller' => 'Order', 'action' => 'index', '?' => ['pn' => $pn]]);
+    }
+
+    private function removeUnwantedPackagingData($pn, $oldPurchase, $purchase, $oldProductionSizes) {
+        $realProductionSizesTable = TableRegistry::getTableLocator()->get('ProductionSizes');
+        $packagingDataTable = TableRegistry::getTableLocator()->get('PackagingData');
+        $productionSizes = $this->TempProductionSizes->find()->where(['Purchase_No' => $pn])->first();
+
+        if ($this->notEqual($productionSizes, 'Matt1Width', $oldProductionSizes, 'Matt1Width') || $this->notEqual($productionSizes, 'Matt1Length', $oldProductionSizes, 'Matt1Length') || $this->notEqual($productionSizes, 'Matt2Width', $oldProductionSizes, 'Matt2Width') || $this->notEqual($productionSizes, 'Matt2Length', $oldProductionSizes, 'Matt2Length')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 1);   
+        }
+        if ($this->notEqual($oldPurchase, 'mattresswidth', $purchase, 'mattresswidth') || $this->notEqual($oldPurchase, 'mattresslength', $purchase, 'mattresslength') || $this->notEqual($oldPurchase, 'savoirmodel', $purchase, 'savoirmodel') || $this->notEqual($oldPurchase, 'mattresstype', $purchase, 'mattresstype')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 1);
+        }
+        if ($this->notEqual($productionSizes, 'Base1Width', $oldProductionSizes, 'Base1Width') || $this->notEqual($productionSizes, 'Base1Length', $oldProductionSizes, 'Base1Length') || $this->notEqual($productionSizes, 'Base2Width', $oldProductionSizes, 'Base2Width') || $this->notEqual($productionSizes, 'Base2Length', $oldProductionSizes, 'Base2Length')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 3);   
+        }
+        if ($this->notEqual($oldPurchase, 'basewidth', $purchase, 'basewidth') || $this->notEqual($oldPurchase, 'baselength', $purchase, 'baselength') || $this->notEqual($oldPurchase, 'basesavoirmodel', $purchase, 'basesavoirmodel') || $this->notEqual($oldPurchase, 'basetype', $purchase, 'basetype')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 3);
+        }
+        if ($this->notEqual($productionSizes, 'topper1Width', $oldProductionSizes, 'topper1Width') || $this->notEqual($productionSizes, 'topper1Length', $oldProductionSizes, 'topper1Length')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 5);   
+        }
+        if ($this->notEqual($oldPurchase, 'topperwidth', $purchase, 'topperwidth') || $this->notEqual($oldPurchase, 'topperlength', $purchase, 'topperlength') || $this->notEqual($oldPurchase, 'toppertype', $purchase, 'toppertype')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 5);
+        }
+        if ($this->notEqual($productionSizes, 'legheight', $oldProductionSizes, 'legheight')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 7);   
+        }
+        if ($this->notEqual($oldPurchase, 'legheight', $purchase, 'legheight')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 7);
+        }
+        if ($this->notEqual($oldPurchase, 'headboardstyle', $purchase, 'headboardstyle') ||  $this->notEqual($oldPurchase, 'headboardWidth', $purchase, 'headboardWidth')) {
+            $packagingDataTable->deletePackagingDataForComponent($pn, 8);
+        }
+    }
+
+    private function notEqual($obj1, $key1, $obj2, $key2) {
+        $val1 = null;
+        $val2 = null;
+        if (isset($obj1) && isset($obj1[$key1])) {
+            $val1 = $obj1[$key1];
+        }
+        //debug($obj2);
+        //debug($key2);
+        if (isset($obj2) && isset($obj2[$key2])) {
+            $val2 = $obj2[$key2];
+        }
+        return $val1 != $val2;
     }
 
     public function checkPurchaseStamp() {

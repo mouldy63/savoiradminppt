@@ -215,6 +215,7 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 		$manifesttable = '';
 		
 		$query = $this->ExportCollections->getManifestPNs($cid);
+		
 		foreach ($query as $row) {
 			$collectionsPN = $row;
 // 			if ($collectionsPN['purchase_no'] == 79219) { // order_number=83566
@@ -290,7 +291,7 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			    }
 			}
 				
-			$exportData = $this->CommercialData->getExportData(null, $collectionsPN['purchase_no'], $mattressinc, $baseinc, $topperinc, $valanceinc, $legsinc, $hbinc, $accinc, $purchase, $wrapid, 'y', $psizes);
+			$exportData = $this->CommercialData->getExportData(null, $collectionsPN['purchase_no'], $mattressinc, $baseinc, $topperinc, $valanceinc, $legsinc, $hbinc, $accinc, $purchase, $wrapid, 'y', $psizes, $cid);
 				
 				
 			$count+=1;
@@ -425,8 +426,34 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			}
 				
 			if ($baseinc=='y' && $packpegwith==0) {
-			
+				
 			    if ($exportData['basebox']==2) {
+					
+			        $basedesc='';
+			        $basedesc.=$exportData['basedesc'];
+			        
+			        if ($componentfirst==0) {
+			            $componentfirst=3;
+			        }
+			        if ($componentfirst==3) {
+			            $borderstyle='topborder';
+			        } else {
+			            $borderstyle='noborder';
+			        }
+			        $component3='';
+			        $component3 .= "<td  class='".$borderstyle."' width=47 valign='top'>".$count." aof ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=130 valign='top'>".$basedesc."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['basedimensions2']."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['base2NW']."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['baseweight2']."</td>";
+			        
+			        
+			        $count+=1;
+			        $linetotal+=1;
+			    }
+			}
+			
+			    if ($baseinc=='y') {
 			        //debug($exportData);
 			        //die;
 			        $basedesc='';
@@ -441,21 +468,22 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			            $borderstyle='noborder';
 			        }
 			        $component3='';
-			        $component3 .= "<td  class='".$borderstyle."' width=47 valign='top'>".$count." of ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=47 valign='top'>".$count." bof ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
 			        $component3 .= "<td  class='".$borderstyle."' width=130 valign='top'>".$basedesc."</td>";
-			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['basedimensions2']."</td>";
-			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['base2NW']."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['basedimensions']."</td>";
+			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['baseNW']."</td>";
 			        $component3 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['baseweight2']."</td>";
 			        
 			        
 			        $count+=1;
 			        $linetotal+=1;
 			    }
-			}
 			//1st base
-			if ($baseinc=='y' && $packpegwith==0) {
-			
-			    $basedesc='';
+			if ($baseinc=='y' && ($packpegwith==0 || !isset($packpegwith))) {
+				
+					$basedesc='';
+				
+			    
 			    $basedesc.=$exportData['basedesc'];
 			    if ($exportData['valancepackedwith']==3) {
 			        $basedesc .= "<br>" .$exportData['valancedesc'];
@@ -506,12 +534,13 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			        $borderstyle='noborder';
 			    }
 			    $component4='';
-			    $component4 .= "<td  class='".$borderstyle."' width=47 valign='top'>".$count." of ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
+				
+			    $component4 .= "<td  class='".$borderstyle."' width=47 valign='top'>".$count." cof ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
 			    $component4 .= "<td  class='".$borderstyle."' width=130 valign='top'>".$basedesc."</td>";
 			    $component4 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['basedimensions']."</td>";
 			    $component4 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['baseNW']."</td>";
 			    $component4 .= "<td  class='".$borderstyle."' width=40 valign='top'>".$exportData['baseweight']."</td>";
-			    
+				
 			    
 			    $count+=1;
 			    $linetotal+=1;
@@ -756,7 +785,7 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			        $count+=1;
 			        $linetotal+=1;
 			    } 
-			    if ($wrapid == 3 || $wrapid == 2) {
+			    if ($wrapid == 2) {
 			        $n = 0;
 			        foreach ($exportData['acc'] as $accline) {
 			            $packinfo = $this->PackagingData->find()->where(['CompPartNo' => $accline['orderaccessory_id']])->first();
@@ -776,6 +805,50 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			                $count+=1;
 			                $linetotal+=1;
 			            }
+			        }
+			    } 
+				if ($wrapid == 3) {
+			        $n = 0;
+			        foreach ($exportData['accbox'] as $acclines) {
+						foreach ($acclines as $accline) {
+							$packinfo = $this->PackagingData->find()->where(['CompPartNo' => $accline['orderaccessory_id']])->first();
+
+							if ($packinfo == null || $packinfo['PackedWith'] == null || $packinfo['PackedWith'] == 0) {
+								$n++;
+								if ($componentfirst==9 && $n == 1) {
+									$borderstyle='topborder';
+								} else {
+									$borderstyle='noborder';
+								}
+								$tmp = "<td class='".$borderstyle."' width=47 valign='top'>".$count." of ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=130 valign='top'>".$accline['description']."</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+								array_push($component9, $tmp);
+								$count+=1;
+								$linetotal+=1;
+							}
+							
+							foreach ($acclines as $accline2) {
+								// loop through the accessories again to see if any packed with current one
+								if ($accline2['PackedWith'] == '9-'.$accline['orderaccessory_id']) {
+									if ($componentfirst==9 && $n == 1) {
+										$borderstyle='topborder';
+									} else {
+										$borderstyle='noborder';
+									}
+									$tmp = "<td class='".$borderstyle."' width=47 valign='top'>".$count." of ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
+									$tmp .= "<td  class='".$borderstyle."' width=130 valign='top'>".$accline2['description']."</td>";
+									$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+									$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+									$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+									array_push($component9, $tmp);
+									$count+=1;
+									$linetotal+=1;
+								}
+							}
+						}
 			        }
 			    } 
 			    if ($wrapid == 4) {
@@ -863,10 +936,15 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
     				$manifesttable .= "<td  class='topleftborder' width=80 valign=top rowspan=".$totalitemsinorder.">".$daddress."</td></tr>";
     				} else {
     				$totalnoitems=$totalnoitems+1;
-    				
+    				if ($exportData['boxQty']==2) {
+						$manifesttable .= "<tr>";
+    					$manifesttable .= $component3;
+    					$manifesttable .= "</tr>";
+					}
     				$manifesttable .= "<tr>";
     				$manifesttable .= $component4;
     				$manifesttable .= "</tr>";
+					
     			}
     		}
     		if ($topperinc=='y') {

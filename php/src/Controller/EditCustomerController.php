@@ -53,6 +53,7 @@ class EditCustomerController extends SecureAppController
 		$status=$this->Status->getStatusList();
 		$interestprodlinks = $this->Interestproductslink->find('all', array('conditions'=> array('contact_no' => $contactno)))->toArray();
 		$channels = $this->Channel->getChannelList();
+		$totalspendinfo = $this->Contact->getCustomerOrdersTotal($contactno);
 		$deliveryaddresses = $this->DeliveryAddress->getDeliveryAddresses($contactno);
 		$sources = $this->Source->getNonRetiredSources();
 		$customertype = $this->CustomerType->getCustomerTypeList();
@@ -184,7 +185,7 @@ class EditCustomerController extends SecureAppController
 		$this->set('deliveryaddresses', $deliveryaddresses);
 		$this->set('additionalcontact1', $additionalcontact1);
 		$this->set('additionalcontact2', $additionalcontact2);
-		
+		$this->set('totalspendinfo', $totalspendinfo);
 		
 		$this->set('custdetails', $custdetails);
 		$this->set('custname', $custname);
@@ -396,6 +397,7 @@ class EditCustomerController extends SecureAppController
 		$contactdetails->mobile = trim($formData['mobile']);
 		$contactdetails->position = trim($formData['companyposition']);
 		$contactdetails->COMPANY_VAT_NO = trim($formData['companyvat']);
+		$contactdetails->accountsRef = trim($formData['accountsref']);
 		if (isset($formData['acceptemail']) && $formData['acceptemail']=='y') {
 			$contactdetails->acceptemail = 'y';
 		} else {
@@ -444,7 +446,6 @@ class EditCustomerController extends SecureAppController
 		$addressdetails->postcode = trim($formData['postcode']);
 		$addressdetails->country = trim($formData['country']);
 		$addressdetails->tel = trim($formData['telhome']);
-		$addressdetails->fax = trim($formData['fax']);
 		$addressdetails->company = trim($formData['company']);
 		if ($formData['pricelist'] != '') {
 			$addressdetails->PRICE_LIST = trim($formData['pricelist']);
@@ -514,11 +515,12 @@ class EditCustomerController extends SecureAppController
 			}
 
 		}
-		$this->Flash->success("Contact amended successfully");
+		
 
 		if (!empty($formData['nextpage'])) {
 			$this->redirect($formData['nextpage']);
 		} else {
+			$this->Flash->success("Contact amended successfully");
 			$this->redirect(['action' => 'index', '?' => ['val' => $contactno]]);
 		}
 
@@ -548,13 +550,12 @@ class EditCustomerController extends SecureAppController
 				$postcode = $address['postcode'];
 				$country = $address['country'];
 				$tel = $address['tel'];
-				$fax = $address['fax'];
 				$email = $address['EMAIL_ADDRESS'];
 
-				$a = [$title, $first, $surname, $company, $position, $street1, $street2, $street3, $town, $county, $postcode, $country, $tel, $fax, $email];
+				$a = [$title, $first, $surname, $company, $position, $street1, $street2, $street3, $town, $county, $postcode, $country, $tel, $email];
 				array_push($data, $a);
 			
-			$header = ['Title', 'First Name', 'Surname', 'Company', 'Position', 'Street1', 'Street2', 'Street3', 'Town', 'County', 'Postcode', 'Country', 'Tel', 'Fax', 'Email'];
+			$header = ['Title', 'First Name', 'Surname', 'Company', 'Position', 'Street1', 'Street2', 'Street3', 'Town', 'County', 'Postcode', 'Country', 'Tel', 'Email'];
 	
 			$this->setResponse($this->getResponse()->withDownload('customerrecord.csv'));
 			$this->set(compact('data'));

@@ -13,8 +13,19 @@ class PackagingDataTable extends Table {
         $this->setPrimaryKey('PackagingDataID');
     }
 
+	public function getAccBoxCount($pn, $cid) {
+    	$sql = "SELECT count(*) as n from exportlinks E, exportCollShowrooms S, packagindata pd where E.LinksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=$cid AND orderConfirmed='y' and E.purchase_no=:pn and E.componentID=9 join packagingdata oa on E.purchase_no=pd.purchase_no and pd.ComponentID=9 and (pd.PackedWith is null or pd.PackedWith = '0') and pd.purchase_no=:pn";
+    	$myconn = ConnectionManager::get('default');
+		$rs = $myconn->execute($sql, ['pn' => $pn]);
+		$count = 0;
+		foreach ($rs as $row) {
+			$count = $row['n'];
+		}
+		return $count;
+    }
+	
     public function getStandAloneAccessoriesCount($pn) {
-    	$sql = "select count(*) as n from packagingdata where purchase_no=:pn and componentid=9 and (packedwith is null or packedwith = '0')";
+    	$sql = "select count(*) as n from packagingdata pd join orderaccessory oa on pd.comppartno=oa.orderaccessory_id and componentid=9 and (packedwith is null or packedwith = '0') and oa.purchase_no=:pn";
     	$myconn = ConnectionManager::get('default');
 		$rs = $myconn->execute($sql, ['pn' => $pn]);
 		$count = 0;
@@ -30,7 +41,7 @@ class PackagingDataTable extends Table {
      */
     public function getAccessoriesSetsForBoxes($pn) {
     	$myconn = ConnectionManager::get('default');
-    	$sql = "select * FROM packagingdata pd join orderaccessory oa on pd.comppartno=oa.orderaccessory_id and pd.componentid=9 and (pd.packedwith is null or pd.packedwith='0') and oa.purchase_no=:pn";
+    	$sql = "select * FROM packagingdata pd join orderaccessory oa on pd.comppartno=oa.orderaccessory_id and pd.componentid=9 and (pd.packedwith is null or pd.packedwith='0') and oa.purchase_no=:pn join exportlinks k on oa.orderaccessory_id=k.AccID";
 		$rs = $myconn->execute($sql, ['pn' => $pn]);
 		$accessorySets = [];
 		$n = 0;
@@ -39,7 +50,9 @@ class PackagingDataTable extends Table {
 			$m = 0;
 			$rows[$m++] = $row;
 	    	$sql = "select * FROM packagingdata pd join orderaccessory oa on pd.comppartno=oa.orderaccessory_id and pd.componentid=9 and pd.packedwith=:pw and oa.purchase_no=:pn";
+			
 			$rs2 = $myconn->execute($sql, ['pw' => '9-'.$row['orderaccessory_id'], 'pn' => $pn]);
+			
 			foreach ($rs2 as $row2) {
 				$rows[$m++] = $row2;
 			}
@@ -47,6 +60,7 @@ class PackagingDataTable extends Table {
 			$accessorySets[$n] = $rows;
 			$n++;
 		}
+		
 		return $accessorySets;
     }
 
@@ -56,5 +70,13 @@ class PackagingDataTable extends Table {
 		$rs = $myconn->execute($sql, ['pn' => $pn, 'pw' => '9-'.$orderAccessoryId]);
 		return (count($rs) > 0);
     }
+
+	public function deletePackagingDataForComponent($pn, $compid) {
+		$myconn = ConnectionManager::get('default');
+    	$sql = "delete from packagingdata where Purchase_no=:pn and componentID=:compid";
+		$myconn->execute($sql, ['pn' => $pn, 'compid' => $compid]);
+		$sql = "update packagingdata set packedwith=null where packedwith=:compid and Purchase_no=:pn";
+		$myconn->execute($sql, ['pn' => $pn, 'compid' => $compid]);
+	}
 }
 ?>

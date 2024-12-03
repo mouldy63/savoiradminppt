@@ -353,6 +353,7 @@ class PrintPDFController extends SecureAppController {
 				};
 				if ($purchase['upholsteredbase'] != 'n' && !empty($purchase['upholsteredbase'])) {
 					$pageheight +=1;
+
 					$basedetails .= "<tr><td valign=top>Fabric Selection: <b>" .$purchase['basefabric'] ."</b></td>";
 					$basedetails .= "<td valign=top>Direction: <b>" .$purchase['basefabricdirection'] ."</b></td>";
 					$basedetails .= "<td valign=top>Description: <b>" .$purchase['basefabricchoice'] ."</b></td>";
@@ -541,8 +542,13 @@ class PrintPDFController extends SecureAppController {
 						$ordersummary .= "<td valign=top>&nbsp;</td></tr>";
 					}
 		};
-		
+		$uphbasewording='';
 		if ($purchase['baserequired'] == 'y') {
+			if ($purchase['upholsteredbase']=='Yes') {
+				$uphbasewording='Base Upholstery Charge, and Fabric';
+			} else if ($purchase['upholsteredbase']=='Yes, Com') {
+				$uphbasewording='Base and Upholstery Charge';
+			}
 		$ordersummary .= "<tr><td>Base</td>";
 		if (!$this->_userHasRole("NOPRICESUSER")) {	
 					$ordersummary .= "<td align=right valign=top><b>" .UtilityComponent::formatMoneyWithHtmlSymbol($purchase['baseprice'], $purchase['ordercurrency']) ."</b></td></tr>";
@@ -584,15 +590,22 @@ class PrintPDFController extends SecureAppController {
 		$upholsteryprice = intval($purchase['upholsteryprice'])+intval($purchase['basefabricprice'])+intval($purchase['valfabricprice'])+intval($purchase['valanceprice']);
 		
 		if (!empty($upholsteryprice)) {
-			$ordersummary .= "<tr><td>Base Upholstery & Fabric</td><td align=right><b>" .UtilityComponent::formatMoneyWithHtmlSymbol($upholsteryprice, $purchase['ordercurrency']) ."</b></td></tr>";
+			$ordersummary .= "<tr><td>".$uphbasewording."</td><td align=right><b>" .UtilityComponent::formatMoneyWithHtmlSymbol($upholsteryprice, $purchase['ordercurrency']) ."</b></td></tr>";
 		}
+		$hbwording='';
 		if ($purchase['headboardrequired'] == 'y') {
 			$headboardcost=$purchase['headboardprice'];
+			if ($purchase['hbfabricoptions']=='Savoir Supply') {
+				$hbwording='Headboard, including Fabric';
+			} else {
+				$hbwording='Headboard';
+			}
 			if ($purchase['hbfabricprice'] != null) {
 			$headboardcost=$purchase['headboardprice'] + $purchase['hbfabricprice'];
-			$ordersummary .= "<tr><td>Headboard, including Fabric</td>";
+			
+			$ordersummary .= "<tr><td>".$hbwording."</td>";
 			} else {
-			$ordersummary .= "<tr><td>Headboard</td>";
+			$ordersummary .= "<tr><td>".$hbwording."</td>";
 			}
 		if (!$this->_userHasRole("NOPRICESUSER")) {	
 					$ordersummary .= "<td align=right valign=top><b>" .UtilityComponent::formatMoneyWithHtmlSymbol($headboardcost, $purchase['ordercurrency']) ."</b></td></tr>";					

@@ -15,9 +15,9 @@ class RevenueTable extends Table {
         $this->setPrimaryKey('PURCHASE_No');
         $this->myconn = ConnectionManager::get('default');
         
-		$this->getRevenueQuery = "SELECT a.ORDER_DATE,a.ORDER_NUMBER,a.mattressrequired, a.topperrequired,a.baserequired,a.legsrequired,a.ordercurrency,a.vatrate, a.vat, a.total, a.completedorders, a.balanceoutstanding, a.purchase_no, ".
+		$this->getRevenueQuery = "SELECT a.ORDER_DATE,a.ORDER_NUMBER,a.mattressrequired, a.topperrequired,a.valancerequired,a.baserequired,a.legsrequired,a.ordercurrency,a.vatrate, a.vat, a.total, a.completedorders, a.balanceoutstanding, a.purchase_no, ".
 							"a.headboardrequired,a.accessoriesrequired, a.savoirmodel,a.basesavoirmodel,a.toppertype,a.deliverycharge,a.bedsettotal,a.discount,a.discounttype, a.ordercompletedDate, su.username, ".
-							"COALESCE(a.topperprice,0) AS topper_sum, COALESCE(a.mattressprice,0) AS mattr_sum, ".
+							"COALESCE(a.topperprice,0) AS topper_sum, COALESCE(a.valanceprice,0) AS valance_sum, COALESCE(a.mattressprice,0) AS mattr_sum, ".
 							"COALESCE(a.baseprice,0)+COALESCE(a.basetrimprice,0)+COALESCE(a.basedrawers,0)+COALESCE(a.basefabricprice,0)+ ".
 							"COALESCE(a.upholsteryprice,0) AS base_sum, COALESCE(a.hbfabricprice,0)+COALESCE(a.headboardprice,0)+".
 							"COALESCE(a.headboardtrimprice,0) AS hb_sum,COALESCE(a.legprice,0)+COALESCE(a.addlegprice,0) AS leg_sum,".
@@ -37,7 +37,7 @@ class RevenueTable extends Table {
 		$whereClause = $this->_whereClauseCreator($requirement);
 
 		$sql = sprintf($this->getRevenueQuery,$whereClause);
-        $raw = $this->myconn->execute($sql)->fetchAll('assoc');
+               $raw = $this->myconn->execute($sql)->fetchAll('assoc');
 		$stantardArray = $this->_stantardArrayCreator($raw);
 		return $stantardArray;
 	}
@@ -63,12 +63,12 @@ class RevenueTable extends Table {
         foreach ($raw as $r) {
             $temp['order date'] = date('Y-m-d', strtotime($r['ORDER_DATE']));
             if (!empty($r['production_completion_date'])) {
-                $temp['production completion date'] = date('Y-m-d', strtotime($r['production_completion_date']));
+            $temp['production completion date'] = date('Y-m-d', strtotime($r['production_completion_date']));
             } else {
 	            $temp['production completion date'] = '';
             }
             if (!empty($r['bookeddeliverydate'])) {
-                $temp['delivery date'] = date('Y-m-d', strtotime($r['bookeddeliverydate']));
+            $temp['delivery date'] = date('Y-m-d', strtotime($r['bookeddeliverydate']));
             } else {
 	            $temp['delivery date'] = '';
             }
@@ -82,9 +82,9 @@ class RevenueTable extends Table {
             $temp['order number'] = $r['ORDER_NUMBER'];
             $temp['surname'] = utf8_encode($r['surname']);
             if (!empty($r['companyname'])) {
-                $temp['company'] = utf8_encode($r['companyname']);
+            $temp['company'] = utf8_encode($r['companyname']);
             } else {
-                $temp['company'] = '';
+            $temp['company'] = '';
             }
             
             $temp['showroom'] = $r['location'];
@@ -128,6 +128,10 @@ class RevenueTable extends Table {
             $temp['no2 mattress'] = '';
             $temp['no3 mattress'] = '';
             $temp['no4 mattress'] = '';
+            $temp['no4v mattress'] = '';
+            $temp['no5 mattress'] = '';
+            $temp['french mattress'] = '';
+            $temp['state mattress'] = '';
             $temp['other mattress'] = '';
             if ($r['mattressrequired'] == 'y') {
                 $mattr_sum = round($r["mattr_sum"] / $afterVATRate, 2);
@@ -146,6 +150,18 @@ class RevenueTable extends Table {
                     case 'No. 4':
                         $temp['no4 mattress'] = $mattr_sum;
                         break;
+                    case 'No. 4v':
+                        $temp['no4v mattress'] = $mattr_sum;
+                        break;
+                    case 'No. 5':
+                        $temp['no5 mattress'] = $mattr_sum;
+                        break;
+                    case 'French Mattress':
+                        $temp['french mattress'] = $mattr_sum;
+                        break;
+                    case 'State':
+                        $temp['state mattress'] = $mattr_sum;
+                        break;
                     default:
                         $temp['other mattress'] = $mattr_sum;
                 }
@@ -154,7 +170,13 @@ class RevenueTable extends Table {
             $temp['no2 base'] = '';
             $temp['no3 base'] = '';
             $temp['no4 base'] = '';
+            $temp['no4v base'] = '';
+            $temp['no5 base'] = '';
             $temp['savoir slim base'] = '';
+            $temp['state base'] = '';
+            $temp['surround base'] = '';
+            $temp['pegboard'] = '';
+            $temp['platform base'] = '';
             $temp['other base'] = '';
             if ($r['baserequired'] == 'y') {
                 $base_sum = round($r["base_sum"] / $afterVATRate, 2);
@@ -172,8 +194,26 @@ class RevenueTable extends Table {
                     case 'No. 4':
                         $temp['no4 base'] = $base_sum;
                         break;
+                    case 'No. 4v':
+                        $temp['no4v base'] = $base_sum;
+                        break;
+                    case 'No. 5':
+                        $temp['no5 base'] = $base_sum;
+                        break;
                     case 'Savoir Slim':
                         $temp['savoir slim base'] = $base_sum;
+                        break;
+                    case 'State':
+                        $temp['state base'] = $base_sum;
+                        break;
+                    case 'Surround':
+                        $temp['surround base'] = $base_sum;
+                        break;
+                    case 'Pegboard':
+                        $temp['pegboard'] = $base_sum;
+                        break;
+                    case 'Platform Base':
+                        $temp['platform base'] = $base_sum;
                         break;
                     default:
                         $temp['other base'] = $base_sum;
@@ -182,6 +222,7 @@ class RevenueTable extends Table {
             $temp['hw topper'] = '';
             $temp['hca topper'] = '';
             $temp['cw topper'] = '';
+            $temp['cfv topper'] = '';
             if ($r['topperrequired'] == 'y') {
                 $topper_sum = round($r["topper_sum"] / $afterVATRate, 2);
                 $topper_sum = round($topper_sum * $tempDiscoutRate, 2);
@@ -195,8 +236,17 @@ class RevenueTable extends Table {
                     case 'CW Topper':
                         $temp['cw topper'] = $topper_sum;
                         break;
+                    case 'CFv Topper':
+                        $temp['cfv topper'] = $topper_sum;
+                        break;
                 }
             }
+            $temp['valance'] = '';
+            if ($r['valancerequired'] == 'y') {
+                $temp['valance'] = round($r["valance_sum"] / $afterVATRate, 2);
+                $temp['valance'] = round($temp['valance'] * $tempDiscoutRate, 2);
+            }
+
             $temp['headboard'] = '';
             if ($r['headboardrequired'] == 'y') {
                 $temp['headboard'] = round($r["hb_sum"] / $afterVATRate, 2);

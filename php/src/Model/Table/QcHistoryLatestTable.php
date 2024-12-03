@@ -27,7 +27,7 @@ class QcHistoryLatestTable extends Table {
     }
 	
 	public function getQCmadeat($compid, $pn) {
-    	$sql = "Select M.id_location, M.ManufacturedAt from qc_history_latest Q, manufacturedat M where Q.madeat=M.manufacturedatid AND Q.componentid=".$compid." AND purchase_no=".$pn ."";
+    	$sql = "Select M.id_location, M.ManufacturedAt, M.ManufacturedAtID from qc_history_latest Q, manufacturedat M where Q.madeat=M.manufacturedatid AND Q.componentid=".$compid." AND purchase_no=".$pn ."";
     	
 		$myconn = ConnectionManager::get('default');
 		return $myconn->execute($sql)->fetchAll('assoc');

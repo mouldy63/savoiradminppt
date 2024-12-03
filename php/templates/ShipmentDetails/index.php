@@ -3,7 +3,7 @@
 $dzType = 'export';
 ?>
 
-<div id="brochureform" class="brochure" style="background-color:#ffffff;">
+<div class="brochure" style="background-color:#ffffff;">
 <h1><br>Shipment Details</h1>
 <?php 
 $addedByName=getUsername($this->AuxiliaryData,$addedby);
@@ -38,6 +38,7 @@ $sid='';
 $sid=$row['shipper_ADDRESS_ID'];
 $lid='';
 $lid=$row['idLocation'];
+
 ?>
 <tr>
 <td align="left"><?= $row['location'] ?></td>
@@ -54,8 +55,13 @@ $lid=$row['idLocation'];
 <?php endforeach; ?>
 <tr><td colspan="9"><hr></tr>
 </tbody>
-</table>            
-<h1>Order Details</h1>
+</table>     
+<form name="form1" method="post" action="/php/ShipmentDetails/mergeinvoices">   
+<input type="hidden" name="location" id="location" value="<?= $location ?>" />
+<input type="hidden" name="id" id="id" value="<?= $cid ?>" />
+<h1>Order Details</h1> <input type="submit" name="submit1" id="submit" value="MERGE INVOICES" class="mergebutton"><span class="question-mark">?</span>
+<div class="mergetooltip">To merge invoices, allocate the invoices you want to merge by entering the number into the boxes in the column below, and then press merge invoices.  For example all the 1’s  will merge those invoices together, all the 2’s will merge together</div>
+
 <table width="99%" border = "0" cellpadding = "6" cellspacing = "1" align="center">
 <tbody>
 <tr>
@@ -233,7 +239,10 @@ foreach ($orders as $row): ?>
     <td align="right" valign="top"><?php echo $this->MyForm->formatMoneyWithSymbol($exporttotal , $row['ordercurrency']) ?></td>
   
      <td align="right" valign="top"><?= $totalitems ?></td>
-      <td valign="top" align="right"><a href="/php/CommercialInvoice.pdf?wholesale=n&sid=<?= $sid ?>&items=<?= $totalitems ?>&loc=<?= $lid ?>&cid=<?= $cid ?>&pno=<?= $row['purchase_no'] ?>">Retail</a>|<a href="/php/CommercialInvoice.pdf?wholesale=y&sid=<?= $sid ?>&items=<?= $totalitems ?>&loc=<?= $lid ?>&cid=<?= $cid ?>&pno=<?= $row['purchase_no'] ?>">Wholesale</a></td>
+      <td valign="top" align="right">
+		<?php if ($row['MergedCI']) { ?>
+		<a href="/php/MergedCommercialInvoice.pdf?wholesale=n&sid=<?= $sid ?>&items=<?= $totalitems ?>&loc=<?= $lid ?>&cid=<?= $cid ?>&pno=<?= $row['purchase_no'] ?>&merge=<?= $row['MergedCI'] ?>">Retail</a><?php } else { ?><a href="/php/CommercialInvoice.pdf?wholesale=n&sid=<?= $sid ?>&items=<?= $totalitems ?>&loc=<?= $lid ?>&cid=<?= $cid ?>&pno=<?= $row['purchase_no'] ?>">Retail</a>&nbsp;<?php } ?>|<a href="/php/CommercialInvoice.pdf?wholesale=y&sid=<?= $sid ?>&items=<?= $totalitems ?>&loc=<?= $lid ?>&cid=<?= $cid ?>&pno=<?= $row['purchase_no'] ?>">Wholesale</a>&nbsp;<input type="text" id="XX_<?= $row['purchase_no'] ?>" name="XX_<?= $row['purchase_no'] ?>" maxlength="2" size="1" value="<?= $row['MergedCI'] ?>" />
+	</td>
       <td  valign="top" align="right">
       <?php
       echo getWholesaleNo($this->AuxiliaryData,$row['purchase_no']);
@@ -248,7 +257,7 @@ foreach ($orders as $row): ?>
 </tr>
 </tbody>
 </table>            
-  
+</form>
 
 </div>
 
@@ -342,6 +351,16 @@ function changeFormAction(formId, newAction) {
 function sortby(sortVal) {
 	window.location.href = "/php/PlannedExports?sortorder=" + sortVal;
 } 
+$(document).ready(function() {
+    $('.question-mark').hover(function(e) {
+        $('.mergetooltip').css({
+            top: e.pageY + 10 + 'px',
+            left: e.pageX - 80 + 'px'
+        }).fadeIn(200);
+    }, function() {
+        $('.mergetooltip').fadeOut(200);
+    });
+});
 </script>
 
 

@@ -175,58 +175,58 @@ if ($quote=='y') {
     <?php  } ?>
 
 <div class="container">
-	<div class="row">
+	<div class="row col-md-12">
         <div class="col-sm-4">
                 
-            <div class="col-md-12">    
+            
                 <p class="ordertxt1"><?=$orderwording?> No: <?php if (isset($purchase['ORDER_NUMBER'])) {
                     echo $purchase['ORDER_NUMBER'];
                 } else {
                     echo 'TBA';
                 } ?></p>
-                <p class="ordertxt1" >Date: <input type="text" name="orderdate" id="orderdate" value="<?=$orderdate ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >Customer Ref: <input type="text" name="customerref" id="customerref" value="<?=$customerreference ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Client's Title: <input type="text" name="title" id="title" value="<?=$contactdetails['title'] ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >First Name: <input type="text" name="first" id="first" value="<?=$contactdetails['first'] ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >Surname: <input type="text" name="surname" id="surname" value="<?=$contactdetails['surname'] ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >Tel Home: <input type="text" name="telhome" id="telhome" value="<?=$contactdetails['tel'] ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >Tel Work: <input type="text" name="telwork" id="telwork" value="<?=$contactdetails['telwork'] ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >Mobile: <input type="text" name="mobile" id="mobile" value="<?=$contactdetails['mobile'] ?>" readonly class="partonefield" /></p>
-                <p class="ordertxt1" >Email Address: <input type="text" name="email" id="email" value="<?=$contactdetails['EMAIL_ADDRESS'] ?>" readonly class="partonefield" /></p>
+                <p class="ordertxt1" >Date: <input type="text" name="orderdate" id="orderdate" value="<?=$orderdate ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Customer Ref: <input type="text" name="customerref" id="customerref" value="<?=$customerreference ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Client's Title: <input type="text" name="title" id="title" value="<?=$contactdetails['title'] ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >First Name: <input type="text" name="first" id="first" value="<?=$contactdetails['first'] ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Surname: <input type="text" name="surname" id="surname" value="<?=$contactdetails['surname'] ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Tel Home: <input type="text" name="telhome" id="telhome" value="<?=$contactdetails['tel'] ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Tel Work: <input type="text" name="telwork" id="telwork" value="<?=$contactdetails['telwork'] ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Mobile: <input type="text" name="mobile" id="mobile" value="<?=$contactdetails['mobile'] ?>" readonly class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Email Address: <input type="text" name="email" id="email" value="<?=$contactdetails['EMAIL_ADDRESS'] ?>" readonly class="partonefield" style="width:70%" /></p>
                 <p class="ordertxt1" ><?=$vatWording ?>(%): 
-                <select name="vatrates" id="vatrates" style="width:138px;" class="partonefield xview">
+                <select name="vatrates" id="vatrates" style="width:70%;" class="partonefield xview">
                     <?php foreach ($vatrates as $row): ?>               
                     <option value="<?php echo $row['vatrate'] ?>" <?= $row['vatrate']==$partOneFormData['vatrate'] ? 'selected':'' ?> ><?php echo $row['vatrate'] ?> </option>
                     <?php endforeach; ?>
                 </select>
                 </p>
                 <p class="ordertxt1" >Wrap Type: 
-                <select name="wrappingtype" id="wrappingtype" style="width:138px;" class="partonefield">
+                <select name="wrappingtype" id="wrappingtype" style="width:70%;" class="partonefield">
                     <?php foreach ($wrappingtypes as $row): ?>               
                     <option value="<?php echo $row['WrappingID'] ?>" <?= $row['WrappingID']==$partOneFormData['wrappingtype'] ? 'selected':'' ?>><?php echo $row['Wrap']  ?> </option>
                     <?php endforeach; ?>
                 </select></p>
-                <p class="ordertxt1" >Select Order Type: 
-                <select name="ordertype" id="ordertype" style="width:138px;" class="partonefield">
+                <p class="ordertxt1" >Order Type: 
+                <select name="ordertype" id="ordertype" style="width:70%;" class="partonefield">
                     <?php foreach ($ordertype as $row): ?>               
                     <option value="<?php echo $row['ordertypeID'] ?>" <?= $row['ordertypeID']==$partOneFormData['ordertype'] ? 'selected':'' ?>><?php echo $row['ordertype'] ?> </option>
                     <?php endforeach; ?>
                 </select></p>
                 
                 
-            </div>
+           
         </div>    
         <div class="col-sm-4">
-            <div class="col-md-12">    
+           
                 <h5 class="card-title">Invoice Address</h5>
-                <p class="ordertxt1" >Line 1: <input type="text" name="add1" id="add1" value="<?=$contactdetails['street1'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Line 2: <input type="text" name="add2" id="add2" value="<?=$contactdetails['street2'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Line 3: <input type="text" name="add3" id="add3" value="<?=$contactdetails['street3'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Town: <input type="text" name="town" id="town" value="<?=$contactdetails['town'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >County: <input type="text" name="county" id="county" value="<?=$contactdetails['county'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Postcode: <input type="text" name="postcode" id="postcode" value="<?=$contactdetails['postcode'] ?>" class="partonefield" maxlength="20" /></p>
+                <p class="ordertxt1" >Line 1: <input type="text" name="add1" id="add1" value="<?=$contactdetails['street1'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Line 2: <input type="text" name="add2" id="add2" value="<?=$contactdetails['street2'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Line 3: <input type="text" name="add3" id="add3" value="<?=$contactdetails['street3'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Town: <input type="text" name="town" id="town" value="<?=$contactdetails['town'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >County: <input type="text" name="county" id="county" value="<?=$contactdetails['county'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Postcode: <input type="text" name="postcode" id="postcode" value="<?=$contactdetails['postcode'] ?>" class="partonefield" maxlength="20" style="width:70%" /></p>
                 <p class="ordertxt1" >Country: 
-                <select name="country" id="country" style="width:138px;" class="partonefield">
+                <select name="country" id="country" style="width:70%;" class="partonefield">
                     <?php foreach ($countrylist as $row): 
                         $slcted='';
                         if ($contactdetails['country']==$row['country']) {
@@ -236,10 +236,10 @@ if ($quote=='y') {
                     <option value="<?php echo $row['country'] ?>" <?=$slcted ?> ><?php echo $row['country'] ?> </option>
                     <?php endforeach; ?>
                 </select></p>
-                <p class="ordertxt1" >Company: <input type="text" name="company" id="company" value="<?=$contactdetails['company'] ?>" class="partonefield" /></p>
+                <p class="ordertxt1" >Company: <input type="text" name="company" id="company" value="<?=$contactdetails['company'] ?>" class="partonefield" style="width:70%" /></p>
                 <?php 
                 if ($userregion == 1 && $overseas == '') { ?>
-                <p class="ordertxt1">Approx. Delivery Date: <select id = "deldate" name = "deldate" class="partonefield">
+                <p class="ordertxt1">Approx. Delivery Date: <select id = "deldate" name = "deldate" class="partonefield" style="width:70%;">
                     <?php foreach (array_keys($approxDateOptions['vals']) as $datekey) { 
                         $select='';
                         if ($datekey == $approxDateOptions['def']) {
@@ -257,18 +257,18 @@ if ($quote=='y') {
                     <?php endforeach; ?>
                 </select></p>
                 <?php } ?>
-            </div>
+            
         </div>
         <div class="col-sm-4 gx-5" >
-            <div class="col-md-12">    
+             
                 <h5 class="card-title">Delivery Address (<a href= "#" onclick = "cleardeliveryaddress(); return false;"></a>)</h5>
-                <p class="ordertxt1" >Line 1: <input type="text" name="deladd1" id="deladd1" value="<?=$partOneFormData['deladd1'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Line 2: <input type="text" name="deladd2" id="deladd2" value="<?=$partOneFormData['deladd2'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Line 3: <input type="text" name="deladd3" id="deladd3" value="<?=$partOneFormData['deladd3'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Town: <input type="text" name="deltown" id="deltown" value="<?=$partOneFormData['deladdtown'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >County: <input type="text" name="delcounty" id="delcounty" value="<?=$partOneFormData['deladdcounty'] ?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Postcode: <input type="text" name="delpostcode" id="delpostcode" maxlength="20" value="<?=$partOneFormData['deladdpostcode']?>" class="partonefield" /></p>
-                <p class="ordertxt1" >Country: <select name="delcountry" id="delcountry" style="width:138px;" class="partonefield">
+                <p class="ordertxt1" >Line 1: <input type="text" name="deladd1" id="deladd1" value="<?=$partOneFormData['deladd1'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Line 2: <input type="text" name="deladd2" id="deladd2" value="<?=$partOneFormData['deladd2'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Line 3: <input type="text" name="deladd3" id="deladd3" value="<?=$partOneFormData['deladd3'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Town: <input type="text" name="deltown" id="deltown" value="<?=$partOneFormData['deladdtown'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >County: <input type="text" name="delcounty" id="delcounty" value="<?=$partOneFormData['deladdcounty'] ?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Postcode: <input type="text" name="delpostcode" id="delpostcode" maxlength="20" value="<?=$partOneFormData['deladdpostcode']?>" class="partonefield" style="width:70%" /></p>
+                <p class="ordertxt1" >Country: <select name="delcountry" id="delcountry" style="width:70%;" class="partonefield">
                     <?php foreach ($countrylist as $row): 
                         $slcted='';
                         if ($partOneFormData['deladdcountry']==$row['country']) {
@@ -283,27 +283,27 @@ if ($quote=='y') {
                     <option value="<?php echo $row['typename'] ?>" <?= $this->MyForm->setSelectedByKey($phoneNumbers, [1, 'phonenumbertype'], $row['typename'])?> ><?php echo $row['typename'] ?> </option>
                     <?php endforeach; ?>
                 </select><br>
-                Contact No 1: <input type="text" name="delContact1" id="delContact1" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [1,'number'])?>" class="partonefield" /></p>
+                Contact No 1: <input type="text" name="delContact1" id="delContact1" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [1,'number'])?>" class="partonefield" style="width:70%;" /></p>
                 <p class="ordertxt1" ><select name="delphonetype2" id="delphonetype2" class="partonefield">
                     <?php foreach ($phonenoTypes as $row): ?>               
                     <option value="<?php echo $row['typename'] ?>" <?= $this->MyForm->setSelectedByKey($phoneNumbers, [2, 'phonenumbertype'], $row['typename'])?> ><?php echo $row['typename'] ?> </option>
                     <?php endforeach; ?>
                 </select><br>
-                Contact No 2: <input type="text" name="delContact2" id="delContact2" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [2,'number'])?>" class="partonefield" /></p>
+                Contact No 2: <input type="text" name="delContact2" id="delContact2" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [2,'number'])?>" class="partonefield" style="width:70%;" /></p>
                 <p class="ordertxt1" ><select name="delphonetype3" id="delphonetype3" class="partonefield">
                     <?php foreach ($phonenoTypes as $row): ?>               
                     <option value="<?php echo $row['typename'] ?>" <?= $this->MyForm->setSelectedByKey($phoneNumbers, [3, 'phonenumbertype'], $row['typename'])?>><?php echo $row['typename'] ?> </option>
                     <?php endforeach; ?>
                 </select><br>
-                Contact No 3: <input type="text" name="delContact3" id="delContact3" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [3,'number'])?>" class="partonefield" /></p>
+                Contact No 3: <input type="text" name="delContact3" id="delContact3" value="<?=$this->MyForm->safeArrayGet($phoneNumbers, [3,'number'])?>" class="partonefield" style="width:70%;" /></p>
                 <p class="ordertxt1" >Production Date: <input style="width:128px" type="text" name="productiondate" id="productiondate" value="" readonly class="partonefield" />&nbsp;<a  href= "#" onclick = "clearproductiondate(); return false;">X</a></p>
-                <p class="ordertxt1" >Booked Delivery Date: <input style="width:128px" type="text" name="bookeddeldate" id="bookeddeldate" value="" readonly class="partonefield" />&nbsp;<a href= "#" onclick = "clearbookeddeldate(); return false;">X</a></p>
+                <p class="ordertxt1" >Booked Delivery Date: <input style="width:128px" type="text" name="bookeddeldate" id="bookeddeldate" value="" readonly class="partonefield  />&nbsp;<a href= "#" onclick = "clearbookeddeldate(); return false;"> X</a></p>
                 <p class="ordertxt1" >Order Currency: <select name="currency" id="currency" style="width:139px" class="partonefield">
                     <?php foreach ($currencylist as $row): ?>               
                     <option value="<?php echo $row ?>" <?= $row==$partOneFormData['currency'] ? 'selected':'' ?>><?php echo $row ?> </option>
                     <?php endforeach; ?>
                 </select></p>
-            </div>       
+                
         </div>
     </div>
     <?php if ($savoirowned=='y') {?>

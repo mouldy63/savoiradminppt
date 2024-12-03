@@ -191,7 +191,7 @@ class ServicesController extends AppController {
         $this->viewBuilder()->setLayout('ajax');
     	set_time_limit(180); // as this can take a while to run
     	
-	 $this->CAMERAIMAGEUPLOADPATH = $_SERVER["DOCUMENT_ROOT"] . "/cameraimageuploads";
+	 	$this->CAMERAIMAGEUPLOADPATH = $_SERVER["DOCUMENT_ROOT"] . "/cameraimageuploads";
     
     	$list = scandir($this->CAMERAIMAGEUPLOADPATH);
 		foreach($list as $file) {
@@ -208,8 +208,9 @@ class ServicesController extends AppController {
     
     function _doCameraImageUpload($fileName) {
     
-    	
+    	debug($fileName);
     	$temp = explode(".", $fileName);
+		debug($temp);
     	if (strtolower($temp[1]) == "jpg" || strtolower($temp[1]) == "jpeg") {
     		$mimeType = "image/jpeg";
     	} else if (strtolower($temp[1]) == "png") {
@@ -221,20 +222,37 @@ class ServicesController extends AppController {
     		return false;
     	}
     	
+		debug($mimeType);
     	$delimiter = "-";
-    	if (strrpos($temp[0], "_") !== false) {
-	    	$delimiter = "_";
-    	}
-   		echo "<br>Trying delimiter: " . $delimiter;
-    	
-    	$vals = explode($delimiter, $temp[0]);
-    	
-    	if (count($vals) < 1) {
-    		echo "<br>Invalid file name: " . $fileName;
-    		return false;
-    	}
+		$orderNumber = null;
+		echo "MBASE: " . substr($temp[0], 0, 6);
 
-	$orderNumber = $vals[0];
+		if (substr($temp[0], 0, 6) === '!MBASE') {
+			// gopro image file name format
+			if (preg_match('/^!MBASE(\d+)/', $temp[0], $matches)) {
+				$orderNumber = $matches[1];
+				echo "Purchase number: " . $orderNumber;
+			} else {
+				echo "Gopro purchase number not found in " . $fileName;
+				return false;
+			}
+		} else {
+			// old camera image file name format
+			if (strrpos($temp[0], "_") !== false) {
+				$delimiter = "_";
+			}
+			   echo "<br>Trying delimiter: " . $delimiter;
+			
+			$vals = explode($delimiter, $temp[0]);
+			
+			if (count($vals) < 1) {
+				echo "<br>Invalid file name: " . $fileName;
+				return false;
+			}
+			$orderNumber = $vals[0];
+		}
+
+
     	echo "<br>orderNumber=$orderNumber";
 
     	$purchaseRow = $this->Purchase->find('all', array('conditions'=> array('ORDER_NUMBER' => $orderNumber)))->toArray();
@@ -254,11 +272,11 @@ class ServicesController extends AppController {
 
         	$purchaseRow = $this->Purchase->find('all', array('conditions'=> array('ORDER_NUMBER' => $orderNumber)))->toArray();
         	if (count($purchaseRow) != 1) {
-    		echo "<br>Incorrect number of rows found: " . count($purchaseRow);
-    		return false;
+    			echo "<br>Incorrect number of rows found: " . count($purchaseRow);
+    			return false;
+    		}
     	}
-    	}
-	$pn = $purchaseRow[0]['PURCHASE_No'];
+		$pn = $purchaseRow[0]['PURCHASE_No'];
     	echo "<br>pn=$pn";
     	echo "<br>date=".date("Y/m/d h:i:sa");
     	

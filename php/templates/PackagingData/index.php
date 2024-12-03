@@ -38,7 +38,7 @@
 </table>
 
 
-<p><a href="add-component-data.asp">Add new product</a></p></div>
+<p><a href="/php/packagingdata/add">Add new product</a></p></div>
 <form name="form1" method="post" action="packagingdata/edit">
 <div class="TabbedPanelsContent">
 

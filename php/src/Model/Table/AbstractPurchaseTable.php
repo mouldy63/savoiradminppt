@@ -207,7 +207,7 @@ class AbstractPurchaseTable extends Table {
 			if ($key == "mattresswidth" && $oldValue == "Special Width") {
 				$query = "SELECT matt1width,matt2width FROM  productionsizes where purchase_no=$pn";
 				$rs = $myconn->execute($query)->fetchAll('assoc');
-				foreach ($results as $row) {
+				foreach ($rs as $row) {
 					$newValue = $row["matt1width"] . "cm";
 					if (isset($row["matt2width"])) {
 						$newValue .= " &amp; " . $row["matt2width"] . "cm";
@@ -219,7 +219,7 @@ class AbstractPurchaseTable extends Table {
 			if ($key == "basewidth" && $oldValue == "Special Width") {
 				$query = "SELECT base1width,base2width FROM  productionsizes where purchase_no=$pn";
 				$rs = $myconn->execute($query)->fetchAll('assoc');
-				foreach ($results as $row) {
+				foreach ($rs as $row) {
 					$newValue = $row["base1width"] . "cm";
 					if (isset($row["base2width"])) {
 						$newValue .= " &amp; " . $row["base2width"] . "cm";
@@ -231,7 +231,7 @@ class AbstractPurchaseTable extends Table {
 			if ($key == "topperwidth" && $oldValue == "Special Width") {
 				$query = "SELECT topper1width FROM  productionsizes where purchase_no=$pn";
 				$rs = $myconn->execute($query)->fetchAll('assoc');
-				foreach ($results as $row) {
+				foreach ($rs as $row) {
 					$newValue = $row["topper1width"] . "cm";
 				}
 			}
@@ -313,8 +313,8 @@ class AbstractPurchaseTable extends Table {
     }
     
     public function getRevenueException($showroom,$monthfrom,$monthto) {
-		$sql = "Select P.ORDER_DATE, P.ORDER_NUMBER, P.PURCHASE_No, P.bookeddeliverydate, P.production_completion_date, C.surname, A.company, L.adminheading, P.ordercurrency, P.discount, P.vatrate, P.vat, P.total, P.bedsettotal, P.discounttype, P.balanceoutstanding, P.mattressrequired, P.savoirmodel, P.mattressprice, P.baserequired, P.basesavoirmodel, P.baseprice, P.topperrequired, P.toppertype, P.topperprice, P.headboardrequired, P.headboardprice, P.legprice, P.legsrequired, P.accessoriesrequired, P.accessoriestotalcost, P.deliverycharge, P.completedorders, ";
-		$sql .= "COALESCE(P.topperprice,0) AS topper_sum, COALESCE(P.mattressprice,0) AS mattr_sum, ";
+		$sql = "Select P.ORDER_DATE, P.ORDER_NUMBER, P.PURCHASE_No, P.bookeddeliverydate, P.production_completion_date, C.surname, A.company, L.adminheading, P.ordercurrency, P.discount, P.vatrate, P.vat, P.total, P.bedsettotal, P.discounttype, P.balanceoutstanding, P.mattressrequired, P.savoirmodel, P.mattressprice, P.baserequired, P.basesavoirmodel, P.baseprice, P.topperrequired, P.toppertype, P.topperprice, P.valancerequired, P.valanceprice, P.headboardrequired, P.headboardprice, P.legprice, P.legsrequired, P.accessoriesrequired, P.accessoriestotalcost, P.deliverycharge, P.completedorders, ";
+		$sql .= "COALESCE(P.topperprice,0) AS topper_sum, COALESCE(P.valanceprice,0) AS valance_sum, COALESCE(P.mattressprice,0) AS mattr_sum, ";
 		$sql .= "COALESCE(P.baseprice,0)+COALESCE(P.basetrimprice,0)+COALESCE(P.basedrawers,0)+COALESCE(P.basefabricprice,0)+ ";
 		$sql .= "COALESCE(P.upholsteryprice,0) AS base_sum, COALESCE(P.hbfabricprice,0)+COALESCE(P.headboardprice,0)+";
 		$sql .= "COALESCE(P.headboardtrimprice,0) AS hb_sum,COALESCE(P.legprice,0)+COALESCE(P.addlegprice,0) AS leg_sum,";

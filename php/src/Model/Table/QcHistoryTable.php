@@ -13,5 +13,12 @@ class QcHistoryTable extends AbstractQcHistoryTable {
         $this->belongsTo('QcStatus')->setForeignKey('QC_StatusID')->setJoinType('LEFT')->setBindingKey('QC_statusID');
     }
 
+    public function getQCCompData($compid, $pn) {
+    	$sql = "Select * from qc_history WHERE purchase_no=".$pn ." AND componentid=" .$compid ." order by QC_Date desc";
+    	
+		$myconn = ConnectionManager::get('default');
+		return $myconn->execute($sql)->fetchAll('assoc');
+    }
+
 }
 ?>

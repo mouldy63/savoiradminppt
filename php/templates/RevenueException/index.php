@@ -61,7 +61,7 @@ $( "#monthto" ).datepicker( "option", "dateFormat", "dd/mm/yy" );
 <?php if (isset($allData)) {  ?>  
 <div id="table-area">
 <table cellspacing="2" cellpadding="2" class="tablebd" style="overflow-x:auto;">
-<tr style="font-weight:bold;"><td>&nbsp;order&nbsp;date&nbsp;</td><td>production completion date</td><td>completed orders</td><td>delivery&nbsp;date</td><td>order number</td><td>surname</td><td>company</td><td>showroom</td><td>currency</td><td>discount</td><td>discountpercent</td><td>vat</td><td>vat rate</td><td>total</td><td>total after discount</td><td>total inc VAT</td><td>balance outstanding</td><td>payments</td><td>refunds</td><td>no1 mattress</td><td>no2 mattress</td><td>no3 mattress</td><td>no4 mattress</td><td>no4v mattress</td><td>other mattress</td><td>no1 base</td><td>no2 base</td><td>no3 base</td><td>no4 base</td><td>no4v base</td><td>savoir slim base</td><td>other base</td><td>hw topper</td><td>hca topper</td><td>cw topper</td><td>cfv topper</td><td>headboard</td><td>leg</td><td>accessories</td><td>delivery</td></tr>
+<tr style="font-weight:bold;"><td>&nbsp;order&nbsp;date&nbsp;</td><td>production completion date</td><td>completed orders</td><td>delivery&nbsp;date</td><td>order number</td><td>surname</td><td>company</td><td>showroom</td><td>currency</td><td>discount</td><td>discountpercent</td><td>vat</td><td>vat rate</td><td>total</td><td>total after discount</td><td>total inc VAT</td><td>balance outstanding</td><td>payments</td><td>refunds</td><td>no1 mattress</td><td>no2 mattress</td><td>no3 mattress</td><td>no4 mattress</td><td>no4v mattress</td><td>no5 mattress</td><td>french mattress</td><td>state mattress</td><td>other mattress</td><td>no1 base</td><td>no2 base</td><td>no3 base</td><td>no4 base</td><td>no4v base</td><td>no5 base</td><td>savoir slim base</td><td>pegboard</td><td>platform base</td><td>State base</td><td>Surround base</td><td>other base</td><td>hw topper</td><td>hca topper</td><td>cw topper</td><td>cfv topper</td><td>valance</td><td>headboard</td><td>leg</td><td>accessories</td><td>delivery</td></tr>
 
 <?php foreach ($allData as $row):
 $afterVATRate = 1;
@@ -77,6 +77,9 @@ $matt2='';
 $matt3='';
 $matt4='';
 $matt4v='';
+$matt5='';
+$frenchmatt='';
+$statematt='';
 $mattO='';
 $DiscoutRate=1;
 $baseprice='';
@@ -85,13 +88,19 @@ $base2='';
 $base3='';
 $base4='';
 $base4v='';
+$base5='';
 $baseS='';
+$basepeg='';
+$baseplatform='';
+$basestate='';
+$basesurround='';
 $baseO='';
 $hw='';
 $hca='';
 $cw='';
 $cfv='';
 $topperprice='';
+$valance='';
 $headboardprice='';
 $legprice='';
 $accprice='';
@@ -136,6 +145,15 @@ if (!empty($row['discount'])) {
 		case 'No. 4v':
 			$matt4v = $mattprice;
 			break;
+		case 'No. 5':
+			$matt5 = $mattprice;
+			break;
+		case 'French Mattress':
+			$frenchmatt = $mattprice;
+			break;
+		case 'State':
+			$statematt = $mattprice;
+			break;
 		default:
 			$mattO = $mattprice;
 	}
@@ -160,8 +178,23 @@ if ($row['baserequired'] == 'y') {
 		case 'No. 4v':
 			$base4v = $baseprice;
 			break;
+		case 'No. 5':
+			$base5 = $baseprice;
+			break;
 		case 'Savoir Slim':
 			$baseS = $baseprice;
+			break;
+		case 'Pegboard':
+			$basepeg = $baseprice;
+			break;
+		case 'Platform Base':
+			$baseplatform = $baseprice;
+			break;
+		case 'State':
+			$basestate = $baseprice;
+			break;
+		case 'Surround':
+			$basesurround = $baseprice;
 			break;
 		default:
 			$baseO = $baseprice;
@@ -174,19 +207,26 @@ if ($row['topperrequired'] == 'y') {
 
 	switch ($row["toppertype"]) {
 		case 'HW Topper':
-			$hw = $baseprice;
+			$hw = $topperprice;
 			break;
 		case 'HCa Topper':
-			$hca = $baseprice;
+			$hca = $topperprice;
 			break;
 		case 'CW Topper':
-			$cw = $baseprice;
+			$cw = $topperprice;
 			break;
 		case 'CFv Topper':
-			$cfv = $baseprice;
+			$cfv = $topperprice;
 			break;
 	}
 }
+
+if ($row['valancerequired'] == 'y') {
+	$valanceprice = round($row["valance_sum"] / $afterVATRate, 2);
+	$valanceprice = round($valanceprice * $DiscoutRate, 2);
+			$valance = $valanceprice;
+}
+
  if ($row['headboardrequired'] == 'y') {
 	$headboardprice = round($row["hb_sum"] / $afterVATRate, 2);
 	$headboardprice = round($headboardprice * $tempDiscoutRate, 2);
@@ -222,7 +262,7 @@ $productioncompletiondate=null;
 $productioncompletiondate=date('d-m-Y', strtotime($row['production_completion_date']));
 }
 ?>
-<tr class="userrow"><td><?= $orderdate ?></td><td><?= $productioncompletiondate ?></td><td><?= $completedorders ?></td><td><?= $bookeddelivery ?></td><td><?= "<a href='/orderdetails.asp?pn=".$row['PURCHASE_No']."' target='_blank'>".$row['ORDER_NUMBER']."</a>"?></td><td> <?=$row['surname']?></td><td><?=$row['company']?></td><td><?=$row['adminheading']?></td><td><?=$row['ordercurrency']?></td><td><?= $discount ?></td><td><?= $discountPercent ?></td><td><?=$row['vat']?></td><td><?=$row['vatrate']?></td><td><?= $bedsettotal ?></td><td><?= $totalafterdiscount ?></td><td><?=$row['total']?></td><td><?=$row['balanceoutstanding']?></td><td><?=$row['payments']?></td><td><?=$row['refunds']?></td><td><?= $matt1 ?></td><td><?= $matt2 ?></td><td><?= $matt3 ?></td><td><?= $matt4 ?></td><td><?= $matt4v ?></td><td><?= $mattO ?></td><td><?= $base1 ?></td><td><?= $base2 ?></td><td><?= $base3 ?></td><td><?= $base4 ?></td><td><?= $base4v ?></td><td><?= $baseS ?></td><td><?= $baseO ?></td><td><?= $hw ?></td><td><?= $hca ?></td><td><?= $cw ?></td><td><?= $cfv ?></td><td><?= $headboardprice ?></td><td><?= $legprice ?></td><td><?= $accprice ?></td><td><?= $deliveryprice ?></td></tr>
+<tr class="userrow"><td><?= $orderdate ?></td><td><?= $productioncompletiondate ?></td><td><?= $completedorders ?></td><td><?= $bookeddelivery ?></td><td><?= "<a href='/orderdetails.asp?pn=".$row['PURCHASE_No']."' target='_blank'>".$row['ORDER_NUMBER']."</a>"?></td><td> <?=$row['surname']?></td><td><?=$row['company']?></td><td><?=$row['adminheading']?></td><td><?=$row['ordercurrency']?></td><td><?= $discount ?></td><td><?= $discountPercent ?></td><td><?=$row['vat']?></td><td><?=$row['vatrate']?></td><td><?= $bedsettotal ?></td><td><?= $totalafterdiscount ?></td><td><?=$row['total']?></td><td><?=$row['balanceoutstanding']?></td><td><?=$row['payments']?></td><td><?=$row['refunds']?></td><td><?= $matt1 ?></td><td><?= $matt2 ?></td><td><?= $matt3 ?></td><td><?= $matt4 ?></td><td><?= $matt4v ?></td><td><?= $matt5 ?></td><td><?= $frenchmatt ?></td><td><?= $statematt ?></td><td><?= $mattO ?></td><td><?= $base1 ?></td><td><?= $base2 ?></td><td><?= $base3 ?></td><td><?= $base4 ?></td><td><?= $base4v ?></td><td><?= $base5 ?></td><td><?= $baseS ?></td><td><?= $basepeg ?></td><td><?= $baseplatform ?></td><td><?= $basestate ?></td><td><?= $basesurround ?></td><td><?= $baseO ?></td><td><?= $hw ?></td><td><?= $hca ?></td><td><?= $cw ?></td><td><?= $cfv ?></td><td><?= $valance ?></td><td><?= $headboardprice ?></td><td><?= $legprice ?></td><td><?= $accprice ?></td><td><?= $deliveryprice ?></td></tr>
 <?php endforeach; ?>
 </table>
 </div>

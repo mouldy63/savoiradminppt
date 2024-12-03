@@ -155,36 +155,36 @@
     </div>
         <div class="form-group col-sm-8">
             <label for="headboardfabric">Headboard Fabric Company:</label><br>
-            <input name = "headboardfabric"style="width:95%" value = "<?= $purchase['headboardfabric'] ?>" class="form-control form-control-sm headboardfield" type = "text" id = "headboardfabric" maxlength = "50"  >
+            <input name = "headboardfabric"style="width:95%" value = "<?= $purchase['headboardfabric'] ?>" class="headboardfield" type = "text" id = "headboardfabric" maxlength = "50"  >
         </div>
         
     </div>
     <div class="form-row">
     <div class="form-group col-sm-2">
             <label for="hbfabricmeters">Fabric Quantity (meters):</label><br> 
-            <input name = "hbfabricmeters" value = "<?= $purchase['hbfabricmeters'] ?>" class="form-control form-control-sm headboardfield" type = "number" id = "hbfabricmeters" size = "15" placeholder="0"oninput="calcHBFabricPrice()">
+            <input name = "hbfabricmeters" value = "<?= $purchase['hbfabricmeters'] ?>" class="headboardfield" type = "number" id = "hbfabricmeters" size = "15" placeholder="0"oninput="calcHBFabricPrice()">
             </div>
         <div class="form-group col-sm-2">
         <label for="hbfabriccost">Price Per Metre:</label><br>
-            <input name = "hbfabriccost" value = "<?= $purchase['hbfabriccost'] ?>" class="form-control form-control-sm headboardfield" type = "number" class="xview" id = "hbfabriccost" size = "15" placeholder="0" oninput="calcHBFabricPrice()">
+            <input name = "hbfabriccost" value = "<?= $purchase['hbfabriccost'] ?>" class="headboardfield" type = "number" class="xview" id = "hbfabriccost" size = "15" placeholder="0" oninput="calcHBFabricPrice()">
             </div>
             
             <div class="form-group col-sm-8">
             <label for="headboardfabricchoice">Fabric Design, Colour & Code:</label><br>
             
-                <input name = "headboardfabricchoice" style="width:95%" value = "<?= $purchase['headboardfabricchoice'] ?>" class="form-control form-control-sm headboardfield" type = "text" id = "headboardfabricchoice" maxlength = "100">
+                <input name = "headboardfabricchoice" style="width:95%" value = "<?= $purchase['headboardfabricchoice'] ?>" class="headboardfield" type = "text" id = "headboardfabricchoice" maxlength = "100">
             </div>
 </div>
 
 <div class="form-row">
     <div class="form-group col-sm-6">
         <label for="headboardfabricdesc">Headboard Fabric Description:</label><br> 
-        <textarea name = "headboardfabricdesc" id="headboardfabricdesc" class="form-control headboardfield"  style="width:90%" rows = "1" maxlength="250"><?= $purchase['headboardfabricdesc'] ?></textarea><span class="pull-right label label-default" id="headboardfabricdesccount"></span>
+        <textarea name = "headboardfabricdesc" id="headboardfabricdesc" class="headboardfield"  style="width:90%" rows = "1" maxlength="250"><?= $purchase['headboardfabricdesc'] ?></textarea><span class="pull-right label label-default" id="headboardfabricdesccount"></span>
     </div>
 
     <div class="form-group col-sm-6">
         <label for="specialinstructionsheadboard">Headboard Special Instructions:</label><br> 
-        <textarea name = "specialinstructionsheadboard" id="specialinstructionsheadboard" class="form-control headboardfield"  style="width:93%" rows = "1" maxlength="250"><?= $purchase['specialinstructionsheadboard'] ?></textarea><span class="pull-right label label-default" id="specialinstructionsheadboardcount"></span>
+        <textarea name = "specialinstructionsheadboard" id="specialinstructionsheadboard" class="headboardfield"  style="width:93%" rows = "1" maxlength="250"><?= $purchase['specialinstructionsheadboard'] ?></textarea><span class="pull-right label label-default" id="specialinstructionsheadboardcount"></span>
     </div>
 </div> 
     <div class="form-row">
@@ -557,6 +557,9 @@ function defaultHeadboardHeight() {
     if (selection == "Casper" || selection == "Shift" || selection == "Stella" || selection == "Talia") {
         $("#headboardheight").val('70cm above topper');
     }
+    if (selection == "Cassie" || selection == "Hudson") {
+        $("#headboardheight").val('90cm Above Mattress/ Topper');
+    }
     if (selection == "Churchill (Stitched With Trim)" || selection == "Manhattan Holly (Buttoned)" || selection == "Winston (Stitched)") {
         $("#headboardheight").val('145cm From Floor (excluding leg)');
     }
@@ -569,7 +572,10 @@ function defaultHeadboardHeight() {
     if (selection == "Edward") {
         $("#headboardheight").val('105cm above topper');
     }
-    if (selection == "Elizabeth (MF32)") {
+    if (selection == "Sienna") {
+        $("#headboardheight").val('105cm Above Mattress/ Topper');
+    }
+    if (selection == "Elizabeth (MF32)" || selection == "Chrissy") {
         $("#headboardheight").val('100cm Above Mattress/ Topper');
     }
     if (selection == "Elliot (F100)" || selection == "Elliot Bedframe (F100 Bedframe)") {
@@ -619,11 +625,17 @@ function defaultHeadboardHeight() {
     if (selection == "Kiku") {
         $("#headboardheight").val('150cm Above Mattress/ Topper');
     }
-    if (selection == "Lenoir" || selection == "Savoy") {
+    if (selection == "Lenoir" || selection == "Savoy" || selection == "Elly") {
         $("#headboardheight").val('75cm Above Mattress/ Topper');
     }
     if (selection == "Margot" || selection == "William") {
         $("#headboardheight").val('100cm above topper');
+    }
+    if (selection == "Louis II") {
+        $("#headboardheight").val('139cm From Floor');
+    }
+    if (selection == "Luna") {
+        $("#headboardheight").val('135cm From Floor');
     }
     if (selection == "Moon - Standard") {
         $("#headboardheight").val('125cm above topper');

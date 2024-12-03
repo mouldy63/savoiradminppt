@@ -18,6 +18,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 
 		$pns = $exportCollectionsModel->getManifestPNs($exportCollectionsId);
 		foreach ($pns as $row) {
+			
 			$pn = $row['purchase_no'];
 			$purchase = $purchaseModel->get($pn);
 			$wrapid = $purchase['wrappingid'];
@@ -72,7 +73,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	}
 
     // TODO remove $ctrl from calling args - no longer used
-    public function getExportData($ctrl, $pn, $mattressinc, $baseinc, $topperinc, $valanceinc, $legsinc, $hbinc, $accinc, $purchase, $wrapid, $wholesale, $psizes) {
+    public function getExportData($ctrl, $pn, $mattressinc, $baseinc, $topperinc, $valanceinc, $legsinc, $hbinc, $accinc, $purchase, $wrapid, $wholesale, $psizes, $cid=null) {
 	    $componentdata = TableRegistry::get('Componentdata');
 	    $shippingBox = TableRegistry::get('ShippingBox');
 	    $wholesalePrices = TableRegistry::get('WholesalePrices');
@@ -121,7 +122,6 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	    $exportData['baseprice']=0;
 	    $exportData['basedesc']='';
 	    $exportData['basetariff']=0;
-	    $exportData['baseweight2']=0;
 	    $exportData['baseqty']=0;
 	    $exportData['basedimensions']='';
 	    $exportData['topperprice']=0;
@@ -137,6 +137,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	    $exportData['legweight']=0;
 	    $exportData['legqty']=0;
 	    $exportData['acc']='';
+		$exportData['accbox']='';
 	    $exportData['packdata']='';
 	    $exportData['hbdesc']='';
 	    $exportData['hbdimensions']='';
@@ -154,6 +155,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 		$exportData['legsNW']=''; 
 		$exportData['hbNW']='';
 		$exportData['accNW']='';
+		$exportData['boxQty']='';
 		$exportData['totalNW']=0;
 			    
 	    $wholesalePriceData='';
@@ -166,8 +168,12 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	    $boxinfo2='';
 	    $acc2='y';
 	    $packedwith='';
+		$mattressTimes=1;
+		$baseTimes=1;
 	    
-	    
+	    //
+		// MATTRESS
+		//
 	    if ($mattressinc == 'y') {
 	        $mattzip='n';
 	        $comptariff = $componentdata->getComponentSpecs($purchase['savoirmodel'],1);
@@ -344,6 +350,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	      	  if (isset($boxinfo)) {
 				$exportData['matt1NW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']));
 				$exportData['totalNW'] +=$exportData['matt1NW'];
+				
 				if ($mattress2=='y') {
 				$exportData['matt2NW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',1,'ProductWgt']));
 				$exportData['totalNW'] +=$exportData['matt2NW'];
@@ -370,13 +377,14 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            }
 	        }
 
-	        $exportData['totalvalue']=floatval($exportData['totalvalue'])+floatval($mattresspricecalc);
 	        if ($mattzip=='y' && $wrapid==1) {
 	            $mattresspricecalc=$mattresspricecalc/2;
+				$mattressTimes=2;
 	            $exportData['mattressbox']=2;
 	        }
 	        if ($mattress2=='y') {
 	            $mattresspricecalc=$mattresspricecalc/2;
+				$mattressTimes=2;
 	            $exportData['mattressbox']=2;
 	        }
 	        
@@ -400,6 +408,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            }
 	            
 	            $mattresspricecalc=$mattresspricecalc/2;
+				$mattressTimes=2;
 	        }
 	        if ($mattzip=='y' && $wrapid==1) {
 	            if (substr($purchase['mattresswidth'], 0, 3)!='Spe') {
@@ -448,6 +457,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        $boxQty1 = $this->ArrayHelper->getInt($exportData, ['packdata',1,'boxQty']);
 	        if ($wrapid==4 && ($boxQty0==2 || $boxQty1 > 0)) {
 	            $mattresspricecalc = $mattresspricecalc/2;
+				$mattressTimes=2;
 				$exportData['matt1NW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']))/2;
 				$exportData['matt2NW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']))/2;
 				$exportData['mattressweight']=$this->ArrayHelper->getFloat($exportData, ['packdata',0,'packkg'])/2;
@@ -456,10 +466,12 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        }
 	        
 	        $exportData['mattressprice'] = UtilityComponent::formatMoneyWithHtmlSymbol($mattresspricecalc, $purchase['ordercurrency']);
-	        
+	        $exportData['totalvalue']=floatval($exportData['totalvalue'])+(float)preg_replace('/[^0-9.]/', '', $exportData['mattressprice'])*$mattressTimes;
 	    }
 	    
-	    
+	    //
+		// BASE
+		//
 	    if ($baseinc == 'y') {
 	        $comptariff = $componentdata->getComponentSpecs($purchase['basesavoirmodel'],3);
 	        if (count($comptariff)>0) {
@@ -471,8 +483,6 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            $exportData['baseweight']=0;
 	            $basedepth=0;
 	        }
-	        
-
 	        
 	        if (!empty($psizes['Base1Width'])) {
 	            $base1width = $psizes['Base1Width'];
@@ -510,10 +520,6 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            $base2length=floatval($base2length)*2.54;
 	        }
 	        
-	        // 	        if ($pn == 79219) {
-// 	            debug($exportData['totalitems']);
-// 	        }
-	        
 	        if (substr($purchase['basetype'], 0, 3)=='Eas'  || substr($purchase['basetype'], 0, 3)=='Nor') {
 	            $exportData['itemno'] += 2;
 	            $exportData['baseqty']=1;
@@ -533,10 +539,6 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        }
 	        
 	        $exportData['totalitems']=intval($exportData['totalitems'])+intval($exportData['baseqty']);
-// 	        if ($pn == 79219) {
-// 	            debug($psizes);
-// 	            die;
-// 	        }
 	        
 	        //cope with North split dimensions for base 1
 	        if (substr($purchase['basetype'], 0, 3)=='Nor' && empty($psizes['Base1Width']) && substr($purchase['basewidth'], 0, 3)!='Spe' && substr($purchase['basewidth'], 0, 1)!='n') {
@@ -562,14 +564,6 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            }
 	        }
 	        
-	        if ($purchase['basesavoirmodel']=='n') {
-	        	$exportData['basedesc']="PIN base 1 pc";
-	        } else {
-	        	$exportData['basedesc']=$purchase['basesavoirmodel'] ." base 1 pc";
-	        }
-	        if ($wrapid==4 && (substr($purchase['basetype'], 0, 3)=='Eas' || substr($purchase['basetype'], 0, 3)=='Nor')) {
-	            $exportData['basedesc']=$purchase['basesavoirmodel'] ." base 2 pc";
-	        }
 	        if ($wrapid==3) {
 	            $exportData['packdata'] = $componentdata->getPackagingdata($pn,3);
 	            if (count($exportData['packdata']) > 0) {
@@ -577,19 +571,29 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            } else {
 	                $exportData['baseweight']=0;
 	            }
-	            
 	        }
+
 	        if ($wrapid==4) {
 	            $exportData['packdata'] = $componentdata->getPackagingdata($pn,3);
+				
 	            $exportData['baseweight'] = $this->ArrayHelper->getFloat($exportData, ['packdata',0,'packkg']);
+	
+				$NetPackagingWgt = $this->ArrayHelper->getFloat($exportData, ['packdata',0,'NetPackagingWgt']);
+				$exportData['baseNW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']));
+				$boxQty = $this->ArrayHelper->getStr($exportData, ['packdata',0,'boxQty']);
+				if ($boxQty==2) {
+					$exportData['baseweight']=$exportData['baseweight']-($NetPackagingWgt/2);
+					$exportData['baseNW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt'])/2);
+				}
 	           
 	        }
+
 	        if ($wrapid==4) {
 	        	if (isset($exportData['packdata'][0]['packwidth'])) {
 		        	$packwidth0 = $this->ArrayHelper->getFloat($exportData, ['packdata',0,'packwidth']);
 		        	$packheight0 = $this->ArrayHelper->getFloat($exportData, ['packdata',0,'packheight']);
 		        	$packdepth0 = $this->ArrayHelper->getFloat($exportData, ['packdata',0,'packdepth']);
-	        		$exportData['basedimensions'] = $packedwith=$packwidth0 ."x" .$packheight0 ."x" .$packdepth0 ."cm";
+	        		$exportData['basedimensions'] = $packwidth0 ."x" .$packheight0 ."x" .$packdepth0 ."cm";
 	        		$exportData['cubicmeters'] =floatval($exportData['cubicmeters'])+($packwidth0*$packheight0*$packdepth0);
 	        	} else {
 	        		$exportData['basedimensions'] = 0;
@@ -601,13 +605,14 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 		        	$packwidth1 = $this->ArrayHelper->getFloat($exportData, ['packdata',1,'packwidth']);
 		        	$packheight1 = $this->ArrayHelper->getFloat($exportData, ['packdata',1,'packheight']);
 		        	$packdepth1 = $this->ArrayHelper->getFloat($exportData, ['packdata',1,'packdepth']);
-		        	$exportData['basedimensions2'] = $packedwith=$packwidth1 . "x" . $packheight1 ."x" . $packdepth1 ."cm";
+		        	$exportData['basedimensions2'] = $packwidth1 . "x" . $packheight1 ."x" . $packdepth1 ."cm";
 	                $base2='y';
 	                $exportData['totalitems']=intval($exportData['totalitems'])+1;
 	                $exportData['baseweight']=$this->ArrayHelper->getFloat($exportData, ['packdata',0,'packkg']);
-	                $exportData['baseweight2']=$this->ArrayHelper->getFloat($exportData, ['packdata',1,'packkg']);
+					$exportData['baseweight2']=$this->ArrayHelper->getFloat($exportData, ['packdata',1,'packkg']);
 	                $exportData['totalweight'] =floatval($exportData['totalweight']) + floatval($exportData['baseweight2']);
 	                $exportData['cubicmeters'] =floatval($exportData['cubicmeters'])+(($packwidth1*$packheight1*$packdepth1));
+					
 	            }
 	        } else if ($wrapid==3) {
 	            
@@ -636,6 +641,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            if (isset($boxinfo)) {
 	            $exportData['cubicmeters'] =floatval($exportData['cubicmeters'])+(floatval($boxinfo['Width'])*floatval($boxinfo['Length'])*floatval($boxinfo['Depth']));
 	            }
+				
 	        } else {
 	            $exportData['basedimensions'] = $base1width ."x" .$base1length ."x" .(float)$basedepth ."cm";
 	            if (count($comptariff)>0) {
@@ -647,14 +653,15 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            
 	            if ($base2=='y') {
 	                $exportData['baseweight2']=$exportData['baseweight'];
+					
 	                $exportData['basedimensions2'] = $base2width ."x" .$base2length ."x" .(float)$basedepth ."cm";
 	                $exportData['totalweight'] =floatval($exportData['totalweight']) + floatval($exportData['baseweight2']);
 	                $exportData['cubicmeters'] =floatval($exportData['cubicmeters'])+(floatval($base1width)*floatval($base1length)*floatval($basedepth));
 	            }
 	            $exportData['cubicmeters'] =floatval($exportData['cubicmeters'])+(floatval($base1width)*floatval($base1length)*floatval($basedepth));
+				$exportData['totalweight'] =floatval($exportData['totalweight']) + floatval($exportData['baseweight']);
 	        }
 	        
-	        $exportData['totalweight'] =floatval($exportData['totalweight']) + floatval($exportData['baseweight']);
 	        $exportData['baseprice']=floatval($purchase['baseprice'])+floatval($purchase['basetrimprice'])+floatval($purchase['upholsteryprice'])+floatval($purchase['basefabricprice'])+floatval($purchase['basedrawersprice']);
 	        
 	        $basepricecalc = $this->getComponentPriceExVatAfterDiscount($exportData['baseprice'], $purchase['discounttype'], $purchase['discount'], $purchase['bedsettotal'], $purchase['istrade'], $purchase['vatrate'] );
@@ -688,17 +695,67 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	                $basepricecalc=$basepricecalc + $this->ArrayHelper->getFloat($wholesalePriceData, [0,'price']);
 	            }
 	        }
-	        $exportData['totalvalue']=floatval($exportData['totalvalue'])+floatval($basepricecalc);
 	        if ($exportData['baseqty']=='2' && $wrapid==1) {
 	            //$basepricecalc=$basepricecalc/2;
 	            $exportData['basebox']=2;
 	        }
+			if ($wrapid==4) {
+				$exportData['packdata'] = $componentdata->getPackagingdata($pn,3);
+				
+	            $boxweight = 0;
+				$prodWght=0;
+	            if (count($exportData['packdata']) > 0) {
+					$boxQty = $this->ArrayHelper->getStr($exportData, ['packdata',0,'boxQty']);
+					$prodWght = $this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']);
+					if ($boxQty==2) {
+						
+						$base2=='y';
+						$exportData['boxQty']=2;
+						$exportData['totalitems']=intval($exportData['totalitems'])+1;
+						$exportData['baseweight']=$exportData['baseweight']-$prodWght;
+						$exportData['baseweight2']=$exportData['baseweight'];
+						$exportData['baseNW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']));
+						$exportData['totalNW'] +=$exportData['baseNW']/2;
+						$exportData['totalweight'] =floatval($exportData['totalweight']) + floatval($exportData['baseweight']);
+						
+					}
+	            	$Boxsize = $this->ArrayHelper->getStr($exportData, ['packdata',0,'Boxsize']);
+	                $boxinfo = $shippingBox->find()->where(['sName' => $Boxsize])->first();
+	                $boxweight = $boxinfo['Weight'];
+					
+					$exportData['totalweight'] =floatval($exportData['totalweight']) + floatval($exportData['baseweight']);
+	            }
+
+				//debug($exportData['totalweight']);
+				//die;
+				$exportData['baseNW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']));
+				if ($boxQty==2) {
+					$exportData['baseNW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt'])/2);
+				}
+				$exportData['base2NW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',1,'ProductWgt']));
+				$exportData['totalNW'] +=$exportData['baseNW'];
+				$exportData['totalNW'] +=$exportData['base2NW'];
+				
+	        }
+			if ($purchase['basesavoirmodel']=='n') {
+	        	$exportData['basedesc']="PIN base 1 pc";
+	        } else {
+	        	$exportData['basedesc']=$purchase['basesavoirmodel'] ." base 1 pc";
+	        }
+	        if ($wrapid==4 && (substr($purchase['basetype'], 0, 3)=='Eas' || substr($purchase['basetype'], 0, 3)=='Nor')) {
+	            $exportData['basedesc']=$purchase['basesavoirmodel'] ." base 2 pc";
+	        }
+			if ($wrapid==4 && $exportData['boxQty']==2) {
+	            $exportData['basedesc']=$purchase['basesavoirmodel'] ." base 1 pc";
+	        }
 	        if ($base2=='y') {
 	            $basepricecalc=$basepricecalc/2;
+				$baseTimes=2;
 	            $exportData['basebox']=2;
 	        }
-	        if ($wrapid==3 || $wrapid==4) {
+	        if ($wrapid==3) {
 				$exportData['packdata'] = $componentdata->getPackagingdata($pn,3);
+				
 	            $boxweight = 0;
 	            if (count($exportData['packdata']) > 0) {
 	            	$Boxsize = $this->ArrayHelper->getStr($exportData, ['packdata',0,'Boxsize']);
@@ -713,20 +770,29 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 				$exportData['totalNW'] +=$exportData['base2NW'];
 				
 	        }
+			
 	        if ($wrapid==2 || $wrapid==1) {
 				$exportData['baseNW']=$exportData['baseweight'];
 				$exportData['totalNW'] +=$exportData['baseNW'];
 				$exportData['base2NW']=$exportData['baseweight2'];
-				$exportData['totalNW'] +=$exportData['base2NW'];
+				//Dave I have added this wrapper below as Planned Exports stopped working xx
+				if ($exportData['base2NW'] != '') {
+					$exportData['totalNW'] +=$exportData['base2NW'];
+				}
 	        }
-	        
+	        if ($wrapid==4 && $boxQty==2) {
+				$basepricecalc=$basepricecalc/2;
+			} 
 	        $exportData['baseprice'] = UtilityComponent::formatMoneyWithHtmlSymbol($basepricecalc, $purchase['ordercurrency']);
-	        
+			$exportData['totalvalue']=floatval($exportData['totalvalue'])+(float)preg_replace('/[^0-9.]/', '', $exportData['baseprice'])*$baseTimes;
 	        $exportData['descofgoods'].="Base&nbsp;";
-	        
+	       
 	        
 	    }
 	    
+	    //
+		// TOPPER
+		//
 	    if ($topperinc == 'y') {
 	        
 	        $comptariff = $componentdata->getComponentSpecs($purchase['toppertype'],5);
@@ -848,6 +914,9 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	    }
 	    
 	    
+	    //
+		// VALANCE
+		//
 	    $exportData['valancepackedwith']='';
 	    if ($valanceinc == 'y') {
 	        $packedwith='';
@@ -856,6 +925,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        if ($wrapid==4 || $wrapid==3) {
 	            $exportData['packdata'] = $componentdata->getPackagingdata($pn,6);
 	            $packedwith=$this->ArrayHelper->getStr($exportData, ['packdata',0,'PackedWith']);
+			
 				$exportData['valanceNW']=intval($this->ArrayHelper->getStr($exportData, ['packdata',0,'ProductWgt']));
 				$exportData['totalNW'] +=$exportData['valanceNW'];
 	        }
@@ -899,6 +969,9 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        $exportData['descofgoods'].="Valance&nbsp;";
 	    }
 	    
+	    //
+		// LEGS
+		//
 	    if ($legsinc == 'y') {
 	        $legboxdesc='(leg box)';
 	        if ($wrapid==4 || $wrapid==3) {
@@ -986,9 +1059,11 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        
 	    }
 	    
+	    //
+		// HEADBOARD
+		//
 	    if ($hbinc == 'y') {
 	       
-	        
 	        $exportData['totalitems']=intval($exportData['totalitems'])+1;
 	        $comptariff = $componentdata->getComponentSpecs($purchase['headboardstyle'],8);
 	        if (isset($comptariff[0]['TARIFFCODE'])) {
@@ -1130,24 +1205,46 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	            
 	    }
 	    
-	    
-	    //echo '<br>$exportData['totalitems']=' . $exportData['totalitems'];
+		//
+		// ACCESSORIES
+		//
 	    if ($accinc == 'y') {
+			
 	        $exportData['acc'] = $accessory->find()->where(['purchase_no' => $pn]);
 	        // @TODO check $exportData['totalitems'] logic with MAd
 	        if ($wrapid==3) {
-	            $exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCount($pn);
+				//debug($exportData['totalitems']);
+				
+	            //$exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCount($pn);
+				if ($cid != null) {
+					$exportData['totalitems'] += $packagingData->getAccBoxCount($pn, $cid);
+				}
+				$exportData['accbox'] = $packagingData->getAccessoriesSetsForBoxes($pn);
+				//debug($exportData['accbox']);
+				//die;
 	        }
+			
 	        if ($wrapid==4) {
 	        	if (isset($componentdata->getPackagingdata($pn,9)[0])) {
 	            $exportData['packdata'] = $componentdata->getPackagingdata($pn,9)[0];
 				
 	            if ($exportData['packdata']['PackedWith'] == 0 || $exportData['packdata']['PackedWith']==NULL) {
 	                $exportData['totalitems'] +=1;
+					
 	            }
 	            }
 	        }
-			if ($wrapid==3 || $wrapid==4) {
+			if ($wrapid==3) {
+				if (isset($componentdata->getPackagingdata($pn,9)[0])) {
+					$exportData['packdata'] = $componentdata->getPackagingdata($pn,9)[0];
+					if ($exportData['packdata']['PackedWith'] == 0 || $exportData['packdata']['PackedWith']==NULL) {
+						$exportData['accNW']=intval($exportData['packdata']['ProductWgt']);
+						$exportData['totalNW'] +=$exportData['accNW'];
+						
+					}
+				}
+			}
+			if ($wrapid==4) {
 				if (isset($componentdata->getPackagingdata($pn,9)[0])) {
 					$exportData['packdata'] = $componentdata->getPackagingdata($pn,9)[0];
 					if ($exportData['packdata']['PackedWith'] == 0 || $exportData['packdata']['PackedWith']==NULL) {

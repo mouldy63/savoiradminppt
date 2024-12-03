@@ -33,7 +33,6 @@ class CommercialInvoiceController extends SecureAppController
 	}
 	
 	public function index() {
-		
 		$wholesaleprices = TableRegistry::get('WholesalePrices');
 		$purchaseTable = TableRegistry::get('Purchase');
 		$this->viewBuilder()->setLayout('manifest');
@@ -116,8 +115,6 @@ class CommercialInvoiceController extends SecureAppController
 		$exportcomponents = TableRegistry::get('ExportCollections');
 		$components = $exportcomponents->getItemsForCommercialInvoice($pn,$cid);
 		
-		
-		
 		$mattressinc='n';
 		$baseinc='n';
 		$topperinc='n';
@@ -149,7 +146,7 @@ class CommercialInvoiceController extends SecureAppController
 					$accinc='y';
 				}
 			}
-		
+		$totalNW=0;
 		$query = $this->ExportCollections->find()->where(['exportCollectionsID' => $cid]);
 		$exportcollections = null;
 		foreach ($query as $row) {
@@ -379,7 +376,7 @@ class CommercialInvoiceController extends SecureAppController
 		$mattresspriceUnit=$exportData['mattressprice'];
 		
 		if ($mattressinc == 'y' && $exportData['mattressbox']=='2') {
-		$commercialinv .="<tr><td width=10%>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td width=40%>" .$exportData['mattressdesc'] ."</td><td>" .$exportData['mattressdimensions2'] ."</td><td>" .$exportData['mattresstariff'] ."</td><td>" .$exportData['mattressweight2'] ."</td><td>" .$exportData['matt2NW'] ."</td><td align=center>" .$exportData['mattressqty'] ."</td><td align=right>" .$mattresspriceUnit ."</td><td align=right>" .$exportData['mattressprice'] ."</td></tr>";
+		$commercialinv .="<tr><td width=10%>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td width=40%>" .$exportData['mattressdesc'] ."</td><td>" .$exportData['mattressdimensions2'] ."</td><td>" .$exportData['mattresstariff'] ."</td><td valign=top>" .$exportData['mattressweight2'] ."</td><td valign=top>" .$exportData['matt2NW'] ."</td><td align=center>" .$exportData['mattressqty'] ."</td><td align=right>" .$mattresspriceUnit ."</td><td align=right>" .$exportData['mattressprice'] ."</td></tr>";
 		}
 		}
 		if ($mattressinc == 'y') {
@@ -417,9 +414,9 @@ class CommercialInvoiceController extends SecureAppController
 							if ($wholesale=='y') {
 								$accpricecalc = $accpackedwith['wholesalePrice'];
 							}
-							$mattresspriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$mattresspriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$accpricecalc = $accpricecalc * (intval($accpackedwith['qty'])-intval($accpackedwith['QtyToFollow']));
-							$exportData['mattressprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$exportData['mattressprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 						}
 					}
@@ -441,10 +438,10 @@ class CommercialInvoiceController extends SecureAppController
 						if ($accpricecalc==0) {
 							$accpricecalc=10;
 							}
-						$mattresspriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$mattresspriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$accpricecalc = $accpricecalc * (intval($accline['qty'])-intval($accline['QtyToFollow']));
 						
-						$exportData['mattressprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$exportData['mattressprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 					}
 			
@@ -454,15 +451,19 @@ class CommercialInvoiceController extends SecureAppController
 				
 			}
 			
-		$commercialinv .="<tr><td width=10% valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td width=40% valign=top>" .$exportData['mattressdesc'] ."</td><td valign=top>" .$exportData['mattressdimensions'] ."</td><td valign=top>" .$exportData['mattresstariff'] ."</td><td valign=top>" .$exportData['mattressweight'] ."</td><td>" .$exportData['matt1NW'] ."</td><td align=center valign=top>" .$exportData['mattressqty'] ."</td><td align=right valign=top>" .$mattresspriceUnit ."</td><td align=right valign=top>" .$exportData['mattressprice'] ."</td></tr>";
+		$commercialinv .="<tr><td width=10% valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td width=40% valign=top>" .$exportData['mattressdesc'] ."</td><td valign=top>" .$exportData['mattressdimensions'] ."</td><td valign=top>" .$exportData['mattresstariff'] ."</td><td valign=top>" .$exportData['mattressweight'] ."</td><td valign=top>" .$exportData['matt1NW'] ."</td><td align=center valign=top>" .$exportData['mattressqty'] ."</td><td align=right valign=top>" .$mattresspriceUnit ."</td><td align=right valign=top>" .$exportData['mattressprice'] ."</td></tr>";
 		}
 		
 		if ($baseinc == 'y') {
 			$basepriceUnit=$exportData['baseprice'];
+			
 			if ($exportData['basebox']==2) {
-			$commercialinv .="<tr><td valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td valign=top>" .$exportData['basedesc'] ."</td><td valign=top>" .$exportData['basedimensions2'] ."</td><td valign=top>" .$exportData['basetariff'] ."</td><td valign=top>" .$exportData['baseweight2'] ."</td><td>" .$exportData['base2NW'] ."</td><td align=center valign=top>" .$exportData['baseqty'] ."</td><td align=right valign=top>" .$basepriceUnit ."</td><td align=right valign=top>" .$exportData['baseprice'] ."</td></tr>";
-		
+			$commercialinv .="<tr><td valign=top>" .($count+=1) ." aof " .$exportData['totalitems'] . " " .$wrapname ."</td><td valign=top>" .$exportData['basedesc'] ."</td><td valign=top>" .$exportData['basedimensions2'] ."</td><td valign=top>" .$exportData['basetariff'] ."</td><td valign=top>" .$exportData['baseweight2'] ."</td><td valign=top>" .$exportData['base2NW'] ."</td><td align=center valign=top>" .$exportData['baseqty'] ."</td><td align=right valign=top>" .$basepriceUnit ."</td><td align=right valign=top>" .$exportData['baseprice'] ."</td></tr>";
 		}
+		if ($exportData['boxQty']==2) {
+			$commercialinv .="<tr><td valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td valign=top>" .$exportData['basedesc'] ."</td><td valign=top>" .$exportData['basedimensions'] ."</td><td valign=top>" .$exportData['basetariff'] ."</td><td valign=top>" .$exportData['baseweight2'] ."</td><td valign=top>" .$exportData['baseNW'] ."</td><td align=center valign=top>" .$exportData['baseqty'] ."</td><td align=right valign=top>" .$basepriceUnit ."</td><td align=right valign=top>" .$exportData['baseprice'] ."</td></tr>";
+		}
+		
 			if ($exportData['valancepackedwith']==3) {
 				$exportData['basedesc'] .= "<br>" .$exportData['valancedesc'];
 				$exportData['basetariff'] .= "<br>" .$exportData['valancetariff'];
@@ -477,6 +478,7 @@ class CommercialInvoiceController extends SecureAppController
 				$basepriceUnit .= "<br>" .$exportData['legprice'];
 				$exportData['baseprice'] .= "<br>" .$exportData['legprice'];
 			}
+			
 			if ($accinc == 'y' && $wrapid == 3) {
 				foreach ($exportData['acc'] as $accline) {
 					$accdesc = "";
@@ -497,9 +499,9 @@ class CommercialInvoiceController extends SecureAppController
 							if ($wholesale=='y') {
 								$accpricecalc = $accpackedwith['wholesalePrice'];
 							}						
-							$basepriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$basepriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$accpricecalc = $accpricecalc * (intval($accpackedwith['qty'])-intval($accpackedwith['QtyToFollow']));
-							$exportData['baseprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$exportData['baseprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 						}
 					}
@@ -521,17 +523,24 @@ class CommercialInvoiceController extends SecureAppController
 						if ($accpricecalc==0) {
 							$accpricecalc=10;
 							}
-						$basepriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$basepriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$accpricecalc = $accpricecalc * (intval($accline['qty'])-intval($accline['QtyToFollow']));
 						
-						$exportData['baseprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$exportData['baseprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 					}
 			
 			
 				}
 			}
-		$commercialinv .="<tr><td valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td valign=top>" .$exportData['basedesc'] ."</td><td valign=top>" .$exportData['basedimensions'] ."</td><td valign=top>" .$exportData['basetariff'] ."</td><td valign=top>" .$exportData['baseweight'] ."</td><td valign=top>" .$exportData['baseNW'] ."</td><td align=center valign=top>" .$exportData['baseqty'] ."</td><td align=right valign=top>" .$basepriceUnit ."</td><td align=right valign=top>" .$exportData['baseprice'] ."</td></tr>";
+			
+		if ($exportData['baseboxQty']==2 && $wrapid == 4) {
+
+			$commercialinv .="<tr><td valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td valign=top>" .$exportData['basedesc'] ."</td><td valign=top>" .$exportData['basedimensions'] ."</td><td valign=top>" .$exportData['basetariff'] ."</td><td valign=top>" .$exportData['baseweight'] ."</td><td valign=top>" .$exportData['baseNW'] ."</td><td align=center valign=top>" .$exportData['baseqty'] ."</td><td align=right valign=top>" .$basepriceUnit ."</td><td align=right valign=top>" .$exportData['baseprice'] ."</td></tr>";
+
+			} else {
+			$commercialinv .="<tr><td valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td><td valign=top>" .$exportData['basedesc'] ."</td><td valign=top>" .$exportData['basedimensions'] ."</td><td valign=top>" .$exportData['basetariff'] ."</td><td valign=top>" .$exportData['baseweight'] ."</td><td valign=top>" .$exportData['baseNW'] ."</td><td align=center valign=top>" .$exportData['baseqty'] ."</td><td align=right valign=top>" .$basepriceUnit ."</td><td align=right valign=top>" .$exportData['baseprice'] ."</td></tr>";
+			}
 		}
 		
 		if ($topperinc == 'y') {
@@ -573,9 +582,9 @@ class CommercialInvoiceController extends SecureAppController
 							if ($wholesale=='y') {
 								$accpricecalc = $accpackedwith['wholesalePrice'];
 							}						
-							$topperpriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$topperpriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$accpricecalc = $accpricecalc * (intval($accpackedwith['qty'])-intval($accpackedwith['QtyToFollow']));
-							$exportData['topperprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$exportData['topperprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 						}
 					}
@@ -644,9 +653,9 @@ class CommercialInvoiceController extends SecureAppController
 							if ($wholesale=='y') {
 								$accpricecalc = $accpackedwith['wholesalePrice'];
 							}						
-							$legpriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$legpriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$accpricecalc = $accpricecalc * (intval($accpackedwith['qty'])-intval($accpackedwith['QtyToFollow']));
-							$exportData['legprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$exportData['legprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 						}
 					}
@@ -669,10 +678,10 @@ class CommercialInvoiceController extends SecureAppController
 						if ($accpricecalc==0) {
 							$accpricecalc=10;
 							}
-						$legpriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$legpriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$accpricecalc = $accpricecalc * (intval($accline['qty'])-intval($accline['QtyToFollow']));
 						
-						$exportData['legprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$exportData['legprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 					}
 			
@@ -710,9 +719,9 @@ class CommercialInvoiceController extends SecureAppController
 							if ($wholesale=='y') {
 								$accpricecalc = $accpackedwith['wholesalePrice'];
 							}						
-							$hbpriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$hbpriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$accpricecalc = $accpricecalc * (intval($accpackedwith['qty'])-intval($accpackedwith['QtyToFollow']));
-							$exportData['hbprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+							$exportData['hbprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 							$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 						}
 					}
@@ -743,10 +752,10 @@ class CommercialInvoiceController extends SecureAppController
 						if ($accpricecalc==0) {
 							$accpricecalc=10;
 							}
-						$hbpriceUnit .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$hbpriceUnit .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$accpricecalc = $accpricecalc * (intval($accline['qty'])-intval($accline['QtyToFollow']));
 						
-						$exportData['hbprice'] .="<br>" .number_format((float)$accpricecalc, 2, '.', '');
+						$exportData['hbprice'] .="<br>" .UtilityComponent::formatMoneyWithHtmlSymbol($accpricecalc, $purchase['ordercurrency']);
 						$exportData['totalvalue']=floatval($exportData['totalvalue'])+($accpricecalc);
 					}
 			
@@ -873,6 +882,7 @@ class CommercialInvoiceController extends SecureAppController
 				$packweight = 0.0;
 				$accpriceFormatted = [];
 				$totalpriceFormatted = [];
+				$netwgtString='';
 				$n = 0;
 				foreach ($set as $row) {
 					
@@ -885,9 +895,17 @@ class CommercialInvoiceController extends SecureAppController
 						$packagingsize[$n] = round($row['packwidth']) ."x". round($row['packheight']) ."x". round($row['packdepth']) ."cm";
 						$exportData['cubicmeters'] =floatval($exportData['cubicmeters'])+(round($row['packwidth'])*round($row['packheight'])*round($row['packdepth']));
 					}
+
+					if (!empty($row['packkg']) && $row['PackedWith']!=0) {
+						$packweight += floatval($row['packkg']);
+						$netwgtString .= floatval($row['packkg']).'<br>';
+					}
 					if (!empty($row['packkg']) && $row['PackedWith']==0) {
 						$packweight += floatval($row['packkg']);
+						$netwgtString .= floatval($row['packkg']).'<br>';
 					}
+
+					
 					$accprice = $this->_getComponentPriceExVatAfterDiscount($row['unitprice'], $purchase['discounttype'], $purchase['discount'], $purchase['bedsettotal'], $purchase['istrade'], $purchase['vatrate']);
 					if ($accprice == 0) $accprice = 10.0;
 					if ($wholesale=='y') {
@@ -910,7 +928,9 @@ class CommercialInvoiceController extends SecureAppController
 						$n++;
 					}
 				}
+				$exportData['totalNW'] += $packweight;
 				$exportData['totalweight'] += $packweight;
+				$totalNW+= $packweight;
 				//die;
 
 				$commercialinv .="<tr><td valign=top>" .($count+=1) ." of " .$exportData['totalitems'] . " " .$wrapname ."</td>";
@@ -918,7 +938,7 @@ class CommercialInvoiceController extends SecureAppController
 				$commercialinv .="<td valign=top>" . implode("<br/>", $packagingsize) ."</td>";
 				$commercialinv .="<td valign=top>" . implode("<br/>", $acctariff) ."</td>";
 				$commercialinv .="<td valign=top>" . $packweight ."</td>";
-				$commercialinv .="<td valign=top>" . $exportData['accNW'] ."</td>";
+				$commercialinv .="<td valign=top>" . $netwgtString ."</td>";
 				$commercialinv .="<td align=center valign=top>" . implode("<br/>", $accqty) ."</td>";
 				$commercialinv .="<td align=right valign=top>" . implode("<br/>", $accpriceFormatted) ."</td>";
 				$commercialinv .="<td align=right valign=top>" . implode("<br/>", $totalpriceFormatted) ."</td></tr>";
@@ -984,7 +1004,7 @@ class CommercialInvoiceController extends SecureAppController
 		$commercialinv .="<tr><td colspan=8 align=right>VALUE</td><td align=right>" .UtilityComponent::formatMoneyWithHtmlSymbol($exportData['totalvalue'], $purchase['ordercurrency']) ."</td></tr></table>";
 		$invoicedate=$collectiondate;
 		
-		$footer="<table style='position:relative; bottom:0;'><tr><td><p align=left style='font-size:10px;'><br />IT IS HEREBY CERTIFIED that this invoice shows the actual price of the goods described, that no other invoice has been or will be issued and that all particulars are true and correct.The exporter of the products covered by this document (EORI GB706817527000) declares that, except where otherwise clearly indicated, these goods are of United Kingdom preferential origin. Savoir Beds Limited, 1 Old Oak Lane, London, NW10 6UD, United Kingdom<br /><img src='webroot/img/commercialinv-sig.gif' width='120' height='77' style='margin-top:40px;' /><br>Signature of Authorised Person<br>".$invoicedate."</p><p align=center style='font-size:10px;'>VAT Reg No. GB 706 8175 27<br>EORI Number: GB706817527000<br>Savoir Beds Limited, registered in England: No. 3395749.<br>Registered Address: 1 Old Oak Lane, London NW10 6UD, UK</p></td></tr></table>";
+		$footer="<table style='position:relative; bottom:0;'><tr><td><p align=left style='font-size:10px;'><br />IT IS HEREBY CERTIFIED that this invoice shows the actual price of the goods described, that no other invoice has been or will be issued and that all particulars are true and correct.The exporter of the products covered by this document (EORI GB706817527000) declares that, except where otherwise clearly indicated, these goods are of United Kingdom preferential origin. Savoir Beds Limited, 1 Old Oak Lane, London, NW10 6UD, United Kingdom<br /><br>These goods are of United Kingdom preferential origin.<br><img src='webroot/img/commercialinv-sig.gif' width='120' height='77' style='margin-top:40px;' /><br>Signature of Authorised Person<br>".$invoicedate."</p><p align=center style='font-size:10px;'>VAT Reg No. GB 706 8175 27<br>EORI Number: GB706817527000<br>Savoir Beds Limited, registered in England: No. 3395749.<br>Registered Address: 1 Old Oak Lane, London NW10 6UD, UK</p></td></tr></table>";
 		
 		
 		$this->set('footer', $footer);

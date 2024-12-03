@@ -178,7 +178,7 @@ class ExportCollectionsTable extends Table {
     }
 
  public function getShipmentPurchaseNos($cid, $userlocation, $location) { 
- 	$sql = "SELECT distinct E.purchase_no, C.surname, P.ORDER_NUMBER, E.InvoiceNo, linksCollectionid, A.company, P.ordercurrency, P.customerreference, P.savoirmodel, P.basesavoirmodel, P.toppertype, P.headboardstyle, P.legstyle, P.legfinish, P.mattressrequired, P.mattresstype, P.mattressprice, P.baserequired, P.basetype, P.baseprice, P.upholsteryprice, P.basedrawersprice, P.basetrimprice, P.basefabricprice, P.topperrequired, P.topperprice, P.headboardrequired, P.headboardprice, P.headboardtrimprice, P.hbfabricprice, P.legsrequired, P.legprice, P.addlegprice, P.valancerequired, P.valanceprice, P.valfabricprice, P.accessoriesrequired, P.accessoriestotalcost from exportlinks E, exportCollShowrooms S, Purchase P, contact C, address A where  E.LinksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=".$cid." AND ";
+ 	$sql = "SELECT distinct E.purchase_no, C.surname, P.ORDER_NUMBER, E.InvoiceNo, linksCollectionID, A.company, P.ordercurrency, P.customerreference, P.savoirmodel, P.basesavoirmodel, P.toppertype, P.headboardstyle, P.legstyle, P.legfinish, P.mattressrequired, P.mattresstype, P.mattressprice, P.baserequired, P.basetype, P.baseprice, P.upholsteryprice, P.basedrawersprice, P.basetrimprice, P.basefabricprice, P.topperrequired, P.topperprice, P.headboardrequired, P.headboardprice, P.headboardtrimprice, P.hbfabricprice, P.legsrequired, P.legprice, P.addlegprice, P.valancerequired, P.valanceprice, P.valfabricprice, P.accessoriesrequired, P.accessoriestotalcost, MergedCI from exportlinks E, exportCollShowrooms S, Purchase P, contact C, address A where  E.LinksCollectionID=S.exportCollshowroomsID and S.exportCollectionID=".$cid." AND ";
     if ($userlocation == 1 || $userlocation == 27 || $userlocation == 34) {
     	 $sql .= "S.idlocation=".$location." and ";
    		 } else {
@@ -187,6 +187,7 @@ class ExportCollectionsTable extends Table {
     	$sql .= "orderConfirmed='y' and P.contact_no=C.CONTACT_NO and A.CODE=C.CODE and E.purchase_no=P.PURCHASE_No";
         $myconn = ConnectionManager::get('default');
 		return $myconn->execute($sql)->fetchAll('assoc');
+
 	}
 
 	public function getExWorksDates($location) {
@@ -206,5 +207,54 @@ class ExportCollectionsTable extends Table {
 	  return $myconn->execute($sql)->fetchAll('assoc');
     }
 
+	public function getCommercialInvoiceInfo($pno) {  
+		$sql="SELECT * FROM exportlinks L, exportcollshowrooms C, exportcollections E where L.purchase_no=".$pno." and L.linkscollectionid=C.exportCollshowroomsID and C.exportCollectionID =E.exportCollectionsID and exists (select 1 from qc_history_latest q where q.purchase_no=L.purchase_no and q.componentid=L.componentid) group by L.linkscollectionid";
+		$myconn = ConnectionManager::get('default');
+	  	return $myconn->execute($sql)->fetchAll('assoc');
+	}  
+
+	public function getExportCollShowroomsID($id, $location) {  
+		$sql="select * from exportcollshowrooms WHERE exportCollectionID=".$id." and idLocation=".$location;
+		$myconn = ConnectionManager::get('default');
+		$data=$myconn->execute($sql)->fetchAll('assoc');
+		$exportCollshowroomsID='';
+		foreach ($data as $row) {
+			$exportCollshowroomsID=$row['exportCollshowroomsID'];
+			break;
+		}
+		return $exportCollshowroomsID;
+  }  
+
+  public function getMergedPNcomps($id, $mergeno) {  
+	$sql="select * from exportlinks WHERE LinksCollectionid=".$id." and MergedCI=".$mergeno;
+	$myconn = ConnectionManager::get('default');
+	return $myconn->execute($sql)->fetchAll('assoc');
+	} 
+	
+  public function getMergedPNs($id, $mergeno) {  
+	$sql="select distinct purchase_no from exportlinks WHERE LinksCollectionid=".$id." and MergedCI=".$mergeno;
+	$myconn = ConnectionManager::get('default');
+	return $myconn->execute($sql)->fetchAll('assoc');
+  } 
+
+  public function getProductionCollectionInfo($pn) {  
+	$sql="SELECT L.componentid, L.linkscollectionid, E.collectiondate FROM exportlinks L, exportcollshowrooms C, exportcollections E where L.purchase_no=".$pn." and L.linkscollectionid=C.exportCollshowroomsID and C.exportCollectionID =E.exportCollectionsID and exists (select 1 from qc_history_latest q where q.purchase_no=L.purchase_no and q.componentid=L.componentid and q.qc_statusid in (60,120)) group by L.linkscollectionid";
+	$myconn = ConnectionManager::get('default');
+	return $myconn->execute($sql)->fetchAll('assoc');
+  } 
+
+  public function getExportAccessoriesCount($pn) {
+	$sql = "select count(*) as n from orderaccessory where purchase_no=:pn";
+	$myconn = ConnectionManager::get('default');
+	$rs = $myconn->execute($sql, ['pn' => $pn]);
+	$count = 0;
+	foreach ($rs as $row) {
+		$count = $row['n'];
+	}
+	return $count;
+	}
+
 }
+
+
 ?>

@@ -139,7 +139,7 @@ class AdvancedSearchController extends SecureAppController
     	$orderdetails='';
     	$orderdetails=$customers->getorderDesc($row['PURCHASE_No']);
     	$html = "<table border='0' cellpadding='3' width='95%'><tr><td><b>Order No</b></td><td><b>Order Date</b></td><td><b>Customer Ref.</b></td><td><b>Archive Information</b></td><td><b>Notes</b></td><td><b>Order Description</b></td></tr>";
-		$html .= "<tr><td valign='top'><a href='edit-purchase.asp?order=".$row['PURCHASE_No']."'>" .$row['ORDER_NUMBER']. "</a></td>";
+		$html .= "<tr><td valign='top'><a href='/edit-purchase.asp?order=".$row['PURCHASE_No']."'>" .$row['ORDER_NUMBER']. "</a></td>";
 		$html .= "<td valign='top'>".$row['ORDER_DATE']."</td>";
 		$html .= "<td valign='top'>".$row['customerreference']."</td>";
 		$html .= "<td valign='top'>".$row['BED']."</td>";

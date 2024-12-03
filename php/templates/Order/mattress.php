@@ -79,10 +79,10 @@
    
     
     <div class="form-row" id="hidespecial" style="margin-top:-10px;">
-        <div id = "mattspecialwidth1" class="col-sm-3"><label for="mattresstype">Matt 1 Special Width cm:<br></label> <input name = "matt1width" type = "text" id = "matt1width" class="form-select mattressfield" value = "<?= empty($prodsizes['Matt1Width']) ? '' : htmlspecialchars($prodsizes['Matt1Width']) ?>" size = "10"></div>
-        <div id = "mattspecialwidth2" class="col-sm-3"><label for="mattresstype">Matt 2 Special Width cm:<br></label><input name = "matt2width" type = "text" id = "matt2width" class="form-select mattressfield" value = "<?= empty($prodsizes['Matt2Width']) ? '' : htmlspecialchars($prodsizes['Matt2Width']) ?>" size = "10"></div>
-        <div id = "mattspeciallength1" class="col-sm-3"><label for="mattresstype">Matt 1 Special Length cm:<br></label><input name = "matt1length" type = "text" id = "matt1length" class="form-select mattressfield" value = "<?= empty($prodsizes['Matt1Length']) ? '' : htmlspecialchars($prodsizes['Matt1Length']) ?>" size = "10"></div>
-        <div id = "mattspeciallength2" class="col-sm-3"><label for="mattresstype">Matt 2 Special Length cm:<br></label><input name = "matt2length" type = "text" id = "matt2length" class="form-select mattressfield" value = "<?= empty($prodsizes['Matt2Length']) ? '' : htmlspecialchars($prodsizes['Matt2Length']) ?>" size = "10"></div>
+        <div id = "mattspecialwidth1" class="col-sm-3"><label for="mattresstype">Matt 1 Special Width cm:<br></label> <input name = "matt1width" type = "text" id = "matt1width" class="mattressfield" value = "<?= empty($prodsizes['Matt1Width']) ? '' : htmlspecialchars($prodsizes['Matt1Width']) ?>" size = "7"></div>
+        <div id = "mattspecialwidth2" class="col-sm-3"><label for="mattresstype">Matt 2 Special Width cm:<br></label><input name = "matt2width" type = "text" id = "matt2width" class="mattressfield" value = "<?= empty($prodsizes['Matt2Width']) ? '' : htmlspecialchars($prodsizes['Matt2Width']) ?>" size = "7"></div>
+        <div id = "mattspeciallength1" class="col-sm-3"><label for="mattresstype">Matt 1 Special Length cm:<br></label><input name = "matt1length" type = "text" id = "matt1length" class="mattressfield" value = "<?= empty($prodsizes['Matt1Length']) ? '' : htmlspecialchars($prodsizes['Matt1Length']) ?>" size = "7"></div>
+        <div id = "mattspeciallength2" class="col-sm-3"><label for="mattresstype">Matt 2 Special Length cm:<br></label><input name = "matt2length" type = "text" id = "matt2length" class="mattressfield" value = "<?= empty($prodsizes['Matt2Length']) ? '' : htmlspecialchars($prodsizes['Matt2Length']) ?>" size = "7"></div>
     </div>
     
     
@@ -164,7 +164,7 @@
 <div class="form-row">
     <div class="col-sm-10">
     Mattress Special Instructions:<br>
-    <textarea name = "mattressinstructions" id="mattressinstructions" class="form-control mattressfield" style="float:left; margin: left 20px; max-width:90%" onKeyUp="return taCount(this,'myCounter')"  cols = "65" rows = "2" maxlength="250"><?= $purchase['mattressinstructions'] ?></textarea>
+    <textarea name = "mattressinstructions" id="mattressinstructions" class="mattressfield" style="width:90%" onKeyUp="return taCount(this,'myCounter')"  cols = "65" rows = "2" maxlength="250"><?= $purchase['mattressinstructions'] ?></textarea>
     &nbsp;<B><SPAN id=myCounter>250</SPAN></B>/250
 <div class = "clear">
 &nbsp;

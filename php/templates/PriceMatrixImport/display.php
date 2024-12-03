@@ -34,7 +34,7 @@
 <tr class="<?=$rowClass?>">
 	<td>
 		<?php if (empty($row['errorMessages'])) { ?>
-			<input type="checkbox" name="KEY-<?= $row['key'] ?>" id="KEY-<?= $row['key'] ?>" class="pmid" <?=$row['isnew'] ? 'checked' : ''?> />
+			<input type="checkbox" name="KEY-<?= str_replace('.', '#', $row['key']) ?>" id="KEY-<?= $row['key'] ?>" class="pmid" <?=$row['isnew'] ? 'checked' : ''?> />
 		<?php } else { ?>
 			&nbsp;
 		<?php } ?>
@@ -57,7 +57,7 @@
 	<td><?=$row['errorMessages']?></td>
 	<td>
 	<?php if (empty($row['errorMessages']) && !$row['isnew']) { ?>
-		<input type="checkbox" name="DELETE-<?= $row['key'] ?>" id="DELETE-<?= $row['key'] ?>" class="did" />
+		<input type="checkbox" name="DELETE-<?= str_replace('.', '#', $row['key']) ?>" id="DELETE-<?= $row['key'] ?>" class="did" />
 	<?php } else { ?>
 		&nbsp;
 	<?php } ?>

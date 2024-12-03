@@ -55,10 +55,15 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 <form name="form1" class = "form-horizontal" id="form1" role = "form" method="post" action="/php/EditCustomer/edit">
 <div class="whitebox">
 
-	<?=$custdetails ?>
+	
   <div class="row">
-    <div class="col-md-8">
-        <p>Edit customer details here using the tabs below and finally clicking on the Save Changes button.<br><a href="/php/EditCustomer/export/?val=<?=$customer['CONTACT_NO']?>"><strong>Download Customer Record CSV</strong></a></p>
+  <div class="col-md-6">
+  <?=$custdetails ?>
+  <p>Edit customer details using the tabs below and finally clicking the Save Changes button.<br><a href="/php/EditCustomer/export/?val=<?=$customer['CONTACT_NO']?>"><strong>Download Customer Record CSV</strong></a></p>
+  </div>
+
+    <div class="col-md-3">
+        
         <p> <a href="/php/EditCustomer/print?env=y&val=<?=$customer['CONTACT_NO']?>"><strong>Print Label</strong></a><strong> |  <label>Print Letter:</label></strong><br>
 
         <select onChange="window.open(this.options[this.selectedIndex].value,'_parent')" name="corresid" id="corresid">
@@ -71,13 +76,14 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 
        </p>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
+    <div class="keepright">
+        <input type="submit" name="submitdb" value="Save Changes"  id="submitdb" class="button" />
+        </div>
         <div class="keepright">
             <input type="submit" name="submitbrochure" value="Brochure Request"  id="submitbrochure" class="button" />
         </div> 
-        <div class="keepright">
-        <input type="submit" name="submitdb" value="Save Changes"  id="submitdb" class="button" />
-        </div>
+        
         <div class="keepright">
 	      	<?php if ($allowedshowrooms=='y') { ?>  
 		      <select name="orderquote" id="orderquote" style="margin-right:13px;" onChange="return orderQuoteChangeHandler2();">
@@ -121,7 +127,9 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
 </div>
 <br>
 <!-- Nav tabs -->
-<ul class="nav nav-tabs responsive-tabs" role="tablist">
+
+<ul class="nav nav-tabs" role="tablist">
+ 
   <li class="active"><a href="#details" role="tab" data-toggle="tab">Contact Details</a></li>
   <li><a href="#info" role="tab" data-toggle="tab">Customer Information/Source</a></li>
   <li><a href="#orders" role="tab" data-toggle="tab">Orders & Quotes</a></li>
@@ -206,15 +214,15 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
           <label class="control-label" for="telwork">Tel Work</label>
           <input type="text" class="form-control form-control-sm" name="telwork" id="telwork" placeholder="Tel Work" value="<?=$customer['telwork']?>">  
           <label class="control-label" for="mobile">Mobile</label>
-          <input type="text" class="form-control form-control-sm" name="mobile" id="mobile" placeholder="Mobile" value="<?=$customer['mobile']?>"> 
-          <label class="control-label" for="fax">Fax</label>
-          <input type="text" class="form-control form-control-sm" name="fax" id="fax" placeholder="Fax" value="<?=$addressdetails['fax']?>">       
+          <input type="text" class="form-control form-control-sm" name="mobile" id="mobile" placeholder="Mobile" value="<?=$customer['mobile']?>">        
           <label class="control-label" for="company">Company</label>
           <input type="text" class="form-control form-control-sm" name="company" id="company" placeholder="Company" value="<?=$addressdetails['company']?>">  
           <label class="control-label" for="companyposition">Position in Company</label>
           <input type="text" class="form-control form-control-sm" name="companyposition" id="companyposition" placeholder="Position in Company" value="<?=$customer['position']?>">  
           <label class="control-label" for="companyvat">Company VAT No</label>
           <input type="text" class="form-control form-control-sm" name="companyvat" id="companyvat" placeholder="Company VAT No." value="<?=$customer['COMPANY_VAT_NO']?>"> 
+          <label class="control-label" for="accountsref">Accounts Customer Ref.</label>
+          <input type="text" class="form-control form-control-sm" name="accountsref" id="accountsref" placeholder="Accounts Customer Reference" value="<?=$customer['accountsRef']?>"> 
           
           <label class="control-label" for="acceptemail">Customer accepts email marketing (ticked if yes)</label>
           <?php if ($userLocation ==1) {
@@ -450,7 +458,25 @@ $( "#nextactive_<?=$commsrow['communicationid']?>" ).datepicker( "option", "date
  <?php if ($userRegion==1) { ?>
     <font color="#009900"> - orders in green are QUOTES</font>
  <?php }?>
- <font color="#555555"> - orders in grey are CANCELLED</font>):</b></p> 
+ <font color="#555555"> - orders in grey are CANCELLED</font>):</b><br>
+<?php
+foreach ($totalspendinfo['overall'] as $line) {
+  echo 'Total orders=<b>'.$totalspendinfo['totalorders'].'</b>.';
+    $total = $this->MyForm->formatMoneyWithSymbol($line['total'], $line['ordercurrency'], true);
+    echo ' Total spend=<b>'.$total.'</b>';
+    $totExVat = $this->MyForm->formatMoneyWithSymbol($line['totExVat'], $line['ordercurrency'], true);
+    echo ' <b>(Ex VAT='.$totExVat.')</b>';
+}
+foreach ($totalspendinfo['year'] as $line) {
+  $total = $this->MyForm->formatMoneyWithSymbol($line['total'], $line['ordercurrency'], true);
+  echo ' Calendar Year Spend=<b>'.$total.'</b>';
+  $totExVat = $this->MyForm->formatMoneyWithSymbol($line['totExVat'], $line['ordercurrency'], true);
+  echo ' <b> (Ex VAT='.$totExVat.'<b>)';
+}
+
+
+?>
+</p> 
 
 
 <table id="ordersdt" class="table table-striped table-bordered" style="width:100%">
@@ -1186,7 +1212,7 @@ jconfirm.defaults = {
     closeIcon: null,
     closeIconClass: false,
     watchInterval: 100,
-    columnClass: 'col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1',
+    columnClass: 'col-md-6 col-md-offset-6 col-sm-6 col-sm-offset-3 col-xs-10 col-xs-offset-1',
     boxWidth: '100%',
     scrollToPreviousElement: true,
     scrollToPreviousElementAnimate: true,
@@ -1410,7 +1436,7 @@ $(document).ready(function() {
 
     // Update the URL hash when a tab is clicked and activate it
     $('.nav-tabs a').on('shown.bs.tab', function(e) {
-        window.location.hash = e.target.hash;
+       // window.location.hash = e.target.hash;
         activateTab(e.target.hash);
     });
 });

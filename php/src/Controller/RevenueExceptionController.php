@@ -65,6 +65,9 @@ $matt2='';
 $matt3='';
 $matt4='';
 $matt4v='';
+$matt5='';
+$frenchmatt='';
+$statematt='';
 $mattO='';
 $DiscoutRate=1;
 $baseprice='';
@@ -73,13 +76,19 @@ $base2='';
 $base3='';
 $base4='';
 $base4v='';
+$base5='';
 $baseS='';
+$basepeg='';
+$baseplatform='';
+$basestate='';
+$basesurround='';
 $baseO='';
 $hw='';
 $hca='';
 $cw='';
 $cfv='';
 $topperprice='';
+$valance='';
 $headboardprice='';
 $legprice='';
 $accprice='';
@@ -124,6 +133,15 @@ if (!empty($row['discount'])) {
 		case 'No. 4v':
 			$matt4v = $mattprice;
 			break;
+		case 'No. 5':
+			$matt5 = $mattprice;
+			break;
+		case 'French Mattress':
+			$frenchmatt = $mattprice;
+			break;
+		case 'State':
+			$statematt = $mattprice;
+			break;
 		default:
 			$mattO = $mattprice;
 	}
@@ -148,8 +166,23 @@ if ($row['baserequired'] == 'y') {
 		case 'No. 4v':
 			$base4v = $baseprice;
 			break;
+		case 'No. 5':
+			$base5 = $baseprice;
+			break;
 		case 'Savoir Slim':
 			$baseS = $baseprice;
+			break;
+		case 'Pegboard':
+			$basepeg = $baseprice;
+			break;
+		case 'Platform Base':
+			$baseplatform = $baseprice;
+			break;
+		case 'State':
+			$baseplatform = $baseprice;
+			break;
+		case 'Surround':
+			$baseplatform = $baseprice;
 			break;
 		default:
 			$baseO = $baseprice;
@@ -162,19 +195,26 @@ if ($row['topperrequired'] == 'y') {
 
 	switch ($row["toppertype"]) {
 		case 'HW Topper':
-			$hw = $baseprice;
+			$hw = $topperprice;
 			break;
 		case 'HCa Topper':
-			$hca = $baseprice;
+			$hca = $topperprice;
 			break;
 		case 'CW Topper':
-			$cw = $baseprice;
+			$cw = $topperprice;
 			break;
 		case 'CFv Topper':
-			$cfv = $baseprice;
+			$cfv = $topperprice;
 			break;
 	}
 }
+
+if ($row['valancerequired'] == 'y') {
+	$valanceprice = round($row["valance_sum"] / $afterVATRate, 2);
+	$valanceprice = round($valanceprice * $DiscoutRate, 2);
+			$valance = $valanceprice;
+}
+
  if ($row['headboardrequired'] == 'y') {
 	$headboardprice = round($row["hb_sum"] / $afterVATRate, 2);
 	$headboardprice = round($headboardprice * $tempDiscoutRate, 2);
@@ -209,11 +249,11 @@ $productioncompletiondate=null;
 } else {
 $productioncompletiondate=date('d-m-Y', strtotime($row['production_completion_date']));
 }
-			$a = [$orderdate, $productioncompletiondate, $completedorders, $bookeddelivery, $row['ORDER_NUMBER'], $row['surname'], $row['company'], $row['adminheading'], $row['ordercurrency'], $discount, $discountPercent, $row['vat'], $row['vatrate'], $bedsettotal, $totalafterdiscount, $row['total'], $row['balanceoutstanding'], $row['payments'], $row['refunds'], $matt1, $matt2, $matt3, $matt4, $matt4v, $mattO, $base1, $base2, $base3, $base4, $base4v, $baseS, $baseO, $hw, $hca, $cw, $cfv, $headboardprice, $legprice, $accprice, $deliveryprice];
+			$a = [$orderdate, $productioncompletiondate, $completedorders, $bookeddelivery, $row['ORDER_NUMBER'], $row['surname'], $row['company'], $row['adminheading'], $row['ordercurrency'], $discount, $discountPercent, $row['vat'], $row['vatrate'], $bedsettotal, $totalafterdiscount, $row['total'], $row['balanceoutstanding'], $row['payments'], $row['refunds'], $matt1, $matt2, $matt3, $matt4, $matt4v, $matt5, $frenchmatt, $statematt, $mattO, $base1, $base2, $base3, $base4, $base4v, $base5, $baseS, $basepeg, $baseplatform, $basestate, $basesurround, $baseO, $hw, $hca, $cw, $cfv, $valance, $headboardprice, $legprice, $accprice, $deliveryprice];
 			array_push($data, $a);
 		}
 		
-		$header = ['Order Date', 'Production Completion Date', 'Completed orders', 'Delivery Date', 'Order Number', 'Surname', 'Company', 'Showroom', 'Currency', 'Discount', 'Discountpercent', 'Vat',	'Vat rate', 'Total', 'Total after discount', 'Total inc VAT', 'Balance outstanding', 'Payments', 'Refunds', 'No1 mattress', 'No2 mattress', 'No3 mattress', 'No4 mattress', 'No4v mattress', 'Other mattress', 'No1 base', 'No2 base', 'No3 base', 'No4 base', 'No4v base', 'Savoir slim base', 'Other base', 'Hw topper', 'Hca topper', 'Cw topper', 'Cfv topper', 'Headboard', 'Leg', 'Accessories', 'Delivery'];
+		$header = ['Order Date', 'Production Completion Date', 'Completed orders', 'Delivery Date', 'Order Number', 'Surname', 'Company', 'Showroom', 'Currency', 'Discount', 'Discountpercent', 'Vat',	'Vat rate', 'Total', 'Total after discount', 'Total inc VAT', 'Balance outstanding', 'Payments', 'Refunds', 'No1 mattress', 'No2 mattress', 'No3 mattress', 'No4 mattress', 'No4v mattress', 'No5 mattress', 'French mattress', 'State mattress', 'Other mattress', 'No1 base', 'No2 base', 'No3 base', 'No4 base', 'No4v base', 'No5 base', 'Savoir slim base', 'Pegboard', 'Platform base', 'State base', 'Surround base', 'Other base', 'Hw topper', 'Hca topper', 'Cw topper', 'Cfv topper', 'Valance', 'Headboard', 'Leg', 'Accessories', 'Delivery'];
 
     	$this->setResponse($this->getResponse()->withDownload('RevenueException.csv'));
     	$this->set(compact('data'));
