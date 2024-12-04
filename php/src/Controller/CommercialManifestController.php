@@ -811,6 +811,8 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 			        $n = 0;
 			        foreach ($exportData['accbox'] as $acclines) {
 						foreach ($acclines as $accline) {
+							//debug($accline);
+							//die;
 							$packinfo = $this->PackagingData->find()->where(['CompPartNo' => $accline['orderaccessory_id']])->first();
 
 							if ($packinfo == null || $packinfo['PackedWith'] == null || $packinfo['PackedWith'] == 0) {
@@ -820,34 +822,39 @@ NW10 6UD<br>UNITED KINGDOM</p></td><td width=50%><p align=center valign='top'><i
 								} else {
 									$borderstyle='noborder';
 								}
+								$packagingsize = '-';
+								if (!empty($accline['packwidth']) && !empty($accline['packheight']) && !empty($accline['packdepth'])) {
+									$packagingsize = round($accline['packwidth']) ."x". round($accline['packheight']) ."x". round($accline['packdepth']) ."cm";
+								}
+								$description = $accline['description'];
+								$grossWeight = 0;
+								$netWeight = '';
+								if (isset($accline['packkg'])) {
+									$grossWeight = floatval($accline['packkg']);
+									$netWeight = floatval($accline['packkg']);
+								}
+								foreach ($acclines as $acclinePackedWith) {
+									if ($acclinePackedWith['PackedWith'] == '9-'.$accline['orderaccessory_id']) {
+										$description .= "<br>".$acclinePackedWith['description'];
+										if (isset($acclinePackedWith['packkg'])) {
+											$grossWeight += floatval($acclinePackedWith['packkg']);
+											$netWeight .= "<br>".floatval($acclinePackedWith['packkg']);
+										} else {
+											$netWeight .= "<br>";
+										}
+									}
+								}
 								$tmp = "<td class='".$borderstyle."' width=47 valign='top'>".$count." of ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
-								$tmp .= "<td  class='".$borderstyle."' width=130 valign='top'>".$accline['description']."</td>";
-								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
-								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
-								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=130 valign='top'>".$description."</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>".$packagingsize."</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>".$netWeight."</td>";
+								$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>".$grossWeight."</td>";
+
 								array_push($component9, $tmp);
 								$count+=1;
 								$linetotal+=1;
 							}
 							
-							foreach ($acclines as $accline2) {
-								// loop through the accessories again to see if any packed with current one
-								if ($accline2['PackedWith'] == '9-'.$accline['orderaccessory_id']) {
-									if ($componentfirst==9 && $n == 1) {
-										$borderstyle='topborder';
-									} else {
-										$borderstyle='noborder';
-									}
-									$tmp = "<td class='".$borderstyle."' width=47 valign='top'>".$count." of ".$totalitemsinorder." ".$wrap['pdfwrapname']."</td>";
-									$tmp .= "<td  class='".$borderstyle."' width=130 valign='top'>".$accline2['description']."</td>";
-									$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
-									$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
-									$tmp .= "<td  class='".$borderstyle."' width=40 valign='top'>-</td>";
-									array_push($component9, $tmp);
-									$count+=1;
-									$linetotal+=1;
-								}
-							}
 						}
 			        }
 			    } 

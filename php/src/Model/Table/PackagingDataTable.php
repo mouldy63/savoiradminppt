@@ -35,7 +35,19 @@ class PackagingDataTable extends Table {
 		return $count;
     }
 
-    /**
+    public function getStandAloneAccessoriesCountForExport($pn, $cid) {
+		$sql = "select count(*) as n from packagingdata pd join orderaccessory oa on pd.comppartno=oa.orderaccessory_id and componentid=9 and (packedwith is null or packedwith = '0') and oa.purchase_no=:pn" . 
+        		" and pd.CompPartNo in (select e.AccId from exportlinks e join exportcollshowrooms s on e.LinksCollectionID=s.exportCollshowroomsID where s.exportCollectionID=:cid and e.purchase_no=:pn and componentId=9)";
+    	$myconn = ConnectionManager::get('default');
+		$rs = $myconn->execute($sql, ['pn' => $pn, 'cid' => $cid]);
+		$count = 0;
+		foreach ($rs as $row) {
+			$count = $row['n'];
+		}
+		return $count;
+    }
+
+	/**
      * Gets the data from the orderaccessory and packagingdata tables for each set of accessories for the order. A set is those that will be boxed together
      * i.e. a standalone accessory (packedwith not set), and those packed with it.
      */
@@ -64,7 +76,7 @@ class PackagingDataTable extends Table {
 		return $accessorySets;
     }
 
-    public function accessoryHasValancePackedWithIt($pn, $orderAccessoryId) {
+	public function accessoryHasValancePackedWithIt($pn, $orderAccessoryId) {
     	$myconn = ConnectionManager::get('default');
     	$sql = "select 1 FROM packagingdata pd where pd.componentid=6 and pd.purchase_no=:pn and pd.packedwith=:pw";
 		$rs = $myconn->execute($sql, ['pn' => $pn, 'pw' => '9-'.$orderAccessoryId]);

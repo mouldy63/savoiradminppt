@@ -1213,12 +1213,15 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        $exportData['acc'] = $accessory->find()->where(['purchase_no' => $pn]);
 	        // @TODO check $exportData['totalitems'] logic with MAd
 	        if ($wrapid==3) {
-				//debug($exportData['totalitems']);
-				
-	            $exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCount($pn);
+				if ($cid != null) {
+					$exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCountForExport($pn, $cid);
+				} else {
+					$exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCount($pn, $cid);
+				}
 				$exportData['accbox'] = $packagingData->getAccessoriesSetsForBoxes($pn);
-				//debug($exportData['accbox']);
-				//die;
+				// debug($exportData['totalitems']);
+				// debug($exportData['accbox']);
+				// die;
 	        }
 			
 	        if ($wrapid==4) {

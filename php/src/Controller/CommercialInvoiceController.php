@@ -364,7 +364,7 @@ class CommercialInvoiceController extends SecureAppController
 
 		$this->set('header', $header);
 		
-		$exportData = $this->CommercialData->getExportData(null, $pn, $mattressinc, $baseinc, $topperinc, $valanceinc, $legsinc, $hbinc, $accinc, $purchase, $wrapid, $wholesale, $psizes);
+		$exportData = $this->CommercialData->getExportData(null, $pn, $mattressinc, $baseinc, $topperinc, $valanceinc, $legsinc, $hbinc, $accinc, $purchase, $wrapid, $wholesale, $psizes, $cid);
 		
 		//echo '<br>$exportData['totalitems']=' . $exportData['totalitems'];
 		//die;
