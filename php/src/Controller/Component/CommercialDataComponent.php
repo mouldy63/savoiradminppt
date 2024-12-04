@@ -1215,10 +1215,7 @@ class CommercialDataComponent extends \Cake\Controller\Component {
 	        if ($wrapid==3) {
 				//debug($exportData['totalitems']);
 				
-	            //$exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCount($pn);
-				if ($cid != null) {
-					$exportData['totalitems'] += $packagingData->getAccBoxCount($pn, $cid);
-				}
+	            $exportData['totalitems'] += $packagingData->getStandAloneAccessoriesCount($pn);
 				$exportData['accbox'] = $packagingData->getAccessoriesSetsForBoxes($pn);
 				//debug($exportData['accbox']);
 				//die;
