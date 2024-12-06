@@ -102,8 +102,8 @@ if compId = 3 then
 		m1width=m1width/2
 		m2width=m2width/2
 		if left(rs("basetype"),3)="Eas" then
-			defaultBoxSize1 = "Small"
-			defaultBoxSize2 = "Medium"
+			defaultBoxSize1 = "Medium"
+			defaultBoxSize2 = "Small"
 		end if
 		'end if
 		if left(rs("basewidth"),4)="Spec" then

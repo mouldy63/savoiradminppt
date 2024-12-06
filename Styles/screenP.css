@@ -1,0 +1,211 @@
+.containerwide {
+	border: 1px solid #ebebeb;
+	margin: 2em auto;
+	padding:0 0 3em 0;
+	width: 100%;
+}
+.tblmargin {position:relative;
+padding-left:30px;
+padding-right:30px;
+	margin-left:30px;
+	margin-right:30px;
+	}
+#floatleft{float:left;
+position:relative;
+z-index:1;}
+#floatrightP{float:right;
+position: relative;
+    top: -20px;
+	z-index:2;}
+#mattress_div{
+	width:1240px;
+	}
+#base_div{
+	width:1240px;
+	}base_div
+#valance_div{
+	width:1240px;
+	}
+#topper_div{
+	width:1240px;
+	}
+#headboard_div{
+	width:1240px;
+	}
+#accessories_div{
+	width:1440px;
+	}
+#legs_div{
+	width:1240px;
+	}
+#matt1 {
+	float:left;
+	width:415px;
+	}
+#matt2 {float: left;
+	width:215px;
+	}
+#matt3 {float: left;
+	width:215px;
+	}
+#matt4 {float: left;
+	width:215px;
+	}
+#topp1 {
+	float:left;
+	width:415px;
+	}
+#topp2 {float: left;
+	width:215px;
+	}
+#topp3 {float: left;
+	width:215px;
+	}
+#topp4 {float: left;
+	width:215px;
+	}
+#legs1 {
+	float:left;
+	width:415px;
+	}
+#legs2 {float: left;
+	width:215px;
+	}
+#legs3 {float: left;
+	width:215px;
+	}
+#legs4 {float: left;
+	width:215px;
+	}
+#valance1 {
+	float:left;
+	width:415px;
+	}
+#valance2 {float: left;
+	width:215px;
+	}
+#valance3 {float: left;
+	width:215px;
+	}
+#valance4 {float: left;
+	width:215px;
+	}
+#accessory1 {
+	float:left;
+	width:1115px;
+	}
+#accessory2 {float: left;
+	width:215px;
+	}
+#accessory3 {float: left;
+	width:215px;
+	}
+#accessory4 {float: left;
+	width:215px;
+	}
+#head1 {
+	float:left;
+	width:415px;
+	}
+#head2 {float: left;
+	width:215px;
+	}
+#head3 {float: left;
+	width:215px;
+	}
+#head4 {float: left;
+	width:215px;
+	}
+#base1 {
+	float:left;
+	width:415px;
+	}
+#base2 {float: left;
+	width:215px;
+	}
+#base3 {float: left;
+	width:215px;
+	}
+#base4 {float: left;
+	width:215px;
+	}
+
+
+table.fabric {
+	border-width: thin;
+	border-spacing: 0px;
+	border-style: solid;
+	border-color: gray;
+	border-collapse: separate;
+	background-color: rgb(255, 255, 240);
+}
+table.fabric th {
+	border-width: 1px;
+	padding: 2px;
+	border-style: dotted;
+	border-color: gray;
+	background-color: white;
+	-moz-border-radius: ;
+}
+table.fabric td {
+	border-width: 1px;
+	padding: 2px;
+	border-style: dotted;
+	border-color: gray;
+	background-color: white;
+	-moz-border-radius: ;
+}
+table.prod {
+	border-width: thin;
+	border-spacing: 0px;
+	border-style: solid;
+	border-color: gray;
+	border-collapse: separate;
+	background-color: rgb(255, 255, 240);
+}
+table.prod th {
+	border-width: 1px;
+	padding: 2px;
+	border-style: dotted;
+	border-color: gray;
+	background-color: white;
+	-moz-border-radius: ;
+}
+table.prod td {
+	border-width: 1px;
+	padding: 2px;
+	border-style: dotted;
+	border-color: gray;
+	background-color: #FFFFF0;
+	-moz-border-radius: ;
+}
+table.logistics {
+	border-width: thin;
+	border-spacing: 0px;
+	border-style: solid;
+	border-color: gray;
+	border-collapse: separate;
+	background-color: rgb(255, 255, 240);
+}
+table.logistics th {
+	border-width: 1px;
+	padding: 2px;
+	border-style: dotted;
+	border-color: gray;
+	background-color: white;
+	-moz-border-radius: ;
+}
+table.logistics td {
+	border-width: 1px;
+	padding: 2px;
+	border-style: dotted;
+	border-color: gray;
+	background-color: #FAF0E6;
+	-moz-border-radius: ;
+}
+.lgtext {font-size: 1.2em;}
+.borderleft {
+	border-left-width: 1px;
+	border-left-style: solid;
+	border-left-color: #063;
+}

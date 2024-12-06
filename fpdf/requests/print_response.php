@@ -200,7 +200,7 @@ class PDF extends FPDF
 //		var_dump($this->currencyShortCode);
 //		var_dump($currencySymbol);
 //		die;
-		
+
 		$this->orderType = $type;
 		if ($this->getPagePercentLeft() < 20) {
 			$this->renderHeader = false;
@@ -220,19 +220,19 @@ class PDF extends FPDF
 			$this->Cell(16-$w_symbol,$cellHight,$commaValue,'TB',0,'R');
 			$this->Cell(2,$cellHight,'','TB',0,'R');
 			$this->Cell(10,$cellHight,$d['cat'],'TB',0,'L');
-			$this->Cell(84,$cellHight,$d['description'],'RTB',0,'L');
+			$this->MultiCell(64,$cellHight,$d['description'],1);
 			$this->Ln($cellHight);
 		}
 		//BOTTOM TOTAL (in development)
         $this->Cell(13,$cellHight,'TOTAL','LRTB',0,'L');
         $this->Cell(22,$cellHight,'','TB',0,'L');
         $this->Cell(20,$cellHight,'','TB',0,'L');
-        $this->Cell(20,$cellHight,'','TB',0,'L');
+        $this->Cell(40,$cellHight,'','TB',0,'L');
         $this->Cell(4,$cellHight,$currencySymbol,'TB',0,'R');
         $this->Cell(14,$cellHight, $total,'TB',0,'R'); //HERE
         $this->Cell(2,$cellHight,'','TB',0,'R');
         $this->Cell(10,$cellHight,'','TB',0,'L');
-        $this->Cell(84,$cellHight,'','RTB',0,'L');
+        $this->Cell(64,$cellHight,'','RTB',0,'L');
 	}
 
     public function setSourceTotalsArray($data)
@@ -294,7 +294,7 @@ class PDF extends FPDF
         $this->Cell(16, $cellHight, 'Value', 'T', 0, 'R');
         $this->Cell(2, $cellHight, '', 'TB', 0, 'R');
         $this->Cell(10, $cellHight, 'Cat', 'T', 0, 'L');
-        $this->Cell(84, $cellHight, 'Description', 'RT', 0, 'L');
+        $this->Cell(64, $cellHight, 'Description', 'RT', 0, 'L');
         $this->Ln($cellHight);
         return array($currencySymbol, $w_symbol, $cellHight);
     }
@@ -314,7 +314,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 	$pdf->AddPage();
 	$pdf->title(array('month'=>$month,'year'=>$year,'showroom'=>ucfirst($data['showroom_name'])));
 	if (array_key_exists("data", $data)) {
-	$pdf->tableBody($data);
+		$pdf->tableBody($data);
 	} else {
 		$pdf->Cell(10,6,'No sales',0,0,'L');
 	}
@@ -363,7 +363,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 					break;
 			}
 		}
-
+		
 		$pdf->setCurrencyShortCode($data['currency']);
 
 		if (!empty($customerOrders)) {

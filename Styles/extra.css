@@ -1,0 +1,41 @@
+.mgindent {
+	padding-left:11px;
+}
+
+
+.screenproduction {
+	border: 1px solid #ebebeb;
+	margin: 2em auto;
+	padding:0 0 3em 0;
+	width: 1050px;
+}
+.contentprod {
+    color: #333333;
+    float: left;
+    width: 1050px;
+}
+.box {
+	margin-top:10px;
+	background-color:#FFFFFF;
+	padding:10px;
+	border: 1px solid #F00;
+}
+.delnote { height: 100px;
+    margin-left: 1059px;
+    position: fixed;
+    z-index: 1099;}
+.redborder {
+	height: auto;
+	width: auto;
+	border: 1px solid #F00;
+	}
+.redcell {
+	background-color: #FFA59D;
+	}
+.retired {
+	color: #CCCCCC;
+	}
+#topright {
+	position:absolute;
+	top:20px;
+	right:20px;}

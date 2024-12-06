@@ -962,7 +962,7 @@ class CommercialInvoiceController extends SecureAppController
 						} else {
 							$commercialinv .="<tr class=comminv2><td>&nbsp;</td>";
 						}
-					$commercialinv .="<td>" .$accline['description'] ."</td>";
+					$commercialinv .="<td>XS" .$accline['description'] ."</td>";
 					$packtariffcode=$accline['tariffcode'];
 					if ($rowcount==1) {
 						$commercialinv .="<td>" .$packagingsize ."</td>";

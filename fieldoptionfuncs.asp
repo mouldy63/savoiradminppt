@@ -1,6 +1,6 @@
 <%
 dim NOPTIONS
-NOPTIONS = 61
+NOPTIONS = 69
 class fieldoptions
 	public optioncount
 	public options

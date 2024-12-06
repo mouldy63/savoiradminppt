@@ -97,4 +97,16 @@ class OrderFormHelper extends Helper {
         $price = $purchaseTable->getComponentPriceXVat($compid, $pn, $incextras);
 		return floatval(str_replace(',', '', $price));
     }
+
+	public function getPaymentsForInvoiceNo($useTempTable, $invno, $pn) {
+        $tablename = $useTempTable ? 'TempPurchase' : 'Purchase';
+        $purchaseTable = TableRegistry::get($tablename);
+        return $purchaseTable->getPaymentsForInvoiceNo($invno, $pn);
+    }
+
+	public function getOutstandingForInvoiceNo($useTempTable, $totalinvoice, $invno, $pn) {
+        $tablename = $useTempTable ? 'TempPurchase' : 'Purchase';
+        $purchaseTable = TableRegistry::get($tablename);
+        return $purchaseTable->getOutstandingForInvoiceNo($totalinvoice, $invno, $pn);
+    }
 }

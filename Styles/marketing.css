@@ -1,0 +1,17 @@
+#articleInputCenter{
+    text-align: center
+}
+#newArticleForm{
+    display: none;
+}
+
+#circle{
+    width:200px;
+    height:200px;
+    background-color: green;
+    border-radius: 100px;
+}
+
+.centertext{
+    text-align: center;
+}

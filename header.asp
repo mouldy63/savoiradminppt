@@ -34,13 +34,13 @@ else
 end if
 
 %>
-<div> <a href="/php/home" style="float:left;"><img src="/images/logo-s.gif" border="0"  width="255" height="40"  /></a>
+<div> <a href="/php/home" style="float:left;"><img src="/images/logo-s.gif" border="0" /></a>
   <p align="right" style="float:right;">&nbsp;Lead Time: London = <%=londonNo%> weeks, Cardiff = <%=cardiffNo%> weeks | Logged in as <%=retrieveUserName()%> | <a href="/access/logout.asp"> Logout</a></p>
 </div>
 <div class="clear"></div>
 <div id="adminhdr">
 <ul>
-  
+  <li><a href="/php/home">Home</a></li>
   <% if userHasRoleInList("ADMINISTRATOR,REGIONAL_ADMINISTRATOR,TESTER") then %>
   <li><a href="/php/AddCustomer">Add Customer</a></li>
   <%end if%>
@@ -74,21 +74,22 @@ end if
   <li class="dropdown">
     <a href="#" class="dropbtn">Customer Services</a>
     <div class="dropdown-content">
-      <a href='/php/customerservice/add'>Add Case</a>
+      <a href="/php/customerservice/add">Add Case</a>
       <%if userHasRoleInList("ADMINISTRATOR") then %>
-      <a href='/php/customerservicehistory'>Closed Cases</a>
+      <a href="/php/customerservicehistory">Closed Cases</a>
       <%end if%>
-      <a href='/php/customerservice'>Outstanding Cases</a>
+      <a href="/php/customerservice">Outstanding Cases</a>
     </div>
   </li>
   <%end if%>
-  <%if retrieveUserRegion()=1 or retrieveuserlocation()=8 or retrieveuserlocation()=37 or retrieveuserlocation()=24 or retrieveuserlocation()=25 or retrieveuserlocation()=34 or retrieveuserlocation()=31 or retrieveuserlocation()=35 or retrieveuserlocation()=17 or retrieveuserlocation()=33 or retrieveuserlocation()=38 or retrieveuserregion()=26 or retrieveuserlocation()=39 or retrieveuserlocation()=14 or retrieveUserRegion()=17 or retrieveuserregion()=19 or retrieveuserlocation()=40 then%>
+  <%if retrieveUserRegion()=1 or retrieveuserlocation()=8 or retrieveuserlocation()=37 or retrieveuserlocation()=24 or retrieveuserlocation()=25 or retrieveuserlocation()=34 or retrieveuserlocation()=31 or retrieveuserlocation()=35 or retrieveuserlocation()=17 or retrieveuserlocation()=33 or retrieveuserlocation()=38 or retrieveuserregion()=26 or retrieveuserlocation()=39 or retrieveuserlocation()=14 or retrieveUserRegion()=17 or retrieveuserregion()=19 or retrieveuserlocation()=40 or retrieveuserlocation()=51 then%>
   <li class="dropdown">
     <a href="#" class="dropbtn">Orders</a>
     <div class="dropdown-content">
       <a href="/php/awaitingorders">Awaiting Confirmation</a>
-      <a href="/current-orders.asp">Current Orders</a>
-      <a href="/heldorders.asp">Held Orders</a>
+      <a href="/php/currentorders">Current Orders</a>
+      <a href="/php/heldorders">Held Orders</a>
+      <a href="/php/harrodsImport">Harrods Ecom Import</a>
      <%if retrieveUserRegion()=1 or retrieveuserlocation()=34 or retrieveuserlocation()=24 or retrieveuserlocation()=17 or retrieveuserlocation()=37 or retrieveuserlocation()=39 then%>
       <a href="/php/quotes">Quotes</a>
       <%end if%>
@@ -112,7 +113,6 @@ end if
       <a href="/php/deliveriesbooked?madeat=1">Cardiff Screen</a>
       <a href="/php/deliveriesbooked?madeat=2">London Screen</a>
       <a href="http://wrap.savoirproduction.co.uk/production.php">Labels Screen</a>
-<a href="http://wrap.savoirproduction.co.uk/qcMonitor/qcIndex.php">QC Screen</a>
     </div>
   </li>
   <%end if%> 
@@ -141,19 +141,19 @@ end if
       <a href="/php/CustomerReadyNotInvoiced">Customer Ready Not Invoiced</a>
       <a href="/php/deliveryreport">Delivery</a>
       <%if isSuperUser() or retrieveUserId()=209 then %> 
-      <a href="/customer-reportsfull.asp">Full Customer/Prospects</a>
+      <a href="/php/customerprospectreport">Full Customer/Prospects</a>
       <%end if%>
       <%if userHasRoleInList("ADMINISTRATOR") then %>
       <a href="/php/orderStatusReport">Order Status Report</a>
       <%end if%>
       <%if isSuperUser() or retrieveUserId()=199 or retrieveUserId()=90 then %> 
-      <a href="/php/ShowroomOrdersReport">Showroom Report</a>
+      <a href="/php/showroomordersreport">Showroom Report</a>
       <%end if%>
       <%if userHasRoleInList("ADMINISTRATOR,REGIONAL_ADMINISTRATOR,SALES") then %>
 		<a href="/php/ShowroomSalesReportPopup">Showroom Sales Report</a>
       <%end if%>
-      <a href="/searchtrade.asp">Trade</a>
-      
+      <a href="/php/tradesearch">Trade</a>
+     
     </div>
   </li>
 
@@ -200,7 +200,7 @@ end if
       <a href="/php/terms">Edit Terms & Conditions</a>
       <a href="/php/pricingmatrix">Pricing Matrix</a>
       <a href="/wholesale-price-report.asp">Wholesale Price Report</a>
-	  <a href="/php/newsalefigures/monthly">Sale Figures</a>
+	  <a href="/php/newsalesfigures/monthly">Sale Figures</a>
 	  <a href="/php/useradmin/">Manage Users</a>
 	
   </li>

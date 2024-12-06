@@ -31,6 +31,7 @@ border:1px solid #d7dada; -webkit-border-radius: 3px; -moz-border-radius: 3px;bo
  background-image: -o-linear-gradient(top, #f4f5f5, #dfdddd);
  background-image: linear-gradient(to bottom, #f4f5f5, #dfdddd);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#f4f5f5, endColorstr=#dfdddd);
 }
+
 .success {
 	clear: both;
 	color: #fff;
@@ -474,6 +475,7 @@ ul.nav li.active {
 	background-color:#f3f2f2;
 }
 
+
 p.credits {
 	clear: both;
 	margin: 0 auto;
@@ -894,3 +896,44 @@ ul.pagination .disabled:hover a {
 .Accordclear {clear:both;}
 .stickleft {float:left;left:0px;}
 .AccordionPanel table {margin-left:30px; background-color:#d4d4d4;}
+.mergebutton {
+	float:right; 
+	background-color:#E97451; 
+	color:white; 
+	margin-right:15px; 
+	padding:5px;
+	cursor: pointer;
+}
+.mergebutton:hover {
+    background-color: #000000; /* Change this to your desired hover color */
+}
+
+.mergetooltip {
+	display: none;
+	position: absolute;
+	background-color: white; /* White background */
+	color: black; /* Black text color */
+	padding: 10px 15px;
+	border: 1px solid black; /* Black border */
+	border-radius: 4px;
+	z-index: 1000;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+}
+.question-mark {
+	display: inline-block;
+	padding: 5px 12px;
+	background-color: #E97451; /* Bootstrap primary color */
+	color: white;
+	border: none;
+	cursor: pointer;
+	font-size: 16px;
+	text-align: center;
+	transition: background-color 0.3s;
+	float: right;
+	margin-right:6px;
+}
+.question-mark:hover {
+	background-color: #000; /* Darker shade on hover */
+}
+
+  

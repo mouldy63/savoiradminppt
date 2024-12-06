@@ -84,6 +84,7 @@ If request("exportchoice") <> "" then
   'response.End()
   Set rs = getMysqlQueryRecordSetWithErrorLogging(sql, con)
  Do until rs.eof
+ response.write("link=" & rs("exportLinksID"))
   Set rs1 = getMysqlUpdateRecordSetWithErrorLogging("Select * from exportLinks where exportLinksID=" & rs("exportLinksID"), con)
   rs1("invoiceNo") = invoiceno
   rs1("invoiceDate") = invoicedate

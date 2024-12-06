@@ -565,7 +565,7 @@ function getOrderNoteHistory(byref acon, aPurchaseNo, aNoteType)
 		an = an + 1
 		redim preserve aNotes(an)
 		set aNote = new ordernote
-		aNote.orderNoteId = cint(ars("ordernote_id"))
+		aNote.orderNoteId = clng(ars("ordernote_id"))
 		aNote.text = ars("notetext")
 		aNote.action = ars("action")
 		aNote.followUpDate = ars("followupdate")
@@ -1034,6 +1034,9 @@ If aToppertype="State HCa Topper" then getTopperMadeAt=2
 	If aToppertype="HW Topper" and (aSavoirmodel<>"" and aSavoirmodel<>"n") then getTopperMadeAt=aMattressmadeat
 	If aToppertype="HW Topper" and (aBasesavoirmodel<>"" and aBasesavoirmodel<>"n") then getTopperMadeAt=aBasemadeat
 	If aToppertype="HW Topper" and (aSavoirmodel="" or aSavoirmodel="n")  and (aBasesavoirmodel="" or aBasesavoirmodel="n") then getTopperMadeAt=1
+	If aToppertype="HC Topper" and (aSavoirmodel<>"" and aSavoirmodel<>"n") then getTopperMadeAt=aMattressmadeat
+	If aToppertype="HC Topper" and (aBasesavoirmodel<>"" and aBasesavoirmodel<>"n") then getTopperMadeAt=aBasemadeat
+	If aToppertype="HC Topper" and (aSavoirmodel="" or aSavoirmodel="n")  and (aBasesavoirmodel="" or aBasesavoirmodel="n") then getTopperMadeAt=1
 	If aToppertype="CW Topper" and (aSavoirmodel<>"" and aSavoirmodel<>"n") then getTopperMadeAt=aMattressmadeat
 	If aToppertype="CW Topper" and (aBasesavoirmodel<>"" and aBasesavoirmodel<>"n") then getTopperMadeAt=aBasemadeat
 	If aToppertype="CW Topper" and (aSavoirmodel="" or aSavoirmodel="n") and (aBasesavoirmodel="" or aBasesavoirmodel="n") then getTopperMadeAt=1
@@ -1376,7 +1379,7 @@ end function
 
 function getCustomerOrdersTotal(byref acon, byval aContactNo)
 	dim asql, ars, aVals(), aCount, aTotExVat
-	asql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND contact_no=" & aContactNo & " group by ordercurrency"
+	asql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test' AND contact_no=" & aContactNo & " group by ordercurrency"
 	set ars = getMysqlQueryRecordSet(asql, acon)
 	aCount = 0
 	while not ars.eof
@@ -1399,7 +1402,7 @@ end function
 
 function getVIPCustomerOrdersTotal(byref acon, byval aContactNo)
 	dim asql, ars, aVals(), aCount, aTotExVat
-	asql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND contact_no=" & aContactNo & " group by ordercurrency"
+	asql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test'  AND contact_no=" & aContactNo & " group by ordercurrency"
 	set ars = getMysqlQueryRecordSet(asql, acon)
 	aCount = 0
 	while not ars.eof
@@ -1422,7 +1425,7 @@ end function
 
 function getCustomerOrdersTotalCurrentYear(byref acon, byval aContactNo)
 	dim asql, ars, aVals(), aCount, aTotExVat
-	asql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND contact_no=" & aContactNo & " and year(order_date) = year(now()) group by ordercurrency"
+	asql = "select sum(total) as tot,sum(totalexvat) as totexvat,ordercurrency from purchase where (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test'  AND contact_no=" & aContactNo & " and year(order_date) = year(now()) group by ordercurrency"
 	set ars = getMysqlQueryRecordSet(asql, acon)
 	aCount = 0
 	while not ars.eof

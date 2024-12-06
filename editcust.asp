@@ -259,7 +259,9 @@ response.write("<br>lastcontactdate=" & Request("lastcontactdate"))
 response.write("<br>visitdate=" & Request("visitdate"))
 If Request("initialcontactdate")<>"" then rs("first_contact_date")=Request("initialcontactdate") else rs("first_contact_date")=date()
 If Request("lastcontactdate")<>"" then rs("last_contact_date")=Request("lastcontactdate")
-If Request("visitdate")<>"" then rs("visit_date")=Request("visitdate") else rs("visit_date")=Null
+If trim(Request("visitdate"))<>"" and len(trim(Request("visitdate")))>0 then 
+rs("VISIT_DATE")=Request("visitdate") 
+end if
 If Request("location")<>"" then rs("visit_location")=Request("location") else rs("visit_location")=Null
 If Request("pricelist")<>"" then rs("price_list")=Request("pricelist") else rs("price_list")=Null
 
@@ -849,7 +851,7 @@ Do until rs3.eof%>
 	      <label for="postcode" id="postcode" class="b">Post Code</label>
 				<br />
                 
-              <input name="postcode" type="text" id="postcode" value="<%=rs1("postcode")%>">
+              <input name="postcode" type="text" id="postcode" value="<%=rs1("postcode")%>" maxlength = "20">
 
 		  </div>
           <%if retrieveUserRegion=1 then%>
@@ -1282,7 +1284,7 @@ Set rs2 = Nothing
               
               <div class="TabbedPanelsContent">
                 <div class="one-col">
-                 <%Set rs2 = getMysqlQueryRecordSet("Select * from purchase WHERE code=" & rs("code") & " ORDER by order_date desc", con)
+                 <%Set rs2 = getMysqlQueryRecordSet("Select * from purchase WHERE contact_no=" & rs("contact_no") & " AND (cancelled<>'y' or cancelled is null) AND (quote<>'y' or quote is null) AND orderSource<>'Test' ORDER by order_date desc", con)
 				 If rs2.EOF then
 				 Response.Write("No orders currently")
 				 Else%>

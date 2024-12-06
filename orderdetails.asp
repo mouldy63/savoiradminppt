@@ -32,7 +32,7 @@ dim valanceframe, valanceframechecked, valanceprepped, valancepreppedchecked, va
 Dim legsfinished, legsmadeat, legsbcwexpected, legsbcwwarehouse, legsdeldate
 Dim  accessoriesbcwexpected, accessoriesbcwwarehouse, accessoriesdeldate, accessoryfabricstatus, accessoryporaised, accessorypackeddate
 dim prevorder, nextorder, search, submitX, salesOnly, formAction
-Dim matt1width, matt2width, matt1length, matt2length, m1width, m1length, m2width, m2length, base1width, base2width, base1length, base2length, topper1width, topper1length, mattwidthdivided, mattlengthdivided, zippedpair, northsouth, basewidth, baselength, basewidth2, baselength2, eastwest, accessoryqtyfollow, acc_design, acc_colour, acc_size, acc_supplier, acc_ponumber, acc_podate, acc_eta, acc_received, acc_checked, acc_special, acc_qtyfollow, x, acc_delivered, acc_length, acc_weight, acc_height, acc_packedwith, acc_width, acc_status, rs4, defaultwrappingid, hbfabricstatus, valfabricstatus, totalLegQty, speciallegheight, legsprepped, rs5, rs6, currentexworksdate, optionselected, lorrycount, splitshipment
+Dim matt1width, matt2width, matt1length, matt2length, m1width, m1length, m2width, m2length, base1width, base2width, base1length, base2length, topper1width, topper1length, mattwidthdivided, mattlengthdivided, zippedpair, northsouth, basewidth, baselength, basewidth2, baselength2, eastwest, accessoryqtyfollow, acc_design, acc_colour, acc_size, acc_supplier, acc_print, acc_ponumber, acc_podate, acc_eta, acc_received, acc_checked, acc_special, acc_qtyfollow, x, acc_delivered, acc_length, acc_weight, acc_height, acc_packedwith, acc_width, acc_status, rs4, defaultwrappingid, hbfabricstatus, valfabricstatus, totalLegQty, speciallegheight, legsprepped, rs5, rs6, currentexworksdate, optionselected, lorrycount, splitshipment
 Dim deliverymethodMatt, deliverymethodBase, deliverymethodTopper, deliverymethodValance, deliverymethodHb, deliverymethodLegs, deliverymethodAcc, preferredshipper, currentexworksdate2, jobflagMatt, jobflagBase, jobflagTopper, isAdhoc
 speciallegheight=""
 Dim acc_packdesc, acc_packwidth, acc_packheight, acc_packdepth, acc_packkg, acc_packtariffcode
@@ -1922,7 +1922,7 @@ Files Required for Production:</strong><br />
 </td>
         </tr>
       <tr>
-        <td width="417"><strong>SALES (<a href="edit-purchase.asp?prod=y&order=<%=pn%>"><font color="#FF0000">click here to amend sales section</font></a>)</strong></td>
+        <td width="417"><strong>SALES (<a href="/php/order?pn=<%=pn%>"><font color="#FF0000">GO BACK TO NEW ORDER FORM</font></a><br><br><a href="edit-purchase.asp?prod=y&order=<%=pn%>"><font color="grey">click here to amend sales section -old version</font></a>)</strong></td>
         <td width="213"><strong>FABRIC</strong></td>
         <td width="218"><strong>PRODUCTION</strong></td>
         <td width="202"><strong>LOGISTICS</strong></td>
@@ -2256,10 +2256,10 @@ set rs3=nothing%></select>
 <td valign="top">
 Ex-Works Date
 <%if retrieveUserLocation()=1  or retrieveUserLocation()=27 or userHasRoleInList("ORDERDETAILS_VIEWER") then
-Set rs5 = getMysqlQueryRecordSet("Select * from exportcollections E, exportCollShowrooms C, Location L where E.collectionStatus=1 and E.exportCollectionsID=C.exportcollectionID and C.idlocation=L.idlocation and transportmode<>'Adhoc Courier'", con)
+Set rs5 = getMysqlQueryRecordSet("Select * from exportcollections E, exportCollShowrooms C, Location L where E.collectionStatus=1 and E.exportCollectionsID=C.exportcollectionID and C.idlocation=L.idlocation and (transportmode<>'Adhoc Courier' or transportmode is null)", con)
 else
 
-Set rs5 = getMysqlQueryRecordSet("Select * from exportcollections E, exportCollShowrooms C, Location L where E.collectionStatus=1 and E.exportCollectionsID=C.exportcollectionID and C.idlocation=L.idlocation and transportmode<>'Adhoc Courier' and C.idlocation=" & retrieveUserLocation(), con)
+Set rs5 = getMysqlQueryRecordSet("Select * from exportcollections E, exportCollShowrooms C, Location L where E.collectionStatus=1 and E.exportCollectionsID=C.exportcollectionID and C.idlocation=L.idlocation and (transportmode<>'Adhoc Courier' or transportmode is null) and C.idlocation=" & retrieveUserLocation(), con)
 end if%>
 <select id="exworksdatematt" name="exworksdatematt" tabindex="4" >
 
@@ -5002,6 +5002,7 @@ set rs3=nothing%>
      </label>
      Hide
      <input name="accessoriesrequired" type="radio" id="accessoriesrequired_n" value="n" <%=ischeckedN(rs("accessoriesrequired"))%> onClick="javascript:accessoriesChanged()" >
+	 &nbsp;&nbsp;<button type="button" id="accprint-button">Print Box Label</button>
 </p>
 <%
 Set rs3 = getMysqlUpdateRecordSet("select * from orderaccessory where purchase_no=" & order & " order by orderaccessory_id", con)
@@ -5049,6 +5050,7 @@ Set rs3 = getMysqlUpdateRecordSet("select * from orderaccessory where purchase_n
 		acc_id = ""
 		acc_supplier=""
 		acc_status=""
+		acc_print=""
 
 		if not rs3.eof then
 			acc_desc = rs3("description")
@@ -5111,7 +5113,7 @@ No.&nbsp;<%=i%></b></td>
 		  <td colspan="11"><hr />&nbsp;</td>
 		  </tr>
 		<tr>
-		  <td valign="top">&nbsp;</td>
+		  <td valign="top">Label<br>Select</td>
 		  <td align="left">Supplier</td>
 		  <td align="left">Purchase <br>
 		    Order No.</td>
@@ -5133,7 +5135,8 @@ follow</td>
 </tr>
       
       <tr>
-<td valign="top">&nbsp;</td>
+<td valign="top"><input type="checkbox" id="acc_print_<%=acc_id%>" name="acc_print_<%=i%>" value="<%=acc_id%>">
+</td>
 <td valign="top"><strong>
 <input name="acc_supplier<%=i%>" type="text" id="acc_supplier" value="<%=acc_supplier%>" size="10" maxlength="25" <%=accreadonly%>>
 </strong></td>
@@ -5561,10 +5564,12 @@ Exit Shots Only:</strong><br />
 
 
 <%if eastwest<>"n" then
-base1width=basewidth/2
+base1width=basewidth
 base2width=base1width
 base1length=baselength
 base2length=baselength2
+
+
 end if%>
 <%if northsouth<>"n" then
 base1width=basewidth
@@ -5579,6 +5584,7 @@ base2length=base1length
 <input type="hidden" name="js_base2width" id="js_base2width" value="<%=base2width%>" />
 <input type="hidden" name="js_base1length" id="js_base1length" value="<%=base1length%>" />
 <input type="hidden" name="js_base2length" id="js_base2length" value="<%=base2length%>" />
+
 <%else%>
 <input type="hidden" name="js_basesavoirmodel" id="js_basesavoirmodel" value="<%=rs("basesavoirmodel")%>" />
 <input type="hidden" name="js_base1width" id="js_base1width" value="<%=base1width%>" />
@@ -6782,4 +6788,27 @@ set rs=nothing
 Con.Close
 Set Con = Nothing
 %>
+
+<script>
+           // JavaScript
+        document.getElementById('accprint-button').addEventListener('click', function () {
+            // Find all checked checkboxes with names starting with 'acc_print_'
+            const checkedBoxes = Array.from(document.querySelectorAll('input[name^="acc_print_"]:checked'));
+
+            // Get the values of checked checkboxes
+            const selectedValues = checkedBoxes.map(cb => cb.value);
+
+            if (selectedValues.length > 0) {
+                // Build the URL with query parameters
+                const baseUrl = 'https://www.savoiradminppt.co.uk/php/AccLabelprint.pdf?pn=<%=pn%>'; // Change to your target URL
+                const queryParams = `selected=${encodeURIComponent(selectedValues.join(','))}`;
+                const targetUrl = `${baseUrl}&${queryParams}`;
+
+                // Open the URL in a new window
+                window.open(targetUrl, '_blank');
+            } else {
+                alert('Please select at least one checkbox.');
+            }
+        });
+    </script>
 <!-- #include file="common/logger-out.inc" -->

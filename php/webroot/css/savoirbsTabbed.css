@@ -46,6 +46,8 @@ padding: 5px;
 	background-image: -o-linear-gradient(top, #76BF6B, #3B8230);
 	background-image: linear-gradient(top, #76BF6B, #3B8230);
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+	margin-top:10px;
+	margin-bottom:0px;
 }
 
 #adminhdr2 form{
@@ -54,7 +56,7 @@ padding: 5px;
 #header{
 	border: 1px solid #ebebeb;
     margin: 2em auto;
-    padding: 0 0 3em 0;
+    padding: 0 0 0 0;
     width: 1020px;
 }
 #header a{
@@ -205,7 +207,7 @@ ul.nav {
 	border-top: 1px solid #ebebeb;
 	margin-left: 5px;
 	padding: 10px 0;
-	width: 910px;
+	width: 780px;
 }
 
 ul.nav li {
@@ -399,7 +401,7 @@ ul.nav li.active {
 .row .button{
 	float:right;
 	margin-right:13px;
-	margin-bottom:10px;
+	margin-bottom:3px;
 }
 
 .press .inline-img{
@@ -510,7 +512,7 @@ p.credits {
 	color:#000;
 	}
 .greytext{
-	color:#555555;
+	color:#333333;
 	}
 .greytext a:link, .greytext a:active, .greytext a:visited {
 	color:#555555;
@@ -548,6 +550,13 @@ p.credits {
 	width:380px;
 	border: 1px dashed #666;
 }
+.tab-content>.tab-pane {
+    display: none;
+}
+.tab-content>.active {
+    display: block;
+}
+
 .linewidth {width:952px;
 margin-left:0;}
 table.tableborder {
@@ -792,5 +801,23 @@ textarea.form-control {
 	  max-width: 100% !important;
 	}
   }
+  @media (max-width: 677px) {
+    .responsive-tabs-container.accordion-sm .accordion-link {
+        display: block;
+    }
+	ul.nav {
+		border-top: 1px solid #ebebeb;
+		margin-left: 5px;
+		margin-bottom:30px;
+		padding: 10px 0;
+		width: 480px !important;
+	}
+	ul.nav li {
+		display: inline;
+		text-decoration: none;
+		list-style: none;
+		margin-bottom: 20px !important;
+	}
+}
  
   

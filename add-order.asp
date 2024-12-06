@@ -1425,6 +1425,9 @@ onchange = "getStandardTopperPrice();  getMadeAt(); showtoppertickingoptions(); 
 
 <option value = "TBC"<%= selected("TBC", request("toppertype")) %>>TBC</option>
 
+<option value = "HC Topper"
+<%= selected("HC Topper", request("toppertype")) %>>HC Topper</option>
+
 <option value = "HCa Topper"
 <%= selected("HCa Topper", request("toppertype")) %>>HCa Topper</option>
 

@@ -7,6 +7,15 @@ body {font-size: 75%;}
     position: fixed;
     z-index: 1099;
 }
+#right-button {
+	position: fixed;
+	height: 100px;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+	}
+	
+	
 label {
     display: initial;
     margin-bottom: 3px;
@@ -42,6 +51,42 @@ padding: 5px;
 	background-image: -o-linear-gradient(top, #76BF6B, #3B8230);
 	background-image: linear-gradient(top, #76BF6B, #3B8230);
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.jconfirm .jconfirm-box div.jconfirm-title-c {
+    display: block;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+
+.jconfirm .jconfirm-box-container.jconfirm-no-transition {
+    -webkit-transition: none !important;
+    transition: none !important;
+    min-width: 500px;
+}
+
+.jconfirm.jconfirm-white .jconfirm-box, .jconfirm.jconfirm-light .jconfirm-box {
+	font-family:"Trebuchet MS",Arial,Verdana,San serif !important;
+	margin-right:10% !important;
+	}
+.jconfirm.jconfirm-white .jconfirm-box .jconfirm-buttons button.btn-default, .jconfirm.jconfirm-light .jconfirm-box .jconfirm-buttons button.btn-default {
+  font-size:14px !important;}
+.jconfirm.jconfirm-white .jconfirm-box .jconfirm-buttons, .jconfirm.jconfirm-light .jconfirm-box .jconfirm-buttons {
+  float:none !important;
+  text-align:center !important;
+  font-size:12px !important;
+  font-style:normal !important;}
+.jconfirm .jconfirm-box .jconfirm-buttons button {
+  font-size:12px !important;}
+
+  .box {
+    margin-top: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
+    background-color: #FFFFFF;
+    padding: 10px;
+    border: 1px solid #F00;
 }
 
 #adminhdr2 form{
@@ -291,7 +336,49 @@ ul.nav li.active {
 	float:none;
 	margin-bottom:10px;
 }
-
+.form-control {
+display: block;
+width: 100%;
+height: calc(1.25rem + 2px);
+padding: .0rem .3rem;
+font-size: 1rem;
+line-height: 1;
+color: #495057;
+background-color: #fff;
+background-clip: padding-box;
+border: 1px solid #000000;
+border-radius: .25rem;
+transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.prod {
+border-width: thin;
+border-spacing: 0px;
+border-style: solid;
+border-color: gray;
+border-collapse: separate;
+background-color: rgb(255, 255, 240);
+}
+.logistics {
+	border-width: thin;
+	border-spacing: 0px;
+	border-style: solid;
+	border-color: gray;
+	border-collapse: separate;
+	background-color: #FAF0E6;
+	}
+.hyphen-line {
+	border: none;             /* Remove the default border */
+	text-align: center;       /* Center-align the hyphens */
+	font-size: 10px;          /* Adjust the size of the hyphens */
+	color: black; 
+	margin-top:1px;
+	margin-bottom:1px;            /* Set the color of the hyphens */
+  }
+  
+  .hyphen-line::before {
+	content: '-----------------------'; /* Create a string of hyphens */
+	font-family: monospace;     /* Use a monospace font for even spacing */
+  }
 .content .media-page-title{
 	background-color:#cbc8c7;
 	color:#cbc8c7;
@@ -707,6 +794,32 @@ textarea.form-control {
 	font-size: 0.75rem !important;
 	color: #000 !important;
 }
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal-content {
+	background-color: #ffffff;
+	margin: 15% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 50%;
+  }
+.smallproductiontext {
+	font-size:10px;
+}
+.bgwhite {
+	background-color:#fff;
+	padding-right:2px;
+}
+  
 @media (max-width: 767.98px) {
 	/*By default, containers are only full-width on xs screens. 
 	This makes them full-width om sm screens as well*/

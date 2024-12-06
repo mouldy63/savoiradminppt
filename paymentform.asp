@@ -10,7 +10,7 @@ finalInvoiceDate = finalInvoiceData(2)
 <form method="post" name="form_payments_standalone" id="form_payments_standalone" action="updatepayments.asp" onSubmit="return validatePaymentsForm(this);">
 
 <%'if1
-if (idlocation=14 or idlocation=30 or idlocation=40) and pendinginvoiceexists="y" then
+if (idlocation=14 or idlocation=30 or idlocation=40 or idlocation=41) and pendinginvoiceexists="y" then
 %>
 	<p>Invoice number <%= pendinginvoiceNo %> and invoice date <%= pendinginvoiceDate %> has been allocated to the deposit <a href="savoir-invoice-deposit.asp?idlocation=<%=idlocation%>&invdt=<%=pendinginvoiceDate%>&invno=<%=pendinginvoiceNo%>&pno=<%=order%>" target="_blank"><font color="red"><b>>> PRINT DEPOSIT <<</b></font></a></p>
 	<% if finalInvoiceNo = "" then %>
@@ -40,7 +40,7 @@ if orderhasexports="y" then%>
  <option value="n">Please Select</option>
  <option value="/php/commercialinvoice.pdf?cid=XXX&pno=<%=order%>">Commercial Invoice</option>
  <option value="/php/SavoirInvoice.pdf?invno=YYY&cid=XXX&pno=<%=order%>">Standard Invoice</option>
- 
+
  </select></td>
  <%'if2
   if outstanding > 0.0 then %>
@@ -102,7 +102,7 @@ if invoicenumbersexistfororder="y" then%>
   
   <table border="0" cellpadding="2" class="rowlineheight xview">
   <tr>
-  <td valign="top"><strong>Invoice Date</strong><br><img src="trans.gif" width="90" height="1"></td>
+  <td valign="top"><strong>Invoice Date...</strong><br><img src="trans.gif" width="90" height="1"></td>
   <td valign="top"><strong>Invoice No.<br><img src="trans.gif" width="80" height="1"></strong></td>
   <td valign="top"><strong>Invoice Amount</strong><br><img src="trans.gif" width="90" height="1"></td>
   <td valign="top"><strong>Payment</strong>s</td>
@@ -136,14 +136,15 @@ if invoicenumbersexistfororder="y" then%>
             compprice=getComponentPrice(con,compIDarray(expcount2),order)
             if not isnull(compprice) and compprice <> "" then totalcompprice2=CDbl(totalcompprice2)+CDbl(compprice)
            'end if3
-		   end if
-           invdate=rs6("invoicedate")
-           invno=rs6("invoiceNo")
-           cid=rs6("exportCollectionsID")
-           rs6.movenext
+		      end if
+          invdate=rs6("invoicedate")
+          invno=rs6("invoiceNo")
+          cid=rs6("exportCollectionsID")
+          rs6.movenext
           loop
-		  
+		  if (rs("deliveryprice") <>"" and not isnull(rs("deliveryprice"))) then
 		  if rs("deliverycharge")="y" then totalcompprice2=CDbl(totalcompprice2)+CDbl(rs("deliveryprice"))
+		  end if
      %>
      
       
@@ -230,6 +231,7 @@ if invoicenumbersexistfororder="y" then%>
 			end if
 		end if
 	end if
+
 	if isTrade then
 	     totalcompprice=((CDbl(rs("vatrate"))/100) * totalcompprice)+totalcompprice
 	end if

@@ -1306,11 +1306,13 @@ end if
 If accessoriesrequired="y" then
 	for i = 1 to 20
 		exworksdateacc=request("exworksdateacc_"&i)
+		acc_id = request("acc_id"&i)
+	
 		if exworksdateacc <> "" then
-			call updateAccessoryExWorksDates(con, purchaseno, exworksdateacc, i)
+			call updateAccessoryExWorksDates(con, purchaseno, exworksdateacc, i, acc_id)
 		end if
 
-		acc_id = request("acc_id"&i)
+		
 		acc_supplier = request("acc_supplier"&i)
 		acc_ponumber=request("acc_ponumber"&i)
 		acc_podate=request("acc_podate"&i)
@@ -1325,6 +1327,7 @@ If accessoriesrequired="y" then
 		acc_status=request("acc_status"&i)
 		acc_packtariffcode=request("acc_packtariffcode"&i)
 		
+		acc_packwidth=request("acc_width"&i)
 		acc_packdepth=request("acc_length"&i)
 		acc_packheight=request("acc_height"&i)
 		acc_packkg=request("acc_weight"&i)
@@ -2461,7 +2464,7 @@ response.redirect(url)
 %>
 <!-- #include file="common/logger-out.inc" -->
 <%
-sub updateAccessoryExWorksDates(byref acon, apn, aExworksdateacc, aCompItemNo)
+sub updateAccessoryExWorksDates(byref acon, apn, aExworksdateacc, aCompItemNo, acc_id)
 	dim ars
 	if aExworksdateacc="n" then
 		Set ars = getMysqlUpdateRecordSet("Select * from exportlinks where componentid=9 and purchase_no=" & apn & " and compItemNo=" & aCompItemNo, con)
@@ -2482,12 +2485,14 @@ sub updateAccessoryExWorksDates(byref acon, apn, aExworksdateacc, aCompItemNo)
 			ars("purchase_no")=apn
 			ars("componentid")=9
 			ars("compItemNo")=aCompItemNo
+			ars("AccID")=acc_id
 		end if
 		ars("orderconfirmed")="y"
 		if aExworksdateacc = 0 then
 			aExworksdateacc = getAdhocExportCollection(con, apn)
 		end if
 		ars("LinksCollectionID")=aExworksdateacc
+		ars("AccID")=acc_id
 		ars.Update
 		ars.close
 		set ars=nothing

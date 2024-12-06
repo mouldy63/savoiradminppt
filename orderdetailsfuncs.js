@@ -163,7 +163,7 @@ function wrapTypeChangeHandler() {
 	//disablefield('accCrateType','acc1_packwidth','acc1_packheight','acc1_packdepth');
 	
 	
-	//defaultBoxSize('3','base1boxsize','base2boxsize',false);
+	defaultBoxSize('3','base1boxsize','base2boxsize',false);
 	//defaultBoxSize('5','topper1boxsize','',false);
 	defaultBoxSize('6','valance1boxsize','', false);
 	//defaultBoxSize('7','legs1boxsize','', false);
@@ -590,12 +590,18 @@ function isValidFloat(value) {
 }
 
 function setTotalWeight(packagingWgtCtrl, compWgtCtrl, totalWgtCtrl) {
+	
 	var totalWgt = "";
 	var packagingWgt = $("#" + packagingWgtCtrl).val();
 	var compWgt = $("#" + compWgtCtrl).val();
+	
 	if (isValidFloat(packagingWgt) && isValidFloat(compWgt)) {
 		totalWgt = (parseFloat(packagingWgt) + parseFloat(compWgt)).toFixed(0);
 	}
+	//if (totalWgtCtrl=='topper1kg') {
+	//	console.log('@@@totalWgt=' +  totalWgt);
+	//	console.log('@@@compWgtCtrl=' +  compWgt);
+	//}
 	$("#" + totalWgtCtrl).val(totalWgt);
 }
 
@@ -874,7 +880,7 @@ function getCratePackedWithInit(itemCompNo, packedWithDropdownName,	packedwithco
 
 
 function getBoxPackedWith(itemCompNo, packedWithDropdownName, accID) {
-	if (itemCompNo==9 && empty(accID)) {
+	if (itemCompNo==9 && accID!=null && accID!='') {
 		// nothing to do
 		return;
 	}
@@ -939,6 +945,11 @@ function getBoxPackedWith(itemCompNo, packedWithDropdownName, accID) {
 	var currentWeight = $("#" + packedWithWeightFieldName).val();
 	if (currentWeight == '' || typeof currentWeight === "undefined") currentWeight = 0;
 	var newWeight = parseInt(currentWeight) + itemWeight;
+	if (packedWithWeightFieldName=='topper1kg') {
+	console.log('@@@@itemWeight='+itemWeight);
+	console.log('@@@@itemCompNo='+itemCompNo);
+	console.log('@@@@currentWeight='+currentWeight);
+}
 	$("#" + packedWithWeightFieldName).val(newWeight);
 
 	// deduct the item weight from the weight of the component used to be packed with (if any)

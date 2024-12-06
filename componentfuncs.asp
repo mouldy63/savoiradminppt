@@ -349,7 +349,9 @@ function getBoxWeight(byref acon, byval aboxname)
 	set ars = getMysqlQueryRecordSet(asql, acon)
 	aWeight = 0.0
 	if not ars.eof then
+		if not isNull(ars("WEIGHT")) then
 		aWeight=CDbl(ars("WEIGHT"))
+		end if
 	end if
 	
 	call closers(ars)

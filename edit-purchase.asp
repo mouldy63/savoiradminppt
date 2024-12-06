@@ -2202,7 +2202,7 @@ if rs7.recordcount>1 then%>
                                     id = "amendmentemailrequired" />
                                 <%
                             If quote = "y" then%>
-							<div align="right"><a href = "print-pdf.asp?quote=y&val=<%= order %>" target = "_blank">PRINT
+							<div align="right"><a href = "/php/PrintPDF.pdf?quote=y&val=<%= order %>" target = "_blank">PRINT
                                                 QUOTE</a>&nbsp;&nbsp;&nbsp;</div>
                             <%else%>
 
@@ -2484,7 +2484,7 @@ if rs7.recordcount>1 then%>
 
                                         <td>
                                             <input name = "postcode" type = "text" id = "postcode" tabindex = "14"
-                                                value = "<%= rs2("postcode") %>" size = "15" maxlength = "50">
+                                                value = "<%= rs2("postcode") %>" size = "15" maxlength = "20">
                                         </td>
 
                                         <td>
@@ -2493,7 +2493,7 @@ if rs7.recordcount>1 then%>
 
                                         <td>
                                             <input name = "postcoded" type = "text" id = "postcoded" tabindex = "24"
-                                                value = "<%= rs("deliverypostcode") %>" size = "15" maxlength = "50">
+                                                value = "<%= rs("deliverypostcode") %>" size = "15" maxlength = "20">
                                         </td>
                                     </tr>
 
@@ -3824,7 +3824,8 @@ set rs3=nothing%>
 
                                                                     <option value = "TBC"
                                                                         <%= selected(rs("toppertype"), "TBC") %>>TBC</option>
-
+                                                                    <option value = "HC Topper"
+                                                                        <%= selected(rs("toppertype"), "HC Topper") %>>HC Topper</option>
                                                                     <option value = "HCa Topper"
                                                                         <%= selected(rs("toppertype"), "HCa Topper") %>>HCa Topper</option>
 
@@ -4252,6 +4253,8 @@ set rs3=nothing%>
                                                                     
                                                                     <option value = "No. 4v">No. 4v</option>
 
+                                                                     <option value = "No. 4v">No. 5</option>
+
                                                                     <option value = "Pegboard">Pegboard</option>
 
                                                                     <option value = "Platform Base">Platform
@@ -4288,8 +4291,7 @@ set rs3=nothing%>
                                                                     <option value = "East-West Split"
                                                                         <%= selected(rs("basetype"), "East-West Split") %>>East-West Split</option>
 
-                                                                    <option value = "One-Piece"
-                                                                        <%= selected(rs("basetype"), "One-Piece") %>>One-Piece</option>
+                                                                    
                                                                 </select>
                                                             </td>
 
@@ -4929,7 +4931,7 @@ Leg Height:&nbsp;
 </select>
 </td>
 <td><span id = "legspecialheight">
-Special:
+Special Height (cm):
 <input name = "speciallegheight" type = "text" id = "speciallegheight" value="<%= origlegheight %>" size = "10" />
 </span>
 </td>
@@ -4973,11 +4975,12 @@ Leg Finish:&nbsp;
 
                                                     <p>Legs Special Instructions</p>
 <%
-	chcount=250-len(rs("specialinstructionslegs"))%>
-                                                    <input name = "specialinstructionslegs" type = "text"
-                                                        class = "indentleft"
-                                                        value = "<%= rs("specialinstructionslegs") %>" size = "85"
-                                                        maxlength = "255" class = "legs-field" onKeyUp="return taCount(this,'myCounter4')"><br />&nbsp;<B><SPAN id=myCounter4><%=chcount%></SPAN></B>/250
+	chcount=250-len(rs("specialinstructionslegs"))%><textarea name = "specialinstructionslegs" cols = "80"
+                                                                    class = "indentleft" id = "specialinstructionslegs"
+                                                                    class = "legs-field"
+                                                             
+                                                                     onKeyUp="return taCount(this,'myCounter4')"><%=rs("specialinstructionslegs")%></textarea>
+                                                   <br />&nbsp;<B><SPAN id=myCounter4><%=chcount%></SPAN></B>/250
                                                     <%
                                                 set legsDiscountObj = getDiscount(con, rs("purchase_no"), 7, rs("legprice") )
                                                 set addLegsDiscountObj = getDiscount(con, rs("purchase_no"), 16, rs("addlegprice") )
@@ -6091,12 +6094,13 @@ set headboardTrimDiscountObj = getDiscount(con, rs("purchase_no"), 10, rs("headb
                                                     </table>
 
                                                     <p>Delivery Special Instructions:</p>
-
-                                                    <input name = "specialinstructionsdelivery" type = "text"
+<%
+	chcount=250-len(rs("specialinstructionsdelivery"))%>
+                                                    <textarea name = "specialinstructionsdelivery" cols = "65"
                                                         class = "indentleft" id = "specialinstructionsdelivery"
-                                                        tabindex = "95"
-                                                        value = "<%= rs("specialinstructionsdelivery") %>"
-                                                        size = "65" maxlength = "255">
+                                                        tabindex = "95" onKeyUp="return taCount(this,'myCounter8')"><%=rs("specialinstructionsdelivery")%></textarea>
+<br />&nbsp;<B><SPAN id=myCounter8><%=chcount%></SPAN></B>/250
+                                                    
                                                     <span class = "floatprice">
                                                     Delivery <%= getCurrencySymbolForCurrency(orderCurrency) %>
 
@@ -7020,7 +7024,7 @@ set rs3=nothing%>
 <%paymentsexist=0
 paymentsexist=getPaymentsForInvoiceNo(invno,order,con)
 if quote<>"y" then
-	if (idlocation=14 or idlocation=30 or idlocation=40 or idlocation=41) and CDbl(rs("balanceoutstanding"))<>0 and quote<>"y" and pendinginvoiceexists="n" then%>
+	if (idlocation=14 or idlocation=30 or idlocation=40) and CDbl(rs("balanceoutstanding"))<>0 and quote<>"y" and pendinginvoiceexists="n" then%>
 		<!-- #include file="pendinginvoiceform.asp" -->
 	<%else%>
 		<!-- #include file="paymentform.asp" -->
@@ -8667,7 +8671,7 @@ function defaultVentPosition()
         {
             ventPositionDefault = "Vents on Ends";
         }
-        else if (slct == "No. 3" || slct == "No. 4")
+        else if (slct == "No. 3" || slct == "No. 4" || slct == "No. 5")
         {
             ventPositionDefault = "Vents on Sides";
         }
@@ -9735,7 +9739,7 @@ function basevegantext() {
     var selection = $("#basesavoirmodel").val();
     
     if (selection == "No. 4v") {
-     	$('#specialinstructions2').val('Vegan Bed - Vegan materials to be used,' + $('#specialinstructions2').val());
+     	$('#specialinstructions2').val('Vegan Bed - Vegan materials to be used, ' + $('#specialinstructions2').val());
     }
     
 }

@@ -92,7 +92,8 @@ if retrieveUserRegion()=1 or userHasRoleInList("ONLINE_SHOWROOM") then
  if retrieveUserRegion()=1 or retrieveuserlocation()=8 or retrieveuserlocation()=24 or retrieveuserlocation()=25 or retrieveuserlocation()=34 or retrieveuserlocation()=31 or retrieveuserregion()=26 or retrieveuserlocation()=35 or retrieveuserlocation()=17 or retrieveuserlocation()=33 or retrieveuserlocation()=14 or retrieveUserRegion()=17 or retrieveuserregion()=19  or retrieveuserlocation()=40 or retrieveuserlocation()=41 then
   	headText = headText & "<li class='dropdown'><a href='#' class='dropbtn'>Orders</a>" & _
   			"<div class='dropdown-content'><a href='/php/awaitingorders'>Awaiting Confirmation</a>" & _
-      		"<a href='/php/currentorders'>Current Orders</a><a href='/php/heldorders'>Held Orders</a>"
+      		"<a href='/php/currentorders'>Current Orders</a><a href='/php/heldorders'>Held Orders</a>" & _
+			"<a href='/php/harrodsImport'>Harrods Ecom Import</a>"
     if retrieveUserRegion()=1 then
       	headText = headText & "<a href='/php/quotes'>Quotes</a>"
     end if

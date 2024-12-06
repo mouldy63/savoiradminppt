@@ -172,10 +172,12 @@ jconfirm.defaults = {
     onAction: function () {}
 };
 $.confirm({//2
-		title: 'Any changes you made to the customer details will be saved first. Please confirm.',
+		title: 'Are you sure you want to create a copy of this order?',
 		buttons: {//3
 			Cancel: function () {
 				$.alert('Order Cancelled');
+				window.location.href = 'edit-purchase.asp?order=<%=pn%>';
+				return false;
 			},
 			Proceed: {
 				action: function () {
